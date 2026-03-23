@@ -1,0 +1,41 @@
+{
+  "lesson": "PYTHON - SOLID Prinsiplari",
+  "questions": [
+    {
+      "id": 1,
+      "question": "SOLID Prinsiplari haqida asosiy tushuncha nima?",
+      "options": [
+        "Birinchi variant",
+        "Ikkinchi variant",
+        "To'g'ri javob",
+        "To'rtinchi variant"
+      ],
+      "correct": 2,
+      "explanation": "SOLID Prinsiplari mavzusining asosiy tushunchasi."
+    },
+    {
+      "id": 2,
+      "question": "Quyidagilardan qaysi biri SOLID Prinsiplari bilan bog'liq?",
+      "options": [
+        "Bog'liq emas",
+        "Bog'liq",
+        "Ba'zan bog'liq",
+        "Nomaqbul"
+      ],
+      "correct": 1,
+      "explanation": "Bu mavzu SOLID Prinsiplari bilan bevosita bog'liq."
+    },
+    {
+      "id": 3,
+      "question": "SOLID Prinsiplari qayerda qo'llaniladi?",
+      "options": [
+        "Hech qayerda",
+        "Dasturlashda",
+        "Faqat matematikada",
+        "Kundalik hayotda"
+      ],
+      "correct": 1,
+      "explanation": "SOLID Prinsiplari dasturlashda keng qo'llaniladi."
+    }
+  ]
+}

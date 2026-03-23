@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Masala</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{font-family:'Outfit',sans-serif;background:#f0f2f5;}
+    .prob-layout{padding-top:calc(var(--topbar-h) + 20px);max-width:1200px;margin:0 auto;padding-left:16px;padding-right:16px;padding-bottom:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    @media(max-width:900px){.prob-layout{grid-template-columns:1fr;}}
+    .panel{background:white;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
+    .panel-head{padding:16px 20px;border-bottom:1.5px solid #f3f4f6;display:flex;align-items:center;gap:10px;}
+    .panel-title{font-size:1rem;font-weight:800;color:var(--navy);}
+    .panel-body{padding:20px;}
+    .diff-badge{padding:3px 12px;border-radius:999px;font-size:.75rem;font-weight:800;}
+    .diff-easy{background:#dcfce7;color:#166534;}
+    .diff-medium{background:#fef3c7;color:#92400e;}
+    .diff-hard{background:#fee2e2;color:#991b1b;}
+    .section-lbl{font-size:.78rem;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 6px;}
+    .section-lbl:first-child{margin-top:0;}
+    .problem-desc{font-size:.9rem;line-height:1.7;color:#374151;white-space:pre-wrap;}
+    .example-box{background:#f8f9ff;border-radius:10px;border:1.5px solid #e5e7eb;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.6;color:#1B2A4A;white-space:pre-wrap;}
+    .meta-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+    .meta-tag{background:#f3f4f6;color:var(--gray-500);padding:3px 10px;border-radius:8px;font-size:.75rem;font-weight:700;}
+    .code-editor-wrap{position:relative;}
+    .code-editor{width:100%;font-family:'JetBrains Mono',monospace;font-size:.83rem;line-height:1.6;background:#0d1117;color:#e6edf3;border:none;border-radius:10px;padding:14px;resize:vertical;min-height:300px;outline:none;tab-size:4;}
+    .lang-selector{display:flex;gap:6px;margin-bottom:12px;}
+    .lang-btn{padding:6px 14px;border-radius:8px;font-size:.8rem;font-weight:700;border:2px solid var(--gray-200);background:white;color:var(--gray-500);cursor:pointer;transition:.2s;}
+    .lang-btn.active{border-color:var(--navy);color:var(--navy);background:rgba(27,42,74,.07);}
+    .submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1B3A6B,#C9A84C);color:white;border:none;border-radius:12px;font-size:.95rem;font-weight:800;cursor:pointer;transition:.2s;margin-top:12px;}
+    .submit-btn:hover{opacity:.9;transform:translateY(-1px);}
+    .submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .result-box{margin-top:14px;padding:14px 16px;border-radius:12px;font-size:.88rem;font-weight:700;display:none;}
+    .result-accepted{background:#dcfce7;color:#166534;border:1.5px solid #86efac;}
+    .result-wrong{background:#fee2e2;color:#991b1b;border:1.5px solid #fca5a5;}
+    .result-error{background:#fef3c7;color:#92400e;border:1.5px solid #fcd34d;}
+    .result-tle{background:#ede9fe;color:#5b21b6;border:1.5px solid #c4b5fd;}
+    .submissions-mini{margin-top:16px;}
+    .sub-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:#f8f9ff;margin-bottom:6px;font-size:.82rem;}
+    .sub-status{font-weight:700;min-width:130px;}
+    .sub-lang{color:var(--gray-400);font-size:.75rem;}
+    .sub-time{margin-left:auto;color:var(--gray-400);font-size:.72rem;}
+    .solved-banner{background:linear-gradient(135deg,#dcfce7,#bbf7d0);border:2px solid #86efac;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);font-weight:700;text-decoration:none;font-size:.85rem;margin-bottom:16px;opacity:.7;}
+    .back-link:hover{opacity:1;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div style="padding-top:calc(var(--topbar-h) + 16px);padding-left:16px;">
+  <a href="/problems" class="back-link">← Masalalarga qaytish</a>
+</div>
+<div class="prob-layout">
+  <!-- Left: Problem Statement -->
+  <div>
+    <div class="panel" id="problemPanel">
+      <div class="panel-head">
+        <span class="panel-title" id="probTitle">Yuklanmoqda...</span>
+      </div>
+      <div class="panel-body" id="probBody">
+        <div class="loader"><div class="spinner" style="margin:0 auto;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Code Editor + Result -->
+  <div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">💻 Kod yozing</span>
+      </div>
+      <div class="panel-body">
+        <div id="solvedBanner" style="display:none;" class="solved-banner">
+          ✅ <strong>Siz bu masalani hal qilgansiz!</strong>
+        </div>
+        <div class="lang-selector">
+          <button class="lang-btn active" onclick="setLang('python',this)">🐍 Python</button>
+          <button class="lang-btn" onclick="setLang('cpp',this)">⚙️ C++</button>
+        </div>
+        <div class="code-editor-wrap">
+          <textarea class="code-editor" id="codeEditor" spellcheck="false" placeholder="# Kodingizni shu yerga yozing..."></textarea>
+        </div>
+        <button class="submit-btn" id="submitBtn" onclick="submitSolution()">🚀 Yechimni Yuborish</button>
+        <div class="result-box" id="resultBox"></div>
+
+        <div class="submissions-mini">
+          <div style="font-size:.82rem;font-weight:800;color:var(--gray-500);margin-bottom:8px;">📋 So'nggi yuborishlar</div>
+          <div id="recentSubs">
+            <div style="color:var(--gray-400);font-size:.8rem;text-align:center;padding:12px;">Yuklanmoqda...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const pid = {{ pid }};
+let selectedLang = 'python';
+const starterCode = {
+  python: '# Python kodi\n\n# Yechimingizni shu yerga yozing\n',
+  cpp: '#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    ios_base::sync_with_stdio(false);\n    cin.tie(NULL);\n    \n    // Yechimingizni shu yerga yozing\n    \n    return 0;\n}'
+};
+
+function setLang(lang, btn) {
+  selectedLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(!document.getElementById('codeEditor').value.trim() ||
+     document.getElementById('codeEditor').value === starterCode[lang==='python'?'cpp':'python']) {
+    document.getElementById('codeEditor').value = starterCode[lang];
+  }
+}
+
+async function loadProblem() {
+  try {
+    const p = await api(`/api/problems/${pid}`);
+    document.title = `${p.title} — Bilimxon`;
+    document.getElementById('probTitle').textContent = p.title;
+
+    const diffMap = {easy:'🟢 Oson', medium:"🟡 O'rta", hard:'🔴 Qiyin'};
+    const diffClass = {easy:'diff-easy', medium:'diff-medium', hard:'diff-hard'};
+
+    document.getElementById('probBody').innerHTML = `
+      <div class="meta-tags" style="margin-bottom:14px;">
+        <span class="diff-badge ${diffClass[p.difficulty]||'diff-easy'}">${diffMap[p.difficulty]||p.difficulty}</span>
+        <span class="meta-tag">⭐ ${p.points} ball</span>
+        <span class="meta-tag">⏱ ${p.time_limit}s</span>
+        <span class="meta-tag">💾 ${p.memory_limit}MB</span>
+      </div>
+      <div class="section-lbl">📝 Masala tavsifi</div>
+      <div class="problem-desc">${escHtml(p.description)}</div>
+      ${p.input_format ? `<div class="section-lbl">📥 Kirish formati</div><div class="problem-desc">${escHtml(p.input_format)}</div>` : ''}
+      ${p.output_format ? `<div class="section-lbl">📤 Chiqish formati</div><div class="problem-desc">${escHtml(p.output_format)}</div>` : ''}
+      ${p.constraints ? `<div class="section-lbl">⚠️ Cheklovlar</div><div class="problem-desc">${escHtml(p.constraints)}</div>` : ''}
+      ${p.example_input ? `<div class="section-lbl">📌 Misol kirish</div><div class="example-box">${escHtml(p.example_input)}</div>` : ''}
+      ${p.example_output ? `<div class="section-lbl">📌 Misol chiqish</div><div class="example-box">${escHtml(p.example_output)}</div>` : ''}
+    `;
+
+    if(p.solved) {
+      document.getElementById('solvedBanner').style.display = 'flex';
+    }
+  } catch(e) {
+    document.getElementById('probBody').innerHTML = `<p style="color:#EF4444;">Masala topilmadi</p>`;
+  }
+}
+
+async function loadRecentSubs() {
+  try {
+    const subs = await api(`/api/submissions?problem_id=${pid}`);
+    if(!subs.length) {
+      document.getElementById('recentSubs').innerHTML = '<div style="color:var(--gray-400);font-size:.8rem;text-align:center;padding:12px;">Hali yuborilmagan</div>';
+      return;
+    }
+    const statusMap = {
+      accepted:'✅ Qabul qilindi', wrong_answer:"❌ Noto'g'ri javob",
+      runtime_error:'💥 Runtime xato', compile_error:'🔧 Kompilyatsiya xatosi',
+      time_limit:'⏱ Vaqt limiti', pending:'⏳ Kutilmoqda'
+    };
+    const statusColor = {
+      accepted:'#166534', wrong_answer:'#991b1b', runtime_error:'#92400e',
+      compile_error:'#92400e', time_limit:'#5b21b6', pending:'#374151'
+    };
+    document.getElementById('recentSubs').innerHTML = subs.slice(0,5).map(s=>`
+      <div class="sub-item">
+        <span class="sub-status" style="color:${statusColor[s.status]||'#374151'}">${statusMap[s.status]||s.status}</span>
+        <span class="sub-lang">${s.language}</span>
+        ${s.runtime_ms ? `<span class="sub-lang">⏱ ${s.runtime_ms}ms</span>` : ''}
+        <span class="sub-time">${timeAgo(s.submitted_at)}</span>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function submitSolution() {
+  const code = document.getElementById('codeEditor').value.trim();
+  if(!code) { showToast("Kod yozing!", 'error'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Tekshirilmoqda...';
+  const rb = document.getElementById('resultBox');
+  rb.style.display = 'none';
+  try {
+    const res = await api('/api/submit', {
+      method: 'POST',
+      body: JSON.stringify({problem_id: pid, language: selectedLang, code})
+    });
+    const statusClass = {
+      accepted: 'result-accepted',
+      wrong_answer: 'result-wrong',
+      runtime_error: 'result-error',
+      compile_error: 'result-error',
+      time_limit: 'result-tle'
+    };
+    rb.className = `result-box ${statusClass[res.status]||'result-error'}`;
+    rb.style.display = 'block';
+    let detail = '';
+    if(res.stderr) detail += `<div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:.75rem;opacity:.8;white-space:pre-wrap;background:rgba(0,0,0,.15);border-radius:6px;padding:6px;">${escHtml(res.stderr)}</div>`;
+    if(res.status === 'wrong_answer' && res.actual !== undefined) {
+      detail += `<div style="margin-top:8px;font-size:.78rem;opacity:.8;">Sizning javob: <code style="background:rgba(0,0,0,.2);padding:2px 6px;border-radius:4px;">${escHtml(res.actual||'(bo\'sh)')}</code></div>`;
+      detail += `<div style="font-size:.78rem;opacity:.8;">Kutilgan: <code style="background:rgba(0,0,0,.2);padding:2px 6px;border-radius:4px;">${escHtml(res.expected||'(bo\'sh)')}</code></div>`;
+    }
+    rb.innerHTML = `<div>${res.status_label}
+      ${res.runtime_ms ? `<span style="font-weight:500;margin-left:10px;">⏱ ${res.runtime_ms}ms</span>` : ''}
+      ${res.points_earned ? `<span style="margin-left:10px;">⭐ +${res.points_earned} ball!</span>` : ''}
+    </div>${detail}`;
+
+    if(res.status === 'accepted') {
+      document.getElementById('solvedBanner').style.display = 'flex';
+      showToast(`✅ Qabul qilindi! +${res.points_earned} ball`, 'success', 5000);
+    } else {
+      showToast(res.status_label, 'warning');
+    }
+    await loadRecentSubs();
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = '🚀 Yechimni Yuborish';
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Tab key in textarea
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('codeEditor').value = starterCode.python;
+  document.getElementById('codeEditor').addEventListener('keydown', function(e) {
+    if(e.key === 'Tab') {
+      e.preventDefault();
+      const s = this.selectionStart;
+      this.value = this.value.substring(0,s) + '    ' + this.value.substring(this.selectionEnd);
+      this.selectionStart = this.selectionEnd = s + 4;
+    }
+  });
+  loadProblem();
+  loadRecentSubs();
+});
+</script>
+</body>
+</html>

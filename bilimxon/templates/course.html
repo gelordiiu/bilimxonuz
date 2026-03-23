@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilimxon — Kurs</title>
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    :root{--duo-green:#58cc02;--duo-blue:#1cb0f6;--duo-gold:#ffc800;--duo-purple:#ce82ff;}
+    body{background:#0d1117;}
+    .cr-wrap{max-width:680px;margin:0 auto;padding:calc(var(--topbar-h,64px) + 24px) 16px 80px;}
+
+    /* HEADER */
+    .cr-header{background:linear-gradient(135deg,#161b22,#1c2128);border:2px solid #21262d;border-radius:24px;padding:28px;margin-bottom:32px;display:flex;gap:20px;align-items:center;}
+    .cr-header-icon{font-size:3.5rem;width:80px;height:80px;background:rgba(255,255,255,.05);border-radius:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.08);}
+    .cr-header-info h1{font-size:1.4rem;font-weight:900;color:#fff;margin:0 0 6px;}
+    .cr-header-info p{font-size:.85rem;color:rgba(255,255,255,.55);margin:0 0 14px;line-height:1.6;}
+    .cr-header-stats{display:flex;gap:12px;flex-wrap:wrap;}
+    .cr-stat{background:rgba(255,255,255,.06);border-radius:10px;padding:6px 12px;font-size:.75rem;font-weight:700;color:#aaa;}
+    .cr-stat span{color:#fff;}
+
+    /* OVERALL PROGRESS */
+    .cr-overall{background:#161b22;border:2px solid #21262d;border-radius:16px;padding:18px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px;}
+    .cr-overall-ring{width:56px;height:56px;flex-shrink:0;position:relative;}
+    .cr-overall-ring svg{transform:rotate(-90deg);}
+    .cr-overall-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;}
+    .cr-overall-text h3{font-size:.95rem;font-weight:800;color:#fff;margin:0 0 4px;}
+    .cr-overall-text p{font-size:.78rem;color:#555;margin:0;}
+    .cr-resume-btn{margin-left:auto;padding:10px 20px;background:linear-gradient(135deg,var(--duo-green),#46a302);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 0 #2d7a00;transition:.15s;white-space:nowrap;}
+    .cr-resume-btn:hover{filter:brightness(1.08);}
+    .cr-resume-btn:active{transform:translateY(2px);box-shadow:none;}
+
+    /* UNIT (BOB) */
+    .cr-unit{margin-bottom:16px;}
+    .cr-unit-header{display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(135deg,#1c2128,#161b22);border:2px solid #21262d;border-radius:16px;margin-bottom:0;cursor:pointer;transition:.15s;user-select:none;}
+    .cr-unit-header:hover{border-color:#3d444d;}
+    .cr-unit-header.open{border-radius:16px 16px 0 0;border-bottom-color:transparent;}
+    .cr-unit-badge{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+    .cr-unit-title{flex:1;}
+    .cr-unit-title h3{font-size:.95rem;font-weight:800;color:#fff;margin:0 0 2px;}
+    .cr-unit-title p{font-size:.72rem;color:#555;margin:0;}
+    .cr-unit-progress{display:flex;align-items:center;gap:8px;}
+    .cr-unit-bar{width:60px;height:6px;background:#21262d;border-radius:3px;overflow:hidden;}
+    .cr-unit-bar-fill{height:100%;border-radius:3px;background:var(--duo-green);transition:width .5s;}
+    .cr-unit-pct{font-size:.72rem;font-weight:800;color:#555;width:28px;text-align:right;}
+    .cr-unit-chevron{font-size:.8rem;color:#555;transition:transform .2s;flex-shrink:0;}
+    .cr-unit-header.open .cr-unit-chevron{transform:rotate(180deg);}
+
+    /* LESSONS PATH */
+    .cr-lessons-path{background:#161b22;border:2px solid #21262d;border-top:none;border-radius:0 0 16px 16px;padding:20px 20px 12px;position:relative;}
+    .cr-lessons-path::before{content:'';position:absolute;left:46px;top:0;bottom:24px;width:2px;background:repeating-linear-gradient(180deg,#21262d 0,#21262d 6px,transparent 6px,transparent 12px);}
+
+    .cr-lesson-node{display:flex;align-items:center;gap:14px;padding:8px 0;position:relative;}
+    .cr-lesson-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;position:relative;z-index:1;border:3px solid transparent;transition:.2s;cursor:pointer;}
+    .cr-lesson-circle.done{background:var(--duo-green);border-color:#46a302;box-shadow:0 3px 0 #2d7a00;}
+    .cr-lesson-circle.active{background:linear-gradient(135deg,#C9A84C,#8B6914);border-color:#C9A84C;box-shadow:0 3px 0 #6b5010;animation:crPulse 2s ease-in-out infinite;}
+    .cr-lesson-circle.locked{background:#1c2128;border-color:#21262d;}
+    @keyframes crPulse{0%,100%{box-shadow:0 3px 0 #6b5010,0 0 0 0 rgba(201,168,76,0)}50%{box-shadow:0 3px 0 #6b5010,0 0 0 8px rgba(201,168,76,.15)}}
+    .cr-lesson-info{flex:1;cursor:pointer;}
+    .cr-lesson-title{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:2px;line-height:1.3;}
+    .cr-lesson-title.locked{color:#444;}
+    .cr-lesson-meta{display:flex;align-items:center;gap:8px;}
+    .cr-lesson-tag{font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.06);color:#555;}
+    .cr-lesson-score{font-size:.65rem;font-weight:800;color:var(--duo-green);}
+    .cr-lesson-xp{font-size:.65rem;font-weight:800;color:var(--duo-gold);}
+    .cr-lesson-go{padding:6px 14px;border-radius:10px;border:none;font-size:.75rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;flex-shrink:0;}
+    .cr-lesson-go.go-start{background:var(--duo-green);color:#fff;box-shadow:0 2px 0 #2d7a00;}
+    .cr-lesson-go.go-retry{background:rgba(201,168,76,.15);color:#C9A84C;border:1.5px solid rgba(201,168,76,.3);}
+    .cr-lesson-go.go-locked{background:#1c2128;color:#333;cursor:not-allowed;}
+    .cr-lesson-go:hover:not(.go-locked){filter:brightness(1.1);}
+
+    /* STREAK CARD */
+    .cr-streak-card{background:linear-gradient(135deg,rgba(255,200,0,.08),rgba(255,200,0,.02));border:2px solid rgba(255,200,0,.2);border-radius:16px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;}
+    .cr-streak-flame{font-size:2rem;}
+    .cr-streak-info h4{font-size:.95rem;font-weight:800;color:#fff;margin:0 0 3px;}
+    .cr-streak-info p{font-size:.78rem;color:#888;margin:0;}
+    .cr-streak-num{margin-left:auto;font-size:2rem;font-weight:900;color:var(--duo-gold);}
+
+    @media(max-width:600px){
+      .cr-header{flex-direction:column;text-align:center;}
+      .cr-header-stats{justify-content:center;}
+      .cr-overall{flex-wrap:wrap;}
+      .cr-resume-btn{width:100%;justify-content:center;}
+    }
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="cr-wrap">
+  <!-- Loading -->
+  <div id="crLoading" style="text-align:center;padding:60px 0;color:#555;">
+    <div style="font-size:2rem;animation:spin 1s linear infinite;display:inline-block;margin-bottom:12px;">⏳</div>
+    <div>Kurs yuklanmoqda...</div>
+  </div>
+  <div id="crContent" style="display:none;"></div>
+</div>
+
+<style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const courseSlug = window.location.pathname.split('/').pop();
+let courseData = null;
+let streakData = null;
+
+async function init() {
+  try {
+    [courseData, streakData] = await Promise.all([
+      api(`/api/course/${courseSlug}`),
+      api('/api/streak/status').catch(() => ({streak_days:0}))
+    ]);
+    render();
+  } catch(e) {
+    document.getElementById('crLoading').innerHTML = `<div style="color:#f87171;padding:40px;">${e.message}</div>`;
+  }
+}
+
+function render() {
+  document.getElementById('crLoading').style.display = 'none';
+  const el = document.getElementById('crContent');
+  el.style.display = '';
+  document.title = `Bilimxon — ${courseData.title}`;
+
+  // Calculate overall progress
+  let totalLessons = 0, doneLessons = 0, firstUndone = null;
+  (courseData.bobs || []).forEach(bob => {
+    (bob.mavzular || []).forEach(m => {
+      totalLessons++;
+      if (m.completed) doneLessons++;
+      else if (!firstUndone) firstUndone = m;
+    });
+  });
+  const overallPct = totalLessons ? Math.round((doneLessons/totalLessons)*100) : 0;
+
+  let html = '';
+
+  // Streak card
+  if (streakData && streakData.streak_days > 0) {
+    html += `
+    <div class="cr-streak-card">
+      <div class="cr-streak-flame">🔥</div>
+      <div class="cr-streak-info">
+        <h4>Kunlik streak!</h4>
+        <p>Har kuni dars qilib rekord yangilang</p>
+      </div>
+      <div class="cr-streak-num">${streakData.streak_days}</div>
+    </div>`;
+  }
+
+  // Course header
+  html += `
+  <div class="cr-header">
+    <div class="cr-header-icon">${courseData.icon || '📚'}</div>
+    <div class="cr-header-info">
+      <h1>${courseData.title}</h1>
+      <p>${courseData.description || ''}</p>
+      <div class="cr-header-stats">
+        <div class="cr-stat">📚 <span>${totalLessons}</span> mavzu</div>
+        <div class="cr-stat">✅ <span>${doneLessons}</span> bajarildi</div>
+        <div class="cr-stat">🏆 <span>${courseData.level || 'Beginner'}</span></div>
+      </div>
+    </div>
+  </div>`;
+
+  // Overall progress
+  const circumference = 2 * Math.PI * 22;
+  const dashOffset = circumference - (overallPct / 100) * circumference;
+  html += `
+  <div class="cr-overall">
+    <div class="cr-overall-ring">
+      <svg width="56" height="56" viewBox="0 0 56 56">
+        <circle cx="28" cy="28" r="22" fill="none" stroke="#21262d" stroke-width="5"/>
+        <circle cx="28" cy="28" r="22" fill="none" stroke="#58cc02" stroke-width="5"
+          stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
+          stroke-linecap="round"/>
+      </svg>
+      <div class="cr-overall-pct pct">${overallPct}%</div>
+    </div>
+    <div class="cr-overall-text">
+      <h3>Umumiy progress</h3>
+      <p>${doneLessons} / ${totalLessons} mavzu bajarildi</p>
+    </div>
+    ${firstUndone ? `<a href="/lesson/${firstUndone.id}" class="cr-resume-btn">▶ Davom etish</a>` : 
+      doneLessons > 0 ? `<div class="cr-resume-btn" style="background:rgba(201,168,76,.15);color:#C9A84C;box-shadow:none;cursor:default;">🎉 Tugallandi!</div>` : ''}
+  </div>`;
+
+  // Units (bobs)
+  (courseData.bobs || []).forEach((bob, bobIdx) => {
+    const mavzular = bob.mavzular || [];
+    const bobDone = mavzular.filter(m=>m.completed).length;
+    const bobTotal = mavzular.length;
+    const bobPct = bobTotal ? Math.round((bobDone/bobTotal)*100) : 0;
+    const isFirstBob = bobIdx === 0;
+
+    // Color per unit
+    const colors = ['#C9A84C','#1cb0f6','#58cc02','#ce82ff','#ff9f00','#ff4b4b'];
+    const color = colors[bobIdx % colors.length];
+
+    html += `
+    <div class="cr-unit">
+      <div class="cr-unit-header ${isFirstBob ? 'open' : ''}" onclick="toggleUnit(this)">
+        <div class="cr-unit-badge" style="background:${color}22;border:2px solid ${color}44;">
+          ${bob.icon || '📖'}
+        </div>
+        <div class="cr-unit-title">
+          <h3>${bob.title || `Bob ${bobIdx+1}`}</h3>
+          <p>${bobDone}/${bobTotal} mavzu</p>
+        </div>
+        <div class="cr-unit-progress">
+          <div class="cr-unit-bar"><div class="cr-unit-bar-fill" style="width:${bobPct}%;background:${color};"></div></div>
+          <div class="cr-unit-pct">${bobPct}%</div>
+        </div>
+        <div class="cr-unit-chevron">▼</div>
+      </div>
+      <div class="cr-lessons-path" style="${isFirstBob ? '' : 'display:none;'}">
+        ${mavzular.map((m, mIdx) => {
+          // Determine state
+          const isDone = m.completed;
+          const prevDone = mIdx === 0 ? true : mavzular[mIdx-1].completed;
+          const isActive = !isDone && prevDone;
+          const isLocked = !isDone && !prevDone;
+
+          const state = isDone ? 'done' : isActive ? 'active' : 'locked';
+          const icon = isDone ? '✓' : isActive ? '▶' : '🔒';
+          const btnClass = isDone ? 'go-retry' : isActive ? 'go-start' : 'go-locked';
+          const btnText = isDone ? '🔄 Qayta' : isActive ? '▶ Boshlash' : '🔒';
+          const href = isLocked ? '#' : `/lesson/${m.id}`;
+          const onclick = isLocked ? 'return false;' : '';
+
+          return `
+          <div class="cr-lesson-node">
+            <a href="${href}" onclick="${onclick}" style="text-decoration:none;" class="cr-lesson-circle ${state}" title="${m.title}">
+              ${icon}
+            </a>
+            <a href="${href}" onclick="${onclick}" class="cr-lesson-info" style="text-decoration:none;">
+              <div class="cr-lesson-title ${isLocked ? 'locked' : ''}">${m.title}</div>
+              <div class="cr-lesson-meta">
+                ${m.has_quiz ? '<span class="cr-lesson-tag">📝 Test</span>' : ''}
+                ${m.has_code ? '<span class="cr-lesson-tag">💻 Kod</span>' : ''}
+                ${isDone && m.quiz_score >= 0 ? `<span class="cr-lesson-score">✅ ${m.quiz_score}%</span>` : ''}
+                <span class="cr-lesson-xp">+${m.points_reward || 10} XP</span>
+              </div>
+            </a>
+            <a href="${href}" onclick="${onclick}" class="cr-lesson-go ${btnClass}" style="text-decoration:none;">${btnText}</a>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function toggleUnit(header) {
+  const path = header.nextElementSibling;
+  const isOpen = !path.style.display || path.style.display === '';
+  // Close all
+  document.querySelectorAll('.cr-lessons-path').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.cr-unit-header').forEach(h => h.classList.remove('open'));
+  // Open clicked
+  if (!isOpen) {
+    path.style.display = '';
+    header.classList.add('open');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

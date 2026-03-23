@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilimxon — O'zbekistonning #1 IT Ta'lim Platformasi</title>
+  <meta name="description" content="Bilimxon — O'zbekistonning eng yirik IT ta'lim platformasi. HTML, Python, JavaScript, SQL va boshqa zamonaviy texnologiyalarni bepul o'rganing.">
+  <meta name="keywords" content="IT ta'lim, dasturlash, Python, JavaScript, HTML, CSS, Uzbekistan, bepul kurslar">
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    /* ── FEATURES SECTION ── */
+    .features-section{background:#0d1117;padding:60px 0;}
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;padding:0 24px;}
+    .feature-card{background:#161b22;border:2px solid #21262d;border-radius:20px;padding:28px;transition:.2s;}
+    .feature-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px);}
+    .feature-icon{font-size:2.2rem;margin-bottom:14px;}
+    .feature-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:8px;}
+    .feature-desc{font-size:.84rem;color:rgba(255,255,255,.55);line-height:1.7;}
+
+    /* ── ABOUT SECTION ── */
+    .about-section{background:linear-gradient(135deg,#0d1117,#111827);padding:70px 0;border-top:1px solid #21262d;}
+    .about-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+    .about-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.1);border:1.5px solid rgba(201,168,76,.25);border-radius:20px;padding:6px 16px;font-size:.78rem;font-weight:800;color:#C9A84C;margin-bottom:16px;}
+    .about-title{font-size:1.8rem;font-weight:900;color:#fff;line-height:1.25;margin-bottom:16px;}
+    .about-desc{font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:24px;}
+    .about-links{display:flex;gap:12px;flex-wrap:wrap;}
+    .about-link{padding:10px 22px;border-radius:12px;font-size:.85rem;font-weight:800;text-decoration:none;transition:.15s;}
+    .about-link.primary{background:linear-gradient(135deg,#C9A84C,#8B6914);color:#fff;box-shadow:0 4px 0 #6b5010;}
+    .about-link.primary:hover{filter:brightness(1.08);}
+    .about-link.secondary{background:rgba(255,255,255,.06);color:#aaa;border:2px solid #21262d;}
+    .about-link.secondary:hover{background:rgba(255,255,255,.1);color:#fff;}
+    .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .about-stat-card{background:#161b22;border:2px solid #21262d;border-radius:16px;padding:20px;text-align:center;}
+    .about-stat-num{font-size:1.8rem;font-weight:900;color:#C9A84C;}
+    .about-stat-lbl{font-size:.75rem;color:#555;font-weight:700;margin-top:4px;}
+
+    /* ── LEGAL SECTION ── */
+    .legal-section{background:#080c14;border-top:1px solid #21262d;padding:40px 0;}
+    .legal-inner{max-width:1100px;margin:0 auto;padding:0 24px;}
+    .legal-title{font-size:.72rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;}
+    .legal-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .legal-card{background:#0d1117;border:1.5px solid #21262d;border-radius:14px;padding:18px;transition:.15s;text-decoration:none;display:block;}
+    .legal-card:hover{border-color:rgba(201,168,76,.3);background:#161b22;}
+    .legal-card-icon{font-size:1.6rem;margin-bottom:10px;}
+    .legal-card-title{font-size:.88rem;font-weight:800;color:#fff;margin-bottom:4px;}
+    .legal-card-desc{font-size:.72rem;color:#555;line-height:1.5;}
+
+    @media(max-width:900px){
+      .features-grid{grid-template-columns:1fr 1fr;}
+      .about-inner{grid-template-columns:1fr;}
+      .legal-cards{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:600px){
+      .features-grid,.legal-cards{grid-template-columns:1fr;}
+      .about-title{font-size:1.4rem;}
+    }
+  </style>
+</head>
+<body class="page-home">
+
+<nav class="topbar" id="topbar"></nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">⭐ <span data-i18n="hero_badge">O'zbekistonning #1 IT Ta'lim Platformasi</span></div>
+    <h1 data-i18n="hero_title">Kelajak uchun <span>dasturlash</span> o'rganing</h1>
+    <p data-i18n="hero_sub">HTML dan AI gacha — zamonaviy, interaktiv darslar bilan IT mutaxassis bo'ling.</p>
+    <div class="hero-cta">
+      <a href="/login" class="btn btn-gold btn-lg" data-i18n="hero_start">Bepul Boshlash</a>
+      <a href="#courses" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.3);" data-i18n="hero_courses">Kurslarni Ko'rish</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">10,000+</span>
+        <span class="hero-stat-label" data-i18n="hero_students">Talabalar</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">50+</span>
+        <span class="hero-stat-label" data-i18n="hero_courses_label">Kurslar</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">95%</span>
+        <span class="hero-stat-label" data-i18n="hero_completion">Bajarilish darajasi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES SECTION -->
+<section class="section" id="courses">
+  <div class="section-header">
+    <h2 class="section-title" data-i18n="courses_title">Barcha Kurslar</h2>
+    <p class="section-sub" data-i18n="courses_sub">Zamonaviy IT sohasidagi eng muhim yo'nalishlar</p>
+  </div>
+  <div class="courses-grid" id="coursesGrid">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section class="features-section" id="features">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;text-align:center;margin-bottom:36px;">
+    <div style="font-size:.72rem;font-weight:800;color:#C9A84C;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">NIMA UCHUN BILIMXON?</div>
+    <h2 style="font-size:1.7rem;font-weight:900;color:#fff;margin:0;">Bir platformada hamma narsa</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <div class="feature-title">Interaktiv Kurslar</div>
+      <div class="feature-desc">Python, JavaScript, HTML/CSS, SQL, AI — zamonaviy texnologiyalar bo'yicha strukturlangan darslar. Har bir dars test va amaliy mashq bilan.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-title">Gamifikatsiya</div>
+      <div class="feature-desc">Ball to'plang, reytingda ko'tariling, unvonlar va mukofotlar oling. O'rganish jarayoni Duolingo uslubida qiziqarli!</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧩</div>
+      <div class="feature-title">Algoritmik Masalalar</div>
+      <div class="feature-desc">500+ algoritmik masala. Oson=10 ball, O'rta=20 ball, Qiyin=40 ball. Kod yozib, real testdan o'ting.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">AI Yordamchi</div>
+      <div class="feature-desc">Sun'iy intellekt yordamida savol bering, kod yozishda yordam oling, darslarni tushuntirib bering.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔥</div>
+      <div class="feature-title">Kunlik Streak</div>
+      <div class="feature-desc">Har kuni dars qilib streak saqlang. 3, 7, 14, 30 kunlik streaklar uchun maxsus bonuslar!</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <div class="feature-title">Jamiyat</div>
+      <div class="feature-desc">Guruhlar, do'stlar, blog va chat orqali boshqa o'quvchilar bilan aloqa o'rnating va birga o'sib boring.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <div>
+      <div class="about-badge">🏢 Biz haqimizda</div>
+      <h2 class="about-title">Bilimxon — O'zbekiston IT ta'limini o'zgartirmoqda</h2>
+      <p class="about-desc">
+        Bilimxon 2024-yilda tashkil etilgan O'zbekistonning eng yirik bepul IT ta'lim platformasi.
+        Bizning maqsadimiz — har bir o'zbek yoshiga sifatli dasturlash ta'limini qulay va qiziqarli
+        shaklda yetkazib berish. HTML dan sun'iy intellektgacha — biz bilan o'rganing.
+      </p>
+      <p class="about-desc" style="margin-bottom:24px;">
+        Platforma <strong style="color:#fff;">bilimxon5@gmail.com</strong> orqali boshqariladi.
+        Savol va takliflar uchun <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a> Telegramga yozing.
+      </p>
+      <div class="about-links">
+        <a href="/about" class="about-link primary">Batafsil o'qish →</a>
+        <a href="/contact" class="about-link secondary">📬 Aloqa</a>
+      </div>
+    </div>
+    <div class="about-stats">
+      <div class="about-stat-card">
+        <div class="about-stat-num">10K+</div>
+        <div class="about-stat-lbl">Ro'yxatdan o'tgan</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">50+</div>
+        <div class="about-stat-lbl">Interaktiv kurslar</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">500+</div>
+        <div class="about-stat-lbl">Algoritmik masalalar</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">100%</div>
+        <div class="about-stat-lbl">Bepul asosiy kurslar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEGAL / IMPORTANT PAGES SECTION -->
+<section class="legal-section" id="legal">
+  <div class="legal-inner">
+    <div class="legal-title">Muhim sahifalar</div>
+    <div class="legal-cards">
+      <a href="/about" class="legal-card">
+        <div class="legal-card-icon">🏢</div>
+        <div class="legal-card-title">Biz haqimizda</div>
+        <div class="legal-card-desc">Bilimxon platforma tarixi, missiyasi va jamoa haqida</div>
+      </a>
+      <a href="/contact" class="legal-card">
+        <div class="legal-card-icon">📬</div>
+        <div class="legal-card-title">Aloqa</div>
+        <div class="legal-card-desc">bilimxon5@gmail.com · @bilimxonuz · Ko'p so'raladigan savollar</div>
+      </a>
+      <a href="/terms" class="legal-card">
+        <div class="legal-card-icon">📄</div>
+        <div class="legal-card-title">Foydalanish Shartlari</div>
+        <div class="legal-card-desc">Platforma qoidalari, foydalanuvchi majburiyatlari</div>
+      </a>
+      <a href="/privacy" class="legal-card">
+        <div class="legal-card-icon">🔒</div>
+        <div class="legal-card-title">Maxfiylik Siyosati</div>
+        <div class="legal-card-desc">Ma'lumotlar qanday saqlanadi va himoyalanadi</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#050810;border-top:1px solid #21262d;color:rgba(255,255,255,0.45);font-size:0.82rem;padding:48px 0 28px;">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:40px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <img src="/static/images/logo.png" style="height:32px;" onerror="this.style.display='none'">
+          <span style="font-size:1.1rem;font-weight:800;color:#fff;">Bilimxon</span>
+        </div>
+        <p style="line-height:1.7;margin:0 0 16px;font-size:0.8rem;">
+          O'zbekistonning #1 IT ta'lim platformasi. HTML dan AI gacha — zamonaviy interaktiv darslar bilan IT mutaxassis bo'ling.
+        </p>
+        <div style="display:flex;gap:10px;">
+          <a href="https://t.me/bilimxonuz" target="_blank" style="width:34px;height:34px;background:rgba(255,255,255,0.07);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none;font-size:1rem;" onmouseover="this.style.background='rgba(201,168,76,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">✈️</a>
+          <a href="mailto:bilimxon5@gmail.com" style="width:34px;height:34px;background:rgba(255,255,255,0.07);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none;font-size:1rem;" onmouseover="this.style.background='rgba(201,168,76,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">📧</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">Platforma</div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px;">
+          <li><a href="/dashboard" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Dashboard</a></li>
+          <li><a href="/problems" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Masalalar</a></li>
+          <li><a href="/games" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">O'yinlar</a></li>
+          <li><a href="/blog" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Blog</a></li>
+          <li><a href="/leaderboard" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Reyting</a></li>
+          <li><a href="/streak" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">🔥 Streak</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">Kompaniya</div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px;">
+          <li><a href="/about" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Biz haqimizda</a></li>
+          <li><a href="/blog" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Yangiliklar</a></li>
+          <li><a href="/contact" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Aloqa</a></li>
+          <li><a href="/store" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Do'kon</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">Huquqiy</div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px;">
+          <li><a href="/privacy" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Maxfiylik siyosati</a></li>
+          <li><a href="/terms" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Foydalanish shartlari</a></li>
+          <li><a href="/cookie" style="color:rgba(255,255,255,0.5);text-decoration:none;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Cookie siyosati</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <span>© 2025 Bilimxon. Barcha huquqlar himoyalangan.</span>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <a href="mailto:bilimxon5@gmail.com" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:0.78rem;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">bilimxon5@gmail.com</a>
+        <a href="https://t.me/bilimxonuz" target="_blank" style="color:rgba(255,255,255,0.4);text-decoration:none;font-size:0.78rem;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">@bilimxonuz</a>
+        <a href="/privacy" style="color:rgba(255,255,255,0.3);text-decoration:none;font-size:0.72rem;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Maxfiylik</a>
+        <a href="/terms" style="color:rgba(255,255,255,0.3);text-decoration:none;font-size:0.72rem;" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Shartlar</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+@media(max-width:768px){
+  footer > div > div:first-child{grid-template-columns:1fr 1fr!important;}
+}
+@media(max-width:480px){
+  footer > div > div:first-child{grid-template-columns:1fr!important;}
+}
+</style>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function loadCourses() {
+  const grid = document.getElementById('coursesGrid');
+  try {
+    const courses = await api('/api/courses');
+    if (!courses.length) {
+      grid.innerHTML = `<p class="text-muted">${t('no_data')||'Kurslar topilmadi'}</p>`;
+      return;
+    }
+    grid.innerHTML = courses.map(c => `
+      <div class="course-card card-hover" onclick="window.location='/course/${c.slug}'">
+        <div class="course-card-header">
+          <div class="course-icon" style="background:${c.color}22;">
+            <span style="font-size:1.6rem;">${c.icon}</span>
+          </div>
+          <div class="course-card-meta">
+            <div class="course-card-title">${c.title}</div>
+            <div class="course-card-desc">${c.desc}</div>
+          </div>
+        </div>
+        ${c.progress_pct > 0 ? `
+        <div class="course-progress">
+          ${makeProgressBar(c.progress_pct)}
+          <div class="course-progress-label">${c.completed_mavzu}/${c.total_mavzu} ${t('course_lessons')}</div>
+        </div>` : ''}
+        <div class="course-card-footer">
+          <div class="course-card-info">
+            <span>📚 ${c.total_mavzu} ${t('course_lessons')}</span>
+            <span>⏱ ${c.duration}</span>
+            <span class="badge badge-navy">${c.level}</span>
+          </div>
+          <button class="btn btn-primary btn-sm">
+            ${c.progress_pct >= 100 ? t('course_completed') : c.progress_pct > 0 ? t('course_continue') : t('course_start')}
+          </button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    grid.innerHTML = `<p style="color:var(--danger);">${t('error')}: ${e.message}</p>`;
+  }
+}
+
+function reloadPageContent() { loadCourses(); }
+document.addEventListener('DOMContentLoaded', loadCourses);
+</script>
+</body>
+</html>

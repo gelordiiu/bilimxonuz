@@ -1,0 +1,24 @@
+LESSON 16: SOLID Prinsiplari
+
+Bob: BOB 5: Dizayn Naqshlari — Design Patterns (Senior)
+
+## SOLID Prinsiplari
+
+SOLID — 5 ta prinsip: S-Single Responsibility (bir klass — bir mas'uliyat), O-Open/Closed (kengaytirish uchun ochiq, o'zgartirish uchun yopiq), L-Liskov Substitution, I-Interface Segregation, D-Dependency Inversion. Kodni sifatli, kengaytiriladigan va sinovdan o'tkazilishi oson qiladi.
+
+## Kod Namunasi
+```
+# Single Responsibility Principle
+class Hisob:
+    def qoshish(self, a, b): return a + b
+
+class HisobPrinter:
+    def chiqarish(self, natija): print(f"Natija: {natija}")
+
+h = Hisob()
+p = HisobPrinter()
+p.chiqarish(h.qoshish(5, 3))
+```
+
+## Amaliyot
+Yuqoridagi misolni o'rganing va o'zingizning variantingizni yozing!

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'uz' }}">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if lang == 'en' %}<title>Privacy Policy — Bilimxon</title>
+  {% elif lang == 'ru' %}<title>Политика конфиденциальности — Bilimxon</title>
+  {% else %}<title>Maxfiylik Siyosati — Bilimxon</title>{% endif %}
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{background:#0d1117;}
+    .legal-page{max-width:800px;margin:0 auto;padding:calc(var(--topbar-h,64px)+36px) 24px 80px;}
+    .legal-hero{text-align:center;margin-bottom:40px;}
+    .legal-hero h1{font-size:1.8rem;font-weight:800;color:#fff;margin:0 0 10px;}
+    .legal-hero p{font-size:.82rem;color:rgba(255,255,255,.4);}
+    .ls{background:#161b22;border:2px solid #21262d;border-radius:16px;padding:24px;margin-bottom:14px;}
+    .ls h2{font-size:.95rem;font-weight:800;color:#C9A84C;margin:0 0 10px;border-left:3px solid #C9A84C;padding-left:10px;}
+    .ls p,.ls li{font-size:.84rem;color:rgba(255,255,255,.6);line-height:1.75;margin:0 0 8px;}
+    .ls ul{padding-left:18px;margin:0;}
+    .contact-box{background:rgba(201,168,76,.06);border:1.5px solid rgba(201,168,76,.2);border-radius:14px;padding:20px;text-align:center;margin-top:20px;}
+    .contact-box a{color:#C9A84C;text-decoration:none;font-weight:700;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="legal-page">
+
+{% if lang == 'en' %}
+<div class="legal-hero"><div style="font-size:2.5rem;margin-bottom:12px;">🔒</div><h1>Privacy Policy</h1><p>Last updated: January 1, 2025 · Bilimxon platform</p></div>
+<div class="ls"><h2>1. Data We Collect</h2><ul><li>Name, username, email address</li><li>Password (encrypted, never visible)</li><li>Course achievements, point history and learning activity</li><li>Profile picture (optional)</li><li>Technical: IP address, browser type, device info</li></ul></div>
+<div class="ls"><h2>2. How We Use Data</h2><ul><li>Account creation and authentication</li><li>Tracking and personalizing the learning process</li><li>Managing the rating and reward system</li><li>Ensuring platform security</li></ul></div>
+<div class="ls"><h2>3. Third Party Sharing</h2><p>We do not sell or rent user data to third parties. Data may only be shared in legal requests (court orders) or with trusted technical service providers.</p></div>
+<div class="ls"><h2>4. Cookies</h2><p>Bilimxon uses necessary cookies for system operation (session, language settings). See our <a href="/cookie" style="color:#C9A84C;">Cookie Policy</a> for details.</p></div>
+<div class="ls"><h2>5. Data Security</h2><p>Industry-standard encryption is used. Passwords are stored with bcrypt algorithm. We never disclose personal information to anyone.</p></div>
+<div class="ls"><h2>6. Your Rights</h2><ul><li>View and update personal data (through Profile settings)</li><li>Delete your account (Settings → Account → Delete)</li><li>Request data export</li></ul></div>
+<div class="contact-box"><div style="font-size:1.3rem;margin-bottom:8px;">📩</div><div style="font-weight:800;color:#fff;margin-bottom:6px;">Questions?</div><a href="mailto:bilimxon5@gmail.com">bilimxon5@gmail.com</a> &nbsp;·&nbsp; <a href="https://t.me/bilimxonuz" target="_blank">@bilimxonuz</a></div>
+
+{% elif lang == 'ru' %}
+<div class="legal-hero"><div style="font-size:2.5rem;margin-bottom:12px;">🔒</div><h1>Политика конфиденциальности</h1><p>Последнее обновление: 1 января 2025 · Платформа Bilimxon</p></div>
+<div class="ls"><h2>1. Данные которые мы собираем</h2><ul><li>Имя, имя пользователя, email</li><li>Пароль (зашифрованный, никогда не виден)</li><li>Успехи в курсах, история очков и учебная активность</li><li>Фото профиля (необязательно)</li><li>Технические: IP-адрес, тип браузера, информация об устройстве</li></ul></div>
+<div class="ls"><h2>2. Как мы используем данные</h2><ul><li>Создание аккаунта и аутентификация</li><li>Отслеживание и персонализация учебного процесса</li><li>Управление системой рейтингов и наград</li><li>Обеспечение безопасности платформы</li></ul></div>
+<div class="ls"><h2>3. Передача третьим лицам</h2><p>Мы не продаём и не сдаём в аренду данные пользователей третьим лицам. Данные могут быть переданы только по законным запросам (судебные решения) или надёжным техническим провайдерам.</p></div>
+<div class="ls"><h2>4. Файлы cookie</h2><p>Bilimxon использует необходимые файлы cookie для работы системы (сессия, языковые настройки). Подробности в нашей <a href="/cookie" style="color:#C9A84C;">Политике Cookie</a>.</p></div>
+<div class="ls"><h2>5. Безопасность данных</h2><p>Используется шифрование стандарта индустрии. Пароли хранятся с алгоритмом bcrypt. Мы никогда не раскрываем личные данные никому.</p></div>
+<div class="ls"><h2>6. Ваши права</h2><ul><li>Просмотр и обновление личных данных (через настройки профиля)</li><li>Удаление аккаунта (Настройки → Аккаунт → Удалить)</li><li>Запрос экспорта данных</li></ul></div>
+<div class="contact-box"><div style="font-size:1.3rem;margin-bottom:8px;">📩</div><div style="font-weight:800;color:#fff;margin-bottom:6px;">Вопросы?</div><a href="mailto:bilimxon5@gmail.com">bilimxon5@gmail.com</a> &nbsp;·&nbsp; <a href="https://t.me/bilimxonuz" target="_blank">@bilimxonuz</a></div>
+
+{% else %}
+<div class="legal-hero"><div style="font-size:2.5rem;margin-bottom:12px;">🔒</div><h1>Maxfiylik Siyosati</h1><p>Oxirgi yangilanish: 2025 yil 1 yanvar · Bilimxon platformasi</p></div>
+<div class="ls"><h2>1. Biz to'playdigan ma'lumotlar</h2><ul><li>Ism, foydalanuvchi nomi, elektron pochta manzili</li><li>Parol (shifrlangan holda, hech qachon ko'rinmaydi)</li><li>Kurs yutuqlari, ball tarixi va o'quv faoliyati</li><li>Avatar rasmi (ixtiyoriy)</li><li>Texnik: IP-manzil, brauzer turi, qurilma ma'lumotlari</li></ul></div>
+<div class="ls"><h2>2. Ma'lumotlardan foydalanish</h2><ul><li>Hisob yaratish va autentifikatsiya</li><li>O'quv jarayonini kuzatish va shaxsiylashtirish</li><li>Reyting va mukofot tizimini boshqarish</li><li>Platforma xavfsizligini ta'minlash</li></ul></div>
+<div class="ls"><h2>3. Uchinchi tomonlarga berish</h2><p>Biz foydalanuvchi ma'lumotlarini uchinchi tomonlarga sotmaymiz yoki ijaraga bermaymiz. Ma'lumotlar faqat qonuniy talablar yoki ishonchli texnik hamkorlar bilan ulashiladi.</p></div>
+<div class="ls"><h2>4. Cookie fayllar</h2><p>Bilimxon tizim ishlashi uchun zarur cookie fayllardan foydalanadi (sessiya, til sozlamalari). Tafsilotlar uchun <a href="/cookie" style="color:#C9A84C;">Cookie Siyosati</a>mizni o'qing.</p></div>
+<div class="ls"><h2>5. Ma'lumotlar xavfsizligi</h2><p>Sanoat standartidagi shifrlash qo'llaniladi. Parollar bcrypt bilan saqlanadi. Shaxsiy ma'lumotlarni hech kimga oshkor qilmaymiz.</p></div>
+<div class="ls"><h2>6. Foydalanuvchi huquqlari</h2><ul><li>Ma'lumotlarni ko'rish va yangilash (Profil sozlamalari orqali)</li><li>Hisobni o'chirish (Sozlamalar → Hisob → O'chirish)</li><li>Ma'lumotlarni eksport qilishni so'rash</li></ul></div>
+<div class="contact-box"><div style="font-size:1.3rem;margin-bottom:8px;">📩</div><div style="font-weight:800;color:#fff;margin-bottom:6px;">Savollaringiz bormi?</div><a href="mailto:bilimxon5@gmail.com">bilimxon5@gmail.com</a> &nbsp;·&nbsp; <a href="https://t.me/bilimxonuz" target="_blank">@bilimxonuz</a></div>
+{% endif %}
+
+</div>
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

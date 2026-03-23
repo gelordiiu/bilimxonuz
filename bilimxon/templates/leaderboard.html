@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Reyting</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+body{font-family:'Outfit',sans-serif;background:linear-gradient(160deg,#0d1b2e 0%,#111827 60%,#0a0e1a 100%);min-height:100vh;}
+.lb-wrap{padding-top:96px;max-width:720px;margin:0 auto;padding-left:20px;padding-right:20px;padding-bottom:80px;}
+/* Hero */
+.lb-hero{text-align:center;margin-bottom:32px;}
+.lb-hero h1{font-size:2rem;font-weight:900;color:white;text-shadow:0 0 30px rgba(201,168,76,.4);margin-bottom:6px;}
+.lb-hero p{color:rgba(255,255,255,.4);font-size:.9rem;}
+/* Category tabs */
+.cat-tabs{display:flex;gap:10px;justify-content:center;margin-bottom:32px;flex-wrap:wrap;}
+.cat-btn{padding:9px 22px;border-radius:999px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.2s;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);background:rgba(255,255,255,.04);}
+.cat-btn.active{background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;border-color:transparent;box-shadow:0 4px 16px rgba(201,168,76,.35);}
+/* Podium */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-bottom:36px;padding:0 10px;}
+.podium-slot{text-align:center;flex:1;max-width:160px;}
+.pod-avatar{border-radius:50%;background:linear-gradient(135deg,#1a2035,#374151);display:flex;align-items:center;justify-content:center;font-weight:900;color:white;margin:0 auto 8px;overflow:hidden;border:3px solid transparent;position:relative;}
+.pod-avatar img{width:100%;height:100%;object-fit:cover;}
+.pod-crown{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:1.5rem;}
+.pod-name{font-weight:800;color:white;font-size:.85rem;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pod-score{font-weight:700;font-size:.8rem;}
+.pod-rank-label{font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:2px 10px;border-radius:999px;margin-top:4px;display:inline-block;}
+/* Column heights */
+.podium-slot:nth-child(1){order:2;} /* 1st */
+.podium-slot:nth-child(2){order:1;} /* 2nd */
+.podium-slot:nth-child(3){order:3;} /* 3rd */
+.pod-col{border-radius:14px 14px 0 0;margin-top:auto;}
+.pod-1st .pod-avatar{width:80px;height:80px;border-color:#FFD700;box-shadow:0 0 24px rgba(255,215,0,.4);}
+.pod-1st .pod-col{height:90px;background:linear-gradient(180deg,rgba(255,215,0,.3),rgba(255,215,0,.1));border:2px solid rgba(255,215,0,.5);}
+.pod-1st .pod-score{color:#FFD700;}
+.pod-1st .pod-rank-label{background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);}
+.pod-2nd .pod-avatar{width:68px;height:68px;border-color:#C0C0C0;box-shadow:0 0 16px rgba(192,192,192,.3);}
+.pod-2nd .pod-col{height:66px;background:linear-gradient(180deg,rgba(192,192,192,.25),rgba(192,192,192,.08));border:2px solid rgba(192,192,192,.35);}
+.pod-2nd .pod-score{color:#C0C0C0;}
+.pod-2nd .pod-rank-label{background:rgba(192,192,192,.12);color:#C0C0C0;border:1px solid rgba(192,192,192,.25);}
+.pod-3rd .pod-avatar{width:60px;height:60px;border-color:#CD7F32;box-shadow:0 0 14px rgba(205,127,50,.3);}
+.pod-3rd .pod-col{height:48px;background:linear-gradient(180deg,rgba(205,127,50,.25),rgba(205,127,50,.08));border:2px solid rgba(205,127,50,.35);}
+.pod-3rd .pod-score{color:#CD7F32;}
+.pod-3rd .pod-rank-label{background:rgba(205,127,50,.12);color:#CD7F32;border:1px solid rgba(205,127,50,.25);}
+/* List */
+.lb-list{display:flex;flex-direction:column;gap:8px;}
+.lb-row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:.2s;cursor:pointer;}
+.lb-row:hover{background:rgba(255,255,255,.07);transform:translateX(4px);}
+.lb-row.me{background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.2);}
+.lb-rank-num{width:32px;text-align:center;font-weight:900;font-size:.9rem;color:rgba(255,255,255,.35);flex-shrink:0;}
+.lb-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1B2A4A,#C9A84C);display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:1rem;flex-shrink:0;overflow:hidden;}
+.lb-avatar img{width:100%;height:100%;object-fit:cover;}
+.lb-name{font-weight:700;color:white;font-size:.9rem;}
+.lb-username{font-size:.75rem;color:rgba(255,255,255,.35);}
+.lb-score{margin-left:auto;font-weight:900;font-size:.95rem;color:#C9A84C;}
+.lb-you{font-size:.65rem;font-weight:700;color:#C9A84C;padding:2px 7px;border-radius:999px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.25);margin-left:6px;}
+.tick{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:#3B82F6;border-radius:50%;color:white;font-size:.55rem;margin-left:3px;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="lb-wrap">
+  <div class="lb-hero">
+    <h1>🏆 Reyting Jadvali</h1>
+    <p>Eng yaxshi o'quvchilar bilan raqobatlashing!</p>
+  </div>
+
+  <div class="cat-tabs">
+    <button class="cat-btn active" data-cat="points" onclick="loadCat('points',this)">⭐ Ochkolar</button>
+    <button class="cat-btn" data-cat="lessons" onclick="loadCat('lessons',this)">📚 Darslar</button>
+    <button class="cat-btn" data-cat="friends" onclick="loadCat('friends',this)">👥 Do'stlar</button>
+    <button class="cat-btn" data-cat="games_views" onclick="loadCat('games_views',this)">🎮 Top O'yinlar</button>
+    <button class="cat-btn" data-cat="games_rating" onclick="loadCat('games_rating',this)">⭐ Top Rated</button>
+  </div>
+
+  <div id="podium" class="podium"></div>
+  <div id="lbList" class="lb-list">
+    <div style="text-align:center;padding:40px;color:rgba(255,255,255,.35);">
+      <div class="spinner" style="margin:0 auto 12px;width:28px;height:28px;border-width:3px;border-color:rgba(255,255,255,.1);border-top-color:#C9A84C;"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const SCORE_LABELS={points:'ochko',lessons:'dars',friends:'do\'st',games_views:'ko\'rish',games_rating:'reyting'};
+let currentCat='points';
+
+function loadCat(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  loadLeaderboard(cat);
+}
+
+async function loadLeaderboard(cat){
+  document.getElementById('lbList').innerHTML=`<div style="text-align:center;padding:40px;color:rgba(255,255,255,.35);">
+    <div class="spinner" style="margin:0 auto 12px;width:28px;height:28px;border-width:3px;border-color:rgba(255,255,255,.1);border-top-color:#C9A84C;"></div></div>`;
+  document.getElementById('podium').innerHTML='';
+  try{
+    let data;
+    if(cat==='games_views'||cat==='games_rating'){
+      const gcatt = cat==='games_rating'?'rating':'views';
+      data = await api('/api/games/leaderboard?cat='+gcatt);
+      renderGamesList(data, cat);
+      return;
+    }
+    data=await api('/api/leaderboard?cat='+cat);
+    renderPodium(data.slice(0,3),cat);
+    renderList(data.slice(3),cat);
+  }catch(e){document.getElementById('lbList').innerHTML='<p style="color:rgba(255,255,255,.4);text-align:center;">Xatolik yuz berdi</p>';}
+}
+
+function avatarHTML(u,size){
+  if(u.avatar)return`<img src="${u.avatar}" alt="">`;
+  return`<span style="font-size:${size*.35}px;">${(u.full_name||'?')[0].toUpperCase()}</span>`;
+}
+
+function renderPodium(top,cat){
+  const lbl=SCORE_LABELS[cat]||'';
+  if(!top.length){document.getElementById('podium').innerHTML='';return;}
+  const slots=[
+    {u:top[0],cls:'pod-1st',crown:'👑',label:'🥇 1-o\'rin'},
+    {u:top[1],cls:'pod-2nd',crown:'🥈',label:'🥈 2-o\'rin'},
+    {u:top[2],cls:'pod-3rd',crown:'🥉',label:'🥉 3-o\'rin'},
+  ].filter(s=>s.u);
+
+  document.getElementById('podium').innerHTML=slots.map((s,i)=>`
+    <div class="podium-slot ${s.cls}" onclick="window.location='/profile/${s.u.username}'">
+      <div style="position:relative;display:inline-block;">
+        <div class="pod-crown">${s.crown}</div>
+        <div class="pod-avatar" style="width:${i===0?80:i===1?68:60}px;height:${i===0?80:i===1?68:60}px;">${avatarHTML(s.u,i===0?80:68)}</div>
+        ${s.u.has_tick?'<div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:#3B82F6;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:.5rem;border:2px solid #0d1b2e;">✓</div>':''}
+      </div>
+      <div class="pod-col"></div>
+      <div class="pod-name">${s.u.full_name}</div>
+      <div class="pod-score">${(s.u.score||0).toLocaleString()} ${lbl}</div>
+      <div class="pod-rank-label">${s.label}</div>
+    </div>`).join('');
+}
+
+function renderList(rows,cat){
+  const lbl=SCORE_LABELS[cat]||'';
+  if(!rows.length){document.getElementById('lbList').innerHTML='<p style="color:rgba(255,255,255,.35);text-align:center;padding:20px;">Hali ma\'lumot yo\'q</p>';return;}
+  document.getElementById('lbList').innerHTML=rows.map(u=>`
+    <div class="lb-row ${u.is_me?'me':''}" onclick="window.location='/profile/${u.username}'">
+      <div class="lb-rank-num">${u.rank}</div>
+      <div class="lb-avatar">${avatarHTML(u,42)}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="lb-name">
+          ${u.full_name}
+          ${u.has_tick?'<span class="tick">✓</span>':''}
+          ${u.is_me?'<span class="lb-you">Sen</span>':''}
+        </div>
+        <div class="lb-username">@${u.username}</div>
+      </div>
+      <div class="lb-score">${(u.score||0).toLocaleString()} ${lbl}</div>
+    </div>`).join('');
+}
+
+function renderGamesList(rows, cat){
+  document.getElementById('podium').innerHTML='';
+  if(!rows.length){
+    document.getElementById('lbList').innerHTML='<p style="color:rgba(255,255,255,.35);text-align:center;padding:20px;">Hali o\'yin yo\'q</p>';
+    return;
+  }
+  const isRating = cat==='games_rating';
+  document.getElementById('lbList').innerHTML=rows.map(g=>`
+    <div class="lb-row" onclick="window.location='/game/${g.id}'" style="cursor:pointer;">
+      <div class="lb-rank-num">${g.rank}</div>
+      <div class="lb-avatar" style="border-radius:10px;background:linear-gradient(135deg,#2a0860,#1a1035);">
+        ${g.thumbnail?`<img src="${g.thumbnail}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`:'🎮'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="lb-name">${g.title}</div>
+        <div class="lb-username">${g.category||'O\'yin'} · @${g.username}</div>
+      </div>
+      <div class="lb-score" style="color:${isRating?'#C9A84C':'#7c3aed'};">
+        ${isRating ? '⭐ '+(g.rating_avg||0).toFixed(1) : '👁 '+(g.views||0).toLocaleString()}
+      </div>
+    </div>`).join('');
+}
+
+document.addEventListener('DOMContentLoaded',()=>loadLeaderboard('points'));
+</script>
+</body>
+</html>

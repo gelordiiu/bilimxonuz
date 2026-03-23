@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilimxon — Admin Panel</title>
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="admin-layout">
+  <!-- SIDEBAR -->
+  <div class="admin-sidebar">
+    <div style="padding:16px 20px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:8px;">
+      <img src="/static/images/logo.png" style="height:28px;" onerror="this.style.display='none'">
+      <span style="font-weight:700;font-size:0.95rem;color:white;">Admin Panel</span>
+    </div>
+    <div class="admin-nav-section">ASOSIY</div>
+    <div class="admin-nav-item active" data-section="stats" onclick="showSection('stats')">
+      <span class="nav-icon">📊</span> Statistika
+    </div>
+    <div class="admin-nav-item" data-section="users" onclick="showSection('users')">
+      <span class="nav-icon">👥</span> Foydalanuvchilar
+    </div>
+    <div class="admin-nav-section">KONTENT</div>
+    <div class="admin-nav-item" data-section="courses" onclick="showSection('courses')">
+      <span class="nav-icon">📚</span> Kurslar
+    </div>
+    <div class="admin-nav-item" data-section="structure" onclick="showSection('structure')">
+      <span class="nav-icon">🗂️</span> Bob & Mavzular
+    </div>
+    <div class="admin-nav-item" data-section="games" onclick="showSection('games')">
+      <span class="nav-icon">🎮</span> O'yinlar
+    </div>
+    <div class="admin-nav-item" data-section="tickets" onclick="showSection('tickets')">
+      <span class="nav-icon">🎫</span> Murojaatlar
+    </div>
+    <div class="admin-nav-item" data-section="vacancies" onclick="showSection('vacancies')">
+      <span class="nav-icon">💼</span> Vakansiyalar
+    </div>
+    <div class="admin-nav-item" data-section="store" onclick="showSection('store')">
+      <span class="nav-icon">🛒</span> Do'kon
+    </div>
+    <div style="margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,0.08);margin-top:32px;">
+      <div class="lang-switcher" style="background:rgba(255,255,255,0.1);margin-bottom:12px;">
+        <button class="lang-btn" data-lang="uz" style="color:rgba(255,255,255,0.6);">UZ</button>
+        <button class="lang-btn" data-lang="ru" style="color:rgba(255,255,255,0.6);">RU</button>
+      </div>
+      <a href="/" style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);font-size:0.82rem;">
+        🏠 Saytga qaytish
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main" id="adminMain">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+let currentSection = 'stats';
+let allCourses = [];
+let adminRole = 'admin'; // will be set on load
+
+// ── Role-based nav restriction ──
+async function initAdminRole() {
+  try {
+    const me = await getMe();
+    adminRole = me.role || 'admin';
+    // Hide nav items moderators can't see
+    if (adminRole === 'moderator') {
+      const modOnly = ['stats','tickets','vacancies'];
+      document.querySelectorAll('.admin-nav-item').forEach(el => {
+        if (!modOnly.includes(el.dataset.section)) {
+          el.style.display = 'none';
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+// ── Section router ──
+function showSection(name) {
+  // Moderator restriction
+  if (adminRole === 'moderator' && !['stats','tickets','vacancies'].includes(name)) {
+    showToast('Bu bo\'limga ruxsat yo\'q','error'); return;
+  }
+  currentSection = name;
+  document.querySelectorAll('.admin-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === name);
+  });
+  const main = document.getElementById('adminMain');
+  main.innerHTML = `<div class="loader"><div class="spinner"></div></div>`;
+  const fn = { stats: loadStats, users: loadUsers, courses: loadCourses, structure: loadStructure, games: loadGames, tickets: loadTickets, vacancies: loadVacancies, store: loadAdminStore }[name];
+  if (fn) fn();
+}
+
+// ── STATS ──
+async function loadStats() {
+  let data;
+  try {
+    data = await api('/api/admin/stats');
+  } catch(e) {
+    document.getElementById('adminMain').innerHTML = `<div style="padding:40px;text-align:center;color:#f87171;"><div style="font-size:2rem;margin-bottom:12px;">⚠️</div><div style="font-weight:700;">Statistika yuklanmadi</div><div style="font-size:.82rem;color:#666;margin-top:8px;">${e.message}</div><button onclick="loadStats()" style="margin-top:16px;padding:8px 20px;background:#1B3A6B;border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;">🔄 Qayta urinish</button></div>`;
+    return;
+  }
+  document.getElementById('adminMain').innerHTML = `
+    <div class="admin-section-title">
+      📊 Statistika
+      <span style="font-size:0.8rem;font-weight:400;color:var(--gray-400);">So'nggi ma'lumotlar</span>
+    </div>
+
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(59,130,246,0.1);">👥</div>
+        <div><div class="admin-stat-num">${data.users}</div><div class="admin-stat-label">Talabalar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(27,42,74,0.1);">📚</div>
+        <div><div class="admin-stat-num">${data.courses}</div><div class="admin-stat-label">Kurslar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(201,168,76,0.15);">📖</div>
+        <div><div class="admin-stat-num">${data.lessons}</div><div class="admin-stat-label">Mavzular</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(34,197,94,0.1);">✅</div>
+        <div><div class="admin-stat-num">${data.completions}</div><div class="admin-stat-label">Bajarilgan</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(239,68,68,0.1);">👁️</div>
+        <div><div class="admin-stat-num">${data.views}</div><div class="admin-stat-label">Ko'rishlar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(168,85,247,0.1);">⭐</div>
+        <div><div class="admin-stat-num">${data.premium_users||0}</div><div class="admin-stat-label">Premium</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(251,191,36,0.1);">🏆</div>
+        <div><div class="admin-stat-num">${data.problems_solved||0}</div><div class="admin-stat-label">Masala yechilgan</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(20,184,166,0.1);">🟢</div>
+        <div><div class="admin-stat-num">${data.active_today||0}</div><div class="admin-stat-label">Bugun faol</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(99,102,241,0.1);">📅</div>
+        <div><div class="admin-stat-num">${data.active_week||0}</div><div class="admin-stat-label">Hafta faol</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(34,197,94,0.12);">🆕</div>
+        <div><div class="admin-stat-num">${data.new_users_today||0}</div><div class="admin-stat-label">Bugun ro'yxat</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(59,130,246,0.12);">💬</div>
+        <div><div class="admin-stat-num">${data.chat_msgs||0}</div><div class="admin-stat-label">Chat xabarlar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(239,68,68,0.12);">🎫</div>
+        <div><div class="admin-stat-num">${data.open_tickets||0}</div><div class="admin-stat-label">Ochiq tiketlar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(201,168,76,0.12);">💰</div>
+        <div><div class="admin-stat-num">${(data.total_points||0).toLocaleString()}</div><div class="admin-stat-label">Jami balllar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(16,185,129,0.1);">🛒</div>
+        <div><div class="admin-stat-num">${data.store_buys||0}</div><div class="admin-stat-label">Do'kon xaridlar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(249,115,22,0.1);">🎮</div>
+        <div><div class="admin-stat-num">${data.games_count||0}</div><div class="admin-stat-label">O'yinlar</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(255,200,0,0.1);">🔥</div>
+        <div><div class="admin-stat-num">${data.streak_today||0}</div><div class="admin-stat-label">Bugun streak faol</div></div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-icon" style="background:rgba(139,92,246,0.1);">👫</div>
+        <div><div class="admin-stat-num">${data.total_friends||0}</div><div class="admin-stat-label">Do'stliklar</div></div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">📈 Kurs Omilligi</div>
+        <div class="bar-chart">
+          ${data.popular.map(p => {
+            const max = Math.max(...data.popular.map(x => x.cnt), 1);
+            return `<div class="bar-item">
+              <div class="bar-label">${p.icon} ${p.title}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round((p.cnt/max)*100)}%"></div></div>
+              <div class="bar-val">${p.cnt}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">📅 Oxirgi 7 kun (Bajarilganlar)</div>
+        <div class="bar-chart">
+          ${data.daily.length ? data.daily.map(d => {
+            const max = Math.max(...data.daily.map(x => x.cnt), 1);
+            return `<div class="bar-item">
+              <div class="bar-label">${d.day}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round((d.cnt/max)*100)}%"></div></div>
+              <div class="bar-val">${d.cnt}</div>
+            </div>`;
+          }).join('') : '<p style="color:var(--gray-400);font-size:0.85rem;">Ma\'lumot yo\'q</p>'}
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">📊 Haftalik ro'yxatdan o'tish</div>
+        <div class="bar-chart">
+          ${(data.reg_daily||[]).length ? data.reg_daily.map(d => {
+            const max = Math.max(...data.reg_daily.map(x=>x.cnt),1);
+            return `<div class="bar-item">
+              <div class="bar-label">${d.day}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round((d.cnt/max)*100)}%;background:#a78bfa;"></div></div>
+              <div class="bar-val">${d.cnt}</div>
+            </div>`;
+          }).join('') : '<p style="color:var(--gray-400);font-size:0.85rem;">Ma\'lumot yo\'q</p>'}
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🏅 Top 5 foydalanuvchi (balllar)</div>
+        <div class="bar-chart">
+          ${(data.top_users||[]).length ? data.top_users.map((u,i) => {
+            const max = Math.max(...data.top_users.map(x=>x.points),1);
+            return `<div class="bar-item">
+              <div class="bar-label">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${u.full_name||u.username}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round((u.points/max)*100)}%;background:#fbbf24;"></div></div>
+              <div class="bar-val">${u.points}</div>
+            </div>`;
+          }).join('') : '<p style="color:var(--gray-400);font-size:0.85rem;">Ma\'lumot yo\'q</p>'}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── USERS ──
+async function loadUsers() {
+  document.getElementById('adminMain').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  let users;
+  try { users = await api('/api/admin/users'); }
+  catch(e) {
+    document.getElementById('adminMain').innerHTML = `<div style="padding:40px;text-align:center;color:#f87171;">⚠️ Xato: ${e.message}<br><button onclick="loadUsers()" style="margin-top:12px;padding:8px 20px;background:#1B3A6B;border:none;border-radius:8px;color:#fff;cursor:pointer;font-family:inherit;">🔄 Qayta</button></div>`;
+    return;
+  }
+  const myUsername = (await getMe().catch(()=>({username:''}))).username || '';
+  const roleColor = {admin:'badge-gold', moderator:'badge-navy', student:'', banned:'badge-danger'};
+  const roleLabel = {admin:'👑 Admin', moderator:'🛡 Moderator', student:'👤 Talaba', banned:'🚫 Banned'};
+  document.getElementById('adminMain').innerHTML = `
+    <div class="admin-section-title">
+      👥 Foydalanuvchilar
+      <span class="badge badge-navy">${users.length} ta</span>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr>
+          <th>#</th><th>Ism</th><th>Login</th><th>Bal</th>
+          <th>Rol</th><th>Sana</th><th>Boshqaruv</th>
+        </tr></thead>
+        <tbody>
+          ${users.map((u, i) => `
+            <tr>
+              <td>${i+1}</td>
+              <td>
+                <strong>${u.full_name||'—'}</strong>
+                ${u.has_tick?'<span style="font-size:.7rem;color:#3B82F6;">✓</span>':''}
+              </td>
+              <td><code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:.8rem;">${u.username}</code></td>
+              <td style="color:var(--gold);font-weight:700;">⭐ ${u.points||0}</td>
+              <td>
+                <span class="badge ${roleColor[u.role]||''}">
+                  ${roleLabel[u.role]||u.role}
+                </span>
+              </td>
+              <td style="color:var(--gray-400);font-size:.78rem;">${(u.created_at||'').slice(0,10)||'—'}</td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                  ${u.role === 'admin' && u.username === myUsername ? '<span style="color:var(--gray-400);font-size:.75rem;">Asosiy Admin</span>' : `
+                    <select onchange="setRole(${u.id},this.value,this)"
+                      style="padding:3px 6px;border-radius:6px;border:1px solid var(--gray-200);font-size:.75rem;cursor:pointer;">
+                      <option value="student" ${u.role==='student'?'selected':''}>👤 Talaba</option>
+                      <option value="moderator" ${u.role==='moderator'?'selected':''}>🛡 Moderator</option>
+                      <option value="admin" ${u.role==='admin'?'selected':''}>👑 Admin</option>
+                    </select>
+                    <button class="btn btn-sm ${u.role==='banned'?'btn-success':'btn-danger'}"
+                      onclick="toggleBan(${u.id},'${u.username}',${u.role==='banned'?1:0})"
+                      style="font-size:.72rem;padding:3px 8px;">
+                      ${u.role==='banned'?'✅ Unban':'🚫 Ban'}
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="deleteUser(${u.id},'${u.username}')"
+                      style="font-size:.72rem;padding:3px 8px;">🗑️</button>
+                  ` : '<span style="color:var(--gray-400);font-size:.75rem;">Asosiy Admin</span>'}
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function setRole(uid, role, selectEl) {
+  try {
+    await api(`/api/admin/users/${uid}/role`, {method:'POST', body:JSON.stringify({role})});
+    showToast(`Rol o'zgartirildi: ${role}`, 'success');
+    loadUsers();
+  } catch(e) {
+    showToast(e.message, 'error');
+    loadUsers();
+  }
+}
+
+async function toggleBan(uid, username, isBanned) {
+  const action = isBanned ? 'unban' : 'ban';
+  if (!confirm(`"${username}" ni ${action} qilasizmi?`)) return;
+  try {
+    await api(`/api/admin/users/${uid}/ban`, {method:'POST', body:JSON.stringify({banned: isBanned?0:1})});
+    showToast(isBanned ? 'Unban qilindi' : 'Ban qilindi', 'success');
+    loadUsers();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteUser(id, username) {
+  const ok = await confirmDialog(`"${username}" foydalanuvchisini o'chirishni tasdiqlaysizmi?`);
+  if (!ok) return;
+  try {
+    await api(`/api/admin/users/${id}`, { method: 'DELETE' });
+    showToast('O\'chirildi', 'success');
+    loadUsers();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// ── COURSES ──
+async function loadCourses() {
+  allCourses = await api('/api/admin/courses');
+  document.getElementById('adminMain').innerHTML = `
+    <div class="admin-section-title">
+      📚 Kurslar
+      <button class="btn btn-primary btn-sm" onclick="openCourseModal()">+ Kurs Qo'shish</button>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr>
+          <th>Icon</th><th>Nomi (UZ)</th><th>Nomi (RU)</th><th>Bob</th>
+          <th>Mavzu</th><th>Holat</th><th>Amal</th>
+        </tr></thead>
+        <tbody>
+          ${allCourses.map(c => `
+            <tr>
+              <td><span style="font-size:1.4rem;">${c.icon}</span></td>
+              <td><strong>${c.title_uz}</strong></td>
+              <td style="color:var(--gray-400);">${c.title_ru || '—'}</td>
+              <td><span class="badge badge-navy">${c.bob_count}</span></td>
+              <td><span class="badge badge-info">${c.mavzu_count}</span></td>
+              <td><span class="badge ${c.is_active ? 'badge-success' : ''}" style="${!c.is_active ? 'background:#FEE2E2;color:#991B1B;' : ''}">${c.is_active ? '✅ Faol' : '❌ Yopiq'}</span></td>
+              <td style="display:flex;gap:6px;">
+                <button class="btn btn-outline btn-sm" onclick="openCourseModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">✏️</button>
+                <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCourse('${c.slug}')">🗑️</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function openCourseModal(course = null) {
+  const isEdit = !!course;
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">${isEdit ? '✏️ Kursni Tahrirlash' : '➕ Yangi Kurs'}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Slug (URL)</label>
+        <input class="form-control" id="cSlug" value="${course?.slug || ''}" ${isEdit ? 'disabled' : ''} placeholder="masalan: react-basics">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomi (UZ)</label>
+        <input class="form-control" id="cTitleUz" value="${course?.title_uz || ''}" placeholder="Uzbekcha nomi">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomi (RU)</label>
+        <input class="form-control" id="cTitleRu" value="${course?.title_ru || ''}" placeholder="Ruscha nomi">
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Tavsif (UZ)</label>
+        <textarea class="form-control" id="cDescUz" rows="2">${course?.desc_uz || ''}</textarea>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Tavsif (RU)</label>
+        <textarea class="form-control" id="cDescRu" rows="2">${course?.desc_ru || ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input class="form-control" id="cIcon" value="${course?.icon || '📚'}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rang (hex)</label>
+        <input class="form-control" id="cColor" type="color" value="${course?.color || '#1B2A4A'}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Daraja (UZ)</label>
+        <select class="form-control" id="cLevelUz">
+          ${["Boshlang'ich","O'rta","Ilg'or"].map(l => `<option ${course?.level_uz===l?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Daraja (RU)</label>
+        <select class="form-control" id="cLevelRu">
+          ${['Начальный','Средний','Продвинутый'].map(l => `<option ${course?.level_ru===l?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Davomiyligi</label>
+        <input class="form-control" id="cDuration" value="${course?.duration || '10 soat'}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tartib raqami</label>
+        <input class="form-control" id="cSort" type="number" value="${course?.sort_order || 99}">
+      </div>
+      ${isEdit ? `
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Holat</label>
+        <select class="form-control" id="cActive">
+          <option value="1" ${course?.is_active?'selected':''}>✅ Faol</option>
+          <option value="0" ${!course?.is_active?'selected':''}>❌ Yopiq</option>
+        </select>
+      </div>` : ''}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Bekor qilish</button>
+      <button class="btn btn-primary" onclick="saveCourse('${course?.slug || ''}', ${isEdit})">💾 Saqlash</button>
+    </div>`;
+
+  openModal(html);
+}
+
+async function saveCourse(slug, isEdit) {
+  const data = {
+    slug:        document.getElementById('cSlug')?.value,
+    title_uz:    document.getElementById('cTitleUz').value,
+    title_ru:    document.getElementById('cTitleRu').value,
+    desc_uz:     document.getElementById('cDescUz').value,
+    desc_ru:     document.getElementById('cDescRu').value,
+    icon:        document.getElementById('cIcon').value,
+    color:       document.getElementById('cColor').value,
+    level_uz:    document.getElementById('cLevelUz').value,
+    level_ru:    document.getElementById('cLevelRu').value,
+    duration:    document.getElementById('cDuration').value,
+    sort_order:  parseInt(document.getElementById('cSort').value),
+    is_active:   parseInt(document.getElementById('cActive')?.value ?? '1'),
+  };
+  try {
+    const endpoint = isEdit ? `/api/admin/courses/${slug}` : '/api/admin/courses';
+    const method   = isEdit ? 'PUT' : 'POST';
+    await api(endpoint, { method, body: JSON.stringify(data) });
+    showToast('Saqlandi!', 'success');
+    document.querySelector('.modal-overlay')?.remove();
+    loadCourses();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function deleteCourse(slug) {
+  const ok = await confirmDialog(`"${slug}" kursini yopishni tasdiqlaysizmi?`);
+  if (!ok) return;
+  try {
+    await api(`/api/admin/courses/${slug}`, { method: 'DELETE' });
+    showToast("Yopildi", 'success');
+    loadCourses();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// ── STRUCTURE (BOB + MAVZU) ──
+async function loadStructure() {
+  allCourses = await api('/api/admin/courses');
+  const main = document.getElementById('adminMain');
+  main.innerHTML = `
+    <div class="admin-section-title">
+      🗂️ Bob & Mavzular Tuzilmasi
+    </div>
+    <div class="tree-container" id="structureTree">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>`;
+  renderStructureTree();
+}
+
+async function renderStructureTree() {
+  const tree = document.getElementById('structureTree');
+  if (!allCourses.length) { tree.innerHTML = '<p style="color:var(--gray-400);">Kurslar yo\'q</p>'; return; }
+
+  let html = '';
+  for (const c of allCourses) {
+    const bobs = await api(`/api/admin/bobs/${c.slug}`);
+    html += `
+      <div class="tree-course" id="tc-${c.slug}">
+        <div class="tree-course-header" onclick="toggleTree('tc-${c.slug}')">
+          <span class="tree-chevron">▶</span>
+          <span style="font-size:1.3rem;">${c.icon}</span>
+          <strong>${c.title_uz}</strong>
+          <span class="badge badge-navy" style="margin-left:8px;">${c.bob_count} bob</span>
+          <span class="badge badge-info" style="margin-left:4px;">${c.mavzu_count} mavzu</span>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="event.stopPropagation();openBobModal('${c.slug}')">+ Bob</button>
+        </div>
+        <div class="tree-course-body">
+          ${bobs.length === 0 ? '<p style="color:var(--gray-400);font-size:0.85rem;padding:8px 0;">Bob yo\'q. Bob qo\'shing.</p>' : ''}
+          ${bobs.map(b => `
+            <div class="tree-bob">
+              <div class="tree-bob-header">
+                <span>📂</span> ${b.title_uz}
+                <span class="badge badge-navy" style="margin-left:6px;">${b.mavzu_count} mavzu</span>
+                <button class="btn btn-outline btn-sm" style="margin-left:auto;margin-right:4px;" onclick="openBobModal('${c.slug}',${JSON.stringify(b).replace(/"/g,'&quot;')})">✏️</button>
+                <button class="btn btn-danger btn-sm btn-icon" onclick="deleteBob(${b.id})">🗑️</button>
+                <button class="btn btn-gold btn-sm" style="margin-left:8px;" onclick="openMavzuModal(${b.id},'${c.slug}')">+ Mavzu</button>
+              </div>
+              <div id="mavzu-list-${b.id}">
+                <div class="loader" style="padding:8px;"><div class="spinner" style="width:20px;height:20px;border-width:2px;"></div></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+  tree.innerHTML = html;
+
+  // Load mavzular for each bob
+  for (const c of allCourses) {
+    const bobs = await api(`/api/admin/bobs/${c.slug}`);
+    for (const b of bobs) {
+      const mavzular = await api(`/api/admin/mavzular/${b.id}`);
+      const el = document.getElementById(`mavzu-list-${b.id}`);
+      if (!el) continue;
+      el.innerHTML = mavzular.length === 0
+        ? '<p style="color:var(--gray-400);font-size:0.8rem;padding:4px 0;">Mavzu yo\'q</p>'
+        : mavzular.map(m => `
+          <div class="tree-mavzu">
+            <span>📄</span>
+            <span style="flex:1;font-size:0.85rem;">${m.title_uz}</span>
+            ${m.quiz_count > 0 ? `<span class="badge badge-gold">${m.quiz_count} test</span>` : ''}
+            ${m.video_url ? '<span class="badge badge-navy">🎬</span>' : ''}
+            <button class="btn btn-outline btn-sm btn-icon" onclick="openMavzuModal(${b.id},'${c.slug}',${JSON.stringify(m).replace(/"/g,'&quot;')})">✏️</button>
+            <button class="btn btn-outline btn-sm btn-icon" onclick="openQuizManager(${m.id},'${m.title_uz}')">📝</button>
+            <button class="btn btn-outline btn-sm btn-icon" onclick="openVideoUpload(${m.id},'${m.title_uz}')">🎬</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="deleteMavzu(${m.id})">🗑️</button>
+          </div>`).join('');
+    }
+  }
+}
+
+function toggleTree(id) {
+  document.getElementById(id)?.classList.toggle('open');
+}
+
+// ── BOB Modal ──
+function openBobModal(courseSlug, bob = null) {
+  const isEdit = !!bob;
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">${isEdit ? '✏️ Bobni Tahrirlash' : '➕ Yangi Bob'}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="form-group">
+        <label class="form-label">Bob nomi (UZ)</label>
+        <input class="form-control" id="bTitleUz" value="${bob?.title_uz || ''}" placeholder="1-Bob: Kirish">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bob nomi (RU)</label>
+        <input class="form-control" id="bTitleRu" value="${bob?.title_ru || ''}" placeholder="1-Глава: Введение">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tartib raqami</label>
+        <input class="form-control" id="bSort" type="number" value="${bob?.sort_order || 1}">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Bekor qilish</button>
+      <button class="btn btn-primary" onclick="saveBob('${courseSlug}',${bob?.id || 'null'},${isEdit})">💾 Saqlash</button>
+    </div>`;
+  openModal(html);
+}
+
+async function saveBob(courseSlug, bobId, isEdit) {
+  const data = {
+    course_slug: courseSlug,
+    title_uz: document.getElementById('bTitleUz').value,
+    title_ru: document.getElementById('bTitleRu').value,
+    sort_order: parseInt(document.getElementById('bSort').value),
+  };
+  try {
+    if (isEdit) await api(`/api/admin/bobs/${bobId}`, { method:'PUT', body:JSON.stringify(data) });
+    else        await api('/api/admin/bobs', { method:'POST', body:JSON.stringify(data) });
+    showToast('Saqlandi!', 'success');
+    document.querySelector('.modal-overlay')?.remove();
+    loadStructure();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function deleteBob(id) {
+  const ok = await confirmDialog('Bu bob va barcha mavzulari o\'chiriladi. Davom etasizmi?');
+  if (!ok) return;
+  try {
+    await api(`/api/admin/bobs/${id}`, { method:'DELETE' });
+    showToast('O\'chirildi', 'success');
+    loadStructure();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// ── MAVZU Modal ──
+function openMavzuModal(bobId, courseSlug, mavzu = null) {
+  const isEdit = !!mavzu;
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">${isEdit ? '✏️ Mavzuni Tahrirlash' : '➕ Yangi Mavzu'}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Mavzu nomi (UZ)</label>
+          <input class="form-control" id="mTitleUz" value="${mavzu?.title_uz || ''}" placeholder="Mavzu nomi">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mavzu nomi (RU)</label>
+          <input class="form-control" id="mTitleRu" value="${mavzu?.title_ru || ''}" placeholder="Тема">
+        </div>
+      </div>
+
+      <!-- RICH TEXT CONTENT EDITORS -->
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <label class="form-label" style="margin:0;">📝 Dars matni (UZ)</label>
+          <div style="display:flex;gap:4px;">
+            ${['B','I','H2','H3','• List','Code'].map(cmd => `<button type="button" onclick="fmtText('mContentUz','${cmd}')" style="padding:2px 7px;background:rgba(255,255,255,.08);border:1px solid #21262d;border-radius:5px;color:#aaa;font-size:.68rem;font-weight:700;cursor:pointer;font-family:inherit;">${cmd}</button>`).join('')}
+          </div>
+        </div>
+        <textarea class="form-control" id="mContentUz" rows="6" placeholder="Dars mazmuni (Markdown qo'llaniladi: **bold**, *italic*, ## sarlavha, - list, \`kod\`)"
+          style="font-family:'Fira Code',monospace;font-size:.82rem;line-height:1.6;resize:vertical;"
+        >${mavzu?.content_uz || ''}</textarea>
+        <div style="font-size:.68rem;color:#555;margin-top:4px;">💡 Markdown: **qalin** *kursiv* ## sarlavha - ro'yxat \`inline kod\`</div>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <label class="form-label" style="margin:0;">📝 Dars matni (RU)</label>
+          <div style="display:flex;gap:4px;">
+            ${['B','I','H2','H3','• List','Code'].map(cmd => `<button type="button" onclick="fmtText('mContentRu','${cmd}')" style="padding:2px 7px;background:rgba(255,255,255,.08);border:1px solid #21262d;border-radius:5px;color:#aaa;font-size:.68rem;font-weight:700;cursor:pointer;font-family:inherit;">${cmd}</button>`).join('')}
+          </div>
+        </div>
+        <textarea class="form-control" id="mContentRu" rows="4" placeholder="Текст урока (необязательно)"
+          style="font-family:'Fira Code',monospace;font-size:.82rem;line-height:1.6;resize:vertical;"
+        >${mavzu?.content_ru || ''}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">💻 Kod namunasi</label>
+        <textarea class="form-control" id="mCodeExample" rows="5" placeholder="# Kod namunasi (ixtiyoriy)
+print('Hello, World!')"
+          style="font-family:'Fira Code',monospace;font-size:.82rem;line-height:1.6;resize:vertical;"
+        >${mavzu?.code_example || ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🎬 Video</label>
+        <input type="hidden" id="mVideoUrl" value="${mavzu?.video_url || ''}">
+        <div id="videoDrop_${mavzu?.id||'new'}"
+          style="border:2.5px dashed var(--gray-200);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--gray-50);"
+          ondragover="event.preventDefault();this.style.borderColor='var(--navy)';this.style.background='rgba(27,42,74,0.04)'"
+          ondragleave="this.style.borderColor='var(--gray-200)';this.style.background='var(--gray-50)'"
+          ondrop="handleVideoDrop(event,'${mavzu?.id||'new'}',${mavzu?.id||'null'})"
+          onclick="document.getElementById('mVideoFile_${mavzu?.id||'new'}').click()">
+          <div id="videoDropContent_${mavzu?.id||'new'}">
+            ${mavzu?.video_url ? `
+              <div style="font-size:1.6rem;margin-bottom:6px;">🎬</div>
+              <div style="font-weight:700;color:var(--success);font-size:0.88rem;">Video mavjud ✓</div>
+              <div style="font-size:0.72rem;color:var(--gray-400);margin-top:4px;">${mavzu.video_url.split('/').pop()}</div>
+              <div style="font-size:0.72rem;color:var(--gray-400);margin-top:6px;">Yangilash uchun shu yerga video tashlang</div>
+            ` : `
+              <div style="font-size:2rem;margin-bottom:8px;">📹</div>
+              <div style="font-weight:700;color:var(--navy);font-size:0.9rem;">Videoni shu yerga tashlang</div>
+              <div style="font-size:0.75rem;color:var(--gray-400);margin-top:4px;">yoki bosib tanlang • MP4, WebM, MOV (max 500MB)</div>
+            `}
+          </div>
+          <input type="file" id="mVideoFile_${mavzu?.id||'new'}" accept="video/*" style="display:none;"
+            onchange="handleVideoSelect(this,'${mavzu?.id||'new'}',${mavzu?.id||'null'})">
+        </div>
+        <div id="videoUploadProgress_${mavzu?.id||'new'}" style="display:none;margin-top:10px;">
+          <div class="progress-bar"><div class="progress-fill" id="videoFill_${mavzu?.id||'new'}" style="width:0%"></div></div>
+          <div style="font-size:0.75rem;color:var(--gray-400);margin-top:5px;" id="videoStatus_${mavzu?.id||'new'}">Yuklanmoqda...</div>
+        </div>
+      <div class="form-group">
+        <label class="form-label">🎬 Video</label>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:.72rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.04em;">🎬 Til bo'yicha videolar (MP4/WebM)</div>
+
+          ${['uz','ru','en'].map(lang => {
+            const flag = lang==='uz'?'🇺🇿':lang==='ru'?'🇷🇺':'🇺🇸';
+            const label = lang==='uz'?'O\'zbekcha':lang==='ru'?'Ruscha':'Inglizcha';
+            const existing = lang==='uz'?(mavzu?.video_url_uz||mavzu?.video_url||''):lang==='ru'?(mavzu?.video_url_ru||''):(mavzu?.video_url_en||'');
+            const mid = mavzu?.id || 'new';
+            return `
+          <div style="background:#0d1117;border:1.5px solid #21262d;border-radius:12px;padding:12px 14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-size:.82rem;font-weight:800;color:#fff;">${flag} ${label}</span>
+              ${existing ? `<span style="font-size:.68rem;color:#4ade80;font-weight:700;">✅ Video bor</span>` : `<span style="font-size:.68rem;color:#555;font-weight:700;">Video yo'q</span>`}
+            </div>
+            ${existing ? `<div style="font-size:.68rem;color:#555;margin-bottom:8px;word-break:break-all;">${existing.split('/').pop()}</div>` : ''}
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;background:rgba(255,255,255,.06);border:1.5px solid #21262d;border-radius:8px;padding:8px 12px;transition:.15s;" onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#21262d'">
+              <span style="font-size:.8rem;font-weight:700;color:#aaa;">📁 ${existing ? 'Yangi video yuklash' : 'Video tanlash'}</span>
+              <input type="file" accept="video/mp4,video/webm,video/*" style="display:none;"
+                id="vfile_${lang}_${mid}"
+                onchange="uploadMavzuVideo(this, ${mavzu?.id||'null'}, '${lang}')">
+            </label>
+            <div id="vprog_${lang}_${mid}" style="display:none;margin-top:8px;">
+              <div style="height:4px;background:#21262d;border-radius:2px;overflow:hidden;">
+                <div id="vbar_${lang}_${mid}" style="height:100%;width:0%;background:#C9A84C;transition:width .3s;border-radius:2px;"></div>
+              </div>
+              <div id="vstatus_${lang}_${mid}" style="font-size:.68rem;color:#888;margin-top:4px;">Yuklanmoqda...</div>
+            </div>
+          </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tartib raqami</label>
+        <input class="form-control" id="mSort" type="number" value="${mavzu?.sort_order || 1}" style="width:100px;">
+      </div>
+
+      ${isEdit ? `
+      <!-- Inline Quiz Section -->
+      <div style="border-top:2px solid var(--gray-100);padding-top:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <label class="form-label" style="margin:0;">📝 Test Savollari</label>
+          <button class="btn btn-gold btn-sm" onclick="openQuizFormInline(${mavzu?.id})">+ Savol Qo'shish</button>
+        </div>
+        <div id="inlineQuizList" style="max-height:260px;overflow-y:auto;">
+          <div class="loader" style="padding:8px;"><div class="spinner" style="width:20px;height:20px;border-width:2px;"></div></div>
+        </div>
+      </div>` : ''}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Bekor qilish</button>
+      <button class="btn btn-primary" onclick="saveMavzu(${bobId},'${courseSlug}',${mavzu?.id || 'null'},${isEdit})">💾 Saqlash</button>
+    </div>`;
+  openModal(html);
+
+  if (isEdit && mavzu?.id) {
+    loadInlineQuizList(mavzu.id, mavzu.title_uz);
+  }
+}
+
+async function loadInlineQuizList(mavzuId, title) {
+  const el = document.getElementById('inlineQuizList');
+  if (!el) return;
+  try {
+    const qs = await api(`/api/admin/quiz/${mavzuId}`);
+    if (!qs.length) {
+      el.innerHTML = '<p style="color:var(--gray-400);font-size:0.82rem;padding:4px 0;">Hali savol yo\'q. Savol qo\'shing!</p>';
+      return;
+    }
+    el.innerHTML = qs.map((q, i) => `
+      <div style="border:1.5px solid var(--gray-200);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--gray-50);">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:6px;color:var(--navy);">${i+1}. ${q.question_uz}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;margin-bottom:8px;">
+          ${JSON.parse(q.options_uz).map((o, oi) => `
+            <div style="font-size:0.78rem;color:${oi===q.correct_idx?'var(--success)':'var(--gray-500)'};display:flex;align-items:center;gap:4px;">
+              <span style="font-size:0.7rem;">${oi===q.correct_idx?'✅':'○'}</span> ${o}
+            </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" style="font-size:.72rem;padding:3px 9px;" onclick="openQuizFormInline(${mavzuId},'${title}',${JSON.stringify(q).replace(/\"/g,'&quot;')},${q.id})">✏️ Tahrirlash</button>
+          <button class="btn btn-danger btn-sm" style="font-size:.72rem;padding:3px 9px;" onclick="deleteQuizInline(${q.id},${mavzuId},'${title}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = `<p style="color:var(--danger);font-size:0.82rem;">${e.message}</p>`;
+  }
+}
+
+async function deleteQuizInline(qId, mavzuId, title) {
+  const ok = await confirmDialog('Bu savol o\'chirilsinmi?');
+  if (!ok) return;
+  try {
+    await api(`/api/admin/quiz/${qId}`, { method:'DELETE' });
+    showToast('O\'chirildi', 'success');
+    loadInlineQuizList(mavzuId, title);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openQuizFormInline(mavzuId, title = '', existing = null, qId = null) {
+  const isEdit = !!existing;
+  let existOpts_uz = ['', '', '', ''];
+  let existOpts_ru = ['', '', '', ''];
+  if (existing) {
+    try { existOpts_uz = JSON.parse(existing.options_uz); } catch {}
+    try { existOpts_ru = JSON.parse(existing.options_ru || '[]'); } catch {}
+  }
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">${isEdit ? '✏️ Savolni Tahrirlash' : '➕ Yangi Savol'}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="form-group">
+        <label class="form-label">Savol (UZ)</label>
+        <textarea class="form-control" id="qQuzUz" rows="2">${existing?.question_uz || ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Savol (RU)</label>
+        <textarea class="form-control" id="qQuzRu" rows="2">${existing?.question_ru || ''}</textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${[0,1,2,3].map(i => `
+          <div class="form-group">
+            <label class="form-label">Variant ${String.fromCharCode(65+i)} (UZ)</label>
+            <input class="form-control" id="qOpt${i}Uz" value="${existOpts_uz[i] || ''}">
+          </div>`).join('')}
+        ${[0,1,2,3].map(i => `
+          <div class="form-group">
+            <label class="form-label">Variant ${String.fromCharCode(65+i)} (RU)</label>
+            <input class="form-control" id="qOpt${i}Ru" value="${existOpts_ru[i] || ''}">
+          </div>`).join('')}
+      </div>
+      <div class="form-group">
+        <label class="form-label">To'g'ri javob</label>
+        <select class="form-control" id="qCorrect">
+          ${[0,1,2,3].map(i => `<option value="${i}" ${(existing?.correct_idx===i)?'selected':''}>Variant ${String.fromCharCode(65+i)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Izoh (UZ, ixtiyoriy)</label>
+        <textarea class="form-control" id="qExplUz" rows="2">${existing?.explanation_uz || ''}</textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Bekor qilish</button>
+      <button class="btn btn-primary" onclick="saveQuizInline(${mavzuId}, ${qId}, ${isEdit}, '${title}')">💾 Saqlash</button>
+    </div>`;
+  document.querySelector('.modal-overlay')?.remove();
+  openModal(html);
+}
+
+async function saveQuizInline(mavzuId, qId, isEdit, title) {
+  const data = {
+    mavzu_id:       mavzuId,
+    question_uz:    document.getElementById('qQuzUz').value,
+    question_ru:    document.getElementById('qQuzRu').value,
+    options_uz:     [0,1,2,3].map(i => document.getElementById(`qOpt${i}Uz`).value),
+    options_ru:     [0,1,2,3].map(i => document.getElementById(`qOpt${i}Ru`).value),
+    correct_idx:    parseInt(document.getElementById('qCorrect').value),
+    explanation_uz: document.getElementById('qExplUz').value,
+  };
+  try {
+    if (isEdit) await api(`/api/admin/quiz/${qId}`, { method:'PUT', body:JSON.stringify(data) });
+    else        await api('/api/admin/quiz', { method:'POST', body:JSON.stringify(data) });
+    showToast('Saqlandi!', 'success');
+    document.querySelector('.modal-overlay')?.remove();
+    // Reopen mavzu modal with quiz tab active
+    openMavzuModal_withQuiz(mavzuId, title);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function openMavzuModal_withQuiz(mavzuId, title) {
+  // Find the mavzu and bob from loaded structure
+  for (const c of allCourses) {
+    const bobs = await api(`/api/admin/bobs/${c.slug}`);
+    for (const b of bobs) {
+      const mavzular = await api(`/api/admin/mavzular/${b.id}`);
+      const m = mavzular.find(x => x.id === mavzuId);
+      if (m) { openMavzuModal(b.id, c.slug, m); return; }
+    }
+  }
+}
+
+// ── VIDEO DRAG & DROP in Mavzu Modal ──
+function handleVideoDrop(event, key, mavzuId) {
+  event.preventDefault();
+  const dropEl = document.getElementById(`videoDrop_${key}`);
+  dropEl.style.borderColor = 'var(--gray-200)';
+  dropEl.style.background = 'var(--gray-50)';
+  const file = event.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('video/')) {
+    showToast('Faqat video fayl qabul qilinadi!', 'error');
+    return;
+  }
+  startVideoUploadInModal(file, key, mavzuId);
+}
+
+function handleVideoSelect(input, key, mavzuId) {
+  const file = input.files[0];
+  if (!file) return;
+  startVideoUploadInModal(file, key, mavzuId);
+}
+
+async function startVideoUploadInModal(file, key, mavzuId) {
+  const content = document.getElementById(`videoDropContent_${key}`);
+  const progress = document.getElementById(`videoUploadProgress_${key}`);
+  const fill = document.getElementById(`videoFill_${key}`);
+  const status = document.getElementById(`videoStatus_${key}`);
+
+  content.innerHTML = `
+    <div style="font-size:1.5rem;margin-bottom:6px;">⏳</div>
+    <div style="font-weight:700;color:var(--navy);font-size:0.88rem;">${file.name}</div>
+    <div style="font-size:0.73rem;color:var(--gray-400);margin-top:3px;">${(file.size/1024/1024).toFixed(1)} MB — Yuklanmoqda...</div>`;
+  progress.style.display = '';
+  fill.style.width = '0%';
+
+  // If no mavzuId yet (new mavzu), just store file for later
+  if (!mavzuId) {
+    // Store file in memory, show preview
+    window._pendingVideoFile = file;
+    let prog = 0;
+    const fake = setInterval(() => {
+      prog = Math.min(prog + 20, 90);
+      fill.style.width = prog + '%';
+    }, 80);
+    setTimeout(() => {
+      clearInterval(fake);
+      fill.style.width = '100%';
+      status.textContent = '✅ Tayyor — Mavzu saqlanganida yuklanadi';
+      content.innerHTML = `
+        <div style="font-size:1.6rem;margin-bottom:6px;">🎬</div>
+        <div style="font-weight:700;color:var(--success);font-size:0.88rem;">Tayyor: ${file.name} ✓</div>
+        <div style="font-size:0.72rem;color:var(--gray-400);margin-top:3px;">${(file.size/1024/1024).toFixed(1)} MB</div>`;
+    }, 500);
+    return;
+  }
+
+  // Upload immediately
+  let prog = 0;
+  const interval = setInterval(() => {
+    prog = Math.min(prog + Math.random() * 12, 88);
+    fill.style.width = prog + '%';
+  }, 200);
+
+  try {
+    const form = new FormData();
+    form.append('video', file);
+    const res = await fetch(`/api/admin/upload-video/${mavzuId}`, { method:'POST', body:form });
+    const data = await res.json();
+    clearInterval(interval);
+    fill.style.width = '100%';
+    if (data.success) {
+      document.getElementById('mVideoUrl').value = data.video_url;
+      status.textContent = '✅ Muvaffaqiyatli yuklandi!';
+      content.innerHTML = `
+        <div style="font-size:1.6rem;margin-bottom:6px;">🎬</div>
+        <div style="font-weight:700;color:var(--success);font-size:0.88rem;">Yuklandi: ${file.name} ✓</div>
+        <div style="font-size:0.72rem;color:var(--gray-400);margin-top:3px;">${(file.size/1024/1024).toFixed(1)} MB • Yangilash uchun yana tashlang</div>`;
+      showToast('Video yuklandi!', 'success');
+    } else {
+      throw new Error(data.error || 'Xatolik');
+    }
+  } catch(e) {
+    clearInterval(interval);
+    fill.style.width = '0%';
+    status.textContent = '❌ Xatolik: ' + e.message;
+    content.innerHTML = `
+      <div style="font-size:1.6rem;margin-bottom:6px;">❌</div>
+      <div style="font-weight:700;color:var(--danger);font-size:0.88rem;">Xatolik yuz berdi</div>
+      <div style="font-size:0.72rem;color:var(--gray-400);margin-top:3px;">Qayta urinib ko'ring</div>`;
+    showToast(e.message, 'error');
+  }
+}
+
+
+async function saveMavzu(bobId, courseSlug, mavzuId, isEdit) {
+  const data = {
+    bob_id: bobId, course_slug: courseSlug,
+    title_uz:    document.getElementById('mTitleUz').value.trim(),
+    title_ru:    document.getElementById('mTitleRu').value.trim(),
+    content_uz:  document.getElementById('mContentUz')?.value || '',
+    content_ru:  document.getElementById('mContentRu')?.value || '',
+    code_example:document.getElementById('mCodeExample')?.value || '',
+    sort_order:  parseInt(document.getElementById('mSort').value) || 1,
+  };
+  try {
+    let savedId = mavzuId;
+    if (isEdit) {
+      await api(`/api/admin/mavzular/${mavzuId}`, { method:'PUT', body:JSON.stringify(data) });
+    } else {
+      const res = await api('/api/admin/mavzular', { method:'POST', body:JSON.stringify(data) });
+      savedId = res.id;
+    }
+    // Upload pending video file if new mavzu had one dragged in
+    if (!isEdit && window._pendingVideoFile && savedId) {
+      const form = new FormData();
+      form.append('video', window._pendingVideoFile);
+      await fetch(`/api/admin/upload-video/${savedId}`, { method:'POST', body:form });
+      window._pendingVideoFile = null;
+    }
+    showToast('Saqlandi!', 'success');
+    document.querySelector('.modal-overlay')?.remove();
+    loadStructure();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteMavzu(id) {
+  const ok = await confirmDialog('Bu mavzu va testlari o\'chiriladi. Davom etasizmi?');
+  if (!ok) return;
+  try {
+    await api(`/api/admin/mavzular/${id}`, { method:'DELETE' });
+    showToast('O\'chirildi', 'success');
+    loadStructure();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// ── QUIZ MANAGER ──
+async function openQuizManager(mavzuId, title) {
+  const qs = await api(`/api/admin/quiz/${mavzuId}`);
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">📝 Test Savollar — ${title}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div id="quizList" style="max-height:350px;overflow-y:auto;margin-bottom:16px;">
+      ${qs.length === 0 ? '<p style="color:var(--gray-400);">Hali savol yo\'q</p>' : ''}
+      ${qs.map((q, i) => `
+        <div style="border:1px solid var(--gray-200);border-radius:8px;padding:12px;margin-bottom:8px;">
+          <div style="font-weight:600;font-size:0.88rem;margin-bottom:6px;">${i+1}. ${q.question_uz}</div>
+          ${JSON.parse(q.options_uz).map((o, oi) => `
+            <div style="font-size:0.8rem;color:${oi===q.correct_idx?'var(--success)':'var(--gray-400)'};">
+              ${oi===q.correct_idx ? '✅' : '○'} ${o}
+            </div>`).join('')}
+          <div style="margin-top:8px;display:flex;gap:6px;">
+            <button class="btn btn-outline btn-sm" onclick="openQuizForm(${mavzuId}, ${JSON.stringify(q).replace(/"/g,'&quot;')}, ${q.id})">✏️ Tahrirlash</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteQuiz(${q.id}, ${mavzuId}, '${title}')">🗑️</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-primary w-full" onclick="openQuizForm(${mavzuId})">+ Yangi Savol Qo'shish</button>`;
+  openModal(html);
+}
+
+function openQuizForm(mavzuId, existing = null, qId = null) {
+  const isEdit = !!existing;
+  let existOpts_uz = ['', '', '', ''];
+  let existOpts_ru = ['', '', '', ''];
+  if (existing) {
+    try { existOpts_uz = JSON.parse(existing.options_uz); } catch {}
+    try { existOpts_ru = JSON.parse(existing.options_ru || '[]'); } catch {}
+  }
+
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">${isEdit ? '✏️ Savolni Tahrirlash' : '➕ Yangi Savol'}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="form-group">
+        <label class="form-label">Savol (UZ)</label>
+        <textarea class="form-control" id="qQuzUz" rows="2">${existing?.question_uz || ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Savol (RU)</label>
+        <textarea class="form-control" id="qQuzRu" rows="2">${existing?.question_ru || ''}</textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${[0,1,2,3].map(i => `
+          <div class="form-group">
+            <label class="form-label">Variant ${String.fromCharCode(65+i)} (UZ)</label>
+            <input class="form-control" id="qOpt${i}Uz" value="${existOpts_uz[i] || ''}">
+          </div>`).join('')}
+        ${[0,1,2,3].map(i => `
+          <div class="form-group">
+            <label class="form-label">Variant ${String.fromCharCode(65+i)} (RU)</label>
+            <input class="form-control" id="qOpt${i}Ru" value="${existOpts_ru[i] || ''}">
+          </div>`).join('')}
+      </div>
+      <div class="form-group">
+        <label class="form-label">To'g'ri javob</label>
+        <select class="form-control" id="qCorrect">
+          ${[0,1,2,3].map(i => `<option value="${i}" ${(existing?.correct_idx===i)?'selected':''}>Variant ${String.fromCharCode(65+i)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Izoh (UZ, ixtiyoriy)</label>
+        <textarea class="form-control" id="qExplUz" rows="2">${existing?.explanation_uz || ''}</textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Bekor qilish</button>
+      <button class="btn btn-primary" onclick="saveQuiz(${mavzuId}, ${qId}, ${isEdit})">💾 Saqlash</button>
+    </div>`;
+  document.querySelector('.modal-overlay')?.remove();
+  openModal(html);
+}
+
+async function saveQuiz(mavzuId, qId, isEdit) {
+  const data = {
+    mavzu_id:       mavzuId,
+    question_uz:    document.getElementById('qQuzUz').value,
+    question_ru:    document.getElementById('qQuzRu').value,
+    options_uz:     [0,1,2,3].map(i => document.getElementById(`qOpt${i}Uz`).value),
+    options_ru:     [0,1,2,3].map(i => document.getElementById(`qOpt${i}Ru`).value),
+    correct_idx:    parseInt(document.getElementById('qCorrect').value),
+    explanation_uz: document.getElementById('qExplUz').value,
+  };
+  try {
+    if (isEdit) await api(`/api/admin/quiz/${qId}`, { method:'PUT', body:JSON.stringify(data) });
+    else        await api('/api/admin/quiz', { method:'POST', body:JSON.stringify(data) });
+    showToast('Saqlandi!', 'success');
+    document.querySelector('.modal-overlay')?.remove();
+    loadStructure();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function deleteQuiz(qId, mavzuId, title) {
+  const ok = await confirmDialog('Bu savol o\'chirilsinmi?');
+  if (!ok) return;
+  try {
+    await api(`/api/admin/quiz/${qId}`, { method:'DELETE' });
+    showToast('O\'chirildi', 'success');
+    document.querySelector('.modal-overlay')?.remove();
+    openQuizManager(mavzuId, title);
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// ── VIDEO UPLOAD ──
+function openVideoUpload(mavzuId, title) {
+  const html = `
+    <div class="modal-header">
+      <span class="modal-title">🎬 Video Yuklash — ${title}</span>
+      <button class="modal-close">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <p style="color:var(--gray-600);font-size:0.88rem;">MP4, WebM, OGG yoki MOV formatdagi video faylini yuklang (max 500MB)</p>
+      <div style="border:2px dashed var(--gray-200);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;"
+           onclick="document.getElementById('videoFile').click()">
+        <div style="font-size:2.5rem;margin-bottom:8px;">📹</div>
+        <div style="font-weight:600;color:var(--navy);">Video faylni tanlang</div>
+        <div style="font-size:0.78rem;color:var(--gray-400);margin-top:4px;" id="videoFileName">Hali tanlanmagan</div>
+        <input type="file" id="videoFile" accept="video/*" style="display:none;" onchange="updateVideoName()">
+      </div>
+      <div id="uploadProgress" style="display:none;">
+        <div class="progress-bar"><div class="progress-fill" id="uploadFill" style="width:0%"></div></div>
+        <p style="font-size:0.78rem;color:var(--gray-400);margin-top:6px;" id="uploadStatus">Yuklanmoqda...</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Bekor qilish</button>
+      <button class="btn btn-primary" id="uploadBtn" onclick="uploadVideo(${mavzuId})">⬆️ Yuklash</button>
+    </div>`;
+  openModal(html);
+}
+
+function updateVideoName() {
+  const f = document.getElementById('videoFile').files[0];
+  if (f) document.getElementById('videoFileName').textContent = `${f.name} (${(f.size/1024/1024).toFixed(1)} MB)`;
+}
+
+async function uploadVideo(mavzuId) {
+  const file = document.getElementById('videoFile')?.files[0];
+  if (!file) { showToast('Fayl tanlanmagan', 'error'); return; }
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Yuklanmoqda...';
+  document.getElementById('uploadProgress').style.display = '';
+
+  // Simulate progress animation
+  let prog = 0;
+  const interval = setInterval(() => {
+    prog = Math.min(prog + Math.random() * 15, 90);
+    document.getElementById('uploadFill').style.width = prog + '%';
+  }, 200);
+
+  try {
+    const form = new FormData();
+    form.append('video', file);
+    const res = await fetch(`/api/admin/upload-video/${mavzuId}`, { method:'POST', body:form });
+    const data = await res.json();
+    clearInterval(interval);
+    document.getElementById('uploadFill').style.width = '100%';
+    if (data.success) {
+      document.getElementById('uploadStatus').textContent = '✅ Muvaffaqiyatli yuklandi!';
+      showToast('Video yuklandi!', 'success');
+      setTimeout(() => { document.querySelector('.modal-overlay')?.remove(); loadStructure(); }, 1000);
+    } else {
+      throw new Error(data.error);
+    }
+  } catch (e) {
+    clearInterval(interval);
+    showToast(e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = '⬆️ Yuklash';
+  }
+}
+
+// ── GAMES MODERATION ──
+async function loadGames() {
+  const main = document.getElementById('adminMain');
+  const [pending, all] = await Promise.all([
+    api('/api/admin/games/pending'),
+    api('/api/admin/games/all')
+  ]);
+
+  const statuses = { pending:'⏳ Kutmoqda', published:'✅ Tasdiqlangan', rejected:'❌ Rad etilgan' };
+  const scolors  = { pending:'#F59E0B', published:'#22C55E', rejected:'#EF4444' };
+
+  function gameRow(g, showActions) {
+    return `
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:16px;display:flex;gap:16px;align-items:flex-start;" id="grow-${g.id}">
+      <div style="width:90px;height:54px;border-radius:8px;background:#1a1035;overflow:hidden;flex-shrink:0;">
+        ${g.thumbnail?`<img src="${g.thumbnail}" style="width:100%;height:100%;object-fit:cover;">`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;">🎮</div>'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:800;color:white;font-size:.95rem;margin-bottom:3px;">${g.title}</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:4px;">
+          @${g.username} · ${g.category||'Boshqa'} · 👁 ${g.views||0} · ⭐ ${g.rating_avg?g.rating_avg.toFixed(1):'—'}
+        </div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.3);">${(g.description||'').slice(0,80)}</div>
+        ${g.reject_reason ? `<div style="margin-top:5px;font-size:.74rem;color:#EF4444;background:rgba(239,68,68,.08);padding:3px 8px;border-radius:6px;">Sabab: ${g.reject_reason}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+        <span style="font-size:.72rem;font-weight:700;color:${scolors[g.status]||'#888'};background:${scolors[g.status]||'#888'}22;padding:3px 10px;border-radius:999px;">${statuses[g.status]||g.status}</span>
+        ${showActions && g.status==='pending' ? `
+        <button onclick="previewGame(${g.id},'${g.file_path}','${g.game_entry}')" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;padding:5px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.78rem;">🕹 Test qilish</button>
+        <div style="display:flex;gap:6px;">
+          <button onclick="approveGame(${g.id})" style="background:#22C55E22;border:1px solid #22C55E44;color:#22C55E;padding:6px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;">✅ Tasdiqlash</button>
+          <button onclick="rejectGame(${g.id},'${(g.title||'').replace(/'/g,"\\'")}')" style="background:#EF444422;border:1px solid #EF444444;color:#EF4444;padding:6px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem;">❌ Rad etish</button>
+        </div>` : ''}
+        ${g.status==='published'?`<a href="/game/${g.id}" target="_blank" style="font-size:.78rem;color:#7c3aed;">Ko'rish →</a>`:''}
+        <button onclick="deleteGame(${g.id})" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.72rem;">🗑 O'chirish</button>
+      </div>
+    </div>`;
+  }
+
+  main.innerHTML = `
+    <div class="admin-section-title">🎮 O'yinlar Moderatsiyasi</div>
+
+    <div style="margin-bottom:28px;">
+      <div style="font-size:1rem;font-weight:800;color:white;margin-bottom:14px;">
+        ⏳ Kutayotgan O'yinlar
+        <span style="background:#F59E0B22;color:#F59E0B;font-size:.75rem;padding:2px 10px;border-radius:999px;margin-left:8px;">${pending.length}</span>
+      </div>
+      ${pending.length
+        ? `<div style="display:flex;flex-direction:column;gap:10px;">${pending.map(g=>gameRow(g,true)).join('')}</div>`
+        : '<p style="color:rgba(255,255,255,.3);text-align:center;padding:24px;">Hali kutayotgan o\'yin yo\'q 🎉</p>'}
+    </div>
+
+    <div>
+      <div style="font-size:1rem;font-weight:800;color:white;margin-bottom:14px;">
+        📋 Barcha O'yinlar
+        <span style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:.75rem;padding:2px 10px;border-radius:999px;margin-left:8px;">${all.length}</span>
+      </div>
+      ${all.length
+        ? `<div style="display:flex;flex-direction:column;gap:10px;">${all.map(g=>gameRow(g,false)).join('')}</div>`
+        : '<p style="color:rgba(255,255,255,.3);text-align:center;padding:24px;">Hali o\'yin yo\'q</p>'}
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:#111827;border:1px solid rgba(255,255,255,.12);border-radius:20px;width:100%;max-width:900px;max-height:92vh;overflow:hidden;">
+        <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);">
+          <span style="font-weight:800;color:white;font-size:.95rem;">🕹 O'yinni Test Qilish</span>
+          <button onclick="closePreview()" style="background:rgba(255,255,255,.08);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;">✕</button>
+        </div>
+        <iframe id="previewFrame" style="width:100%;aspect-ratio:16/9;border:none;display:block;" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
+      </div>
+    </div>
+  `;
+}
+
+function previewGame(gid, filePath, gameEntry) {
+  const modal = document.getElementById('previewModal');
+  const frame = document.getElementById('previewFrame');
+  if (!filePath) { showToast("O'yin fayli topilmadi", 'error'); return; }
+  frame.src = `/games/${filePath}/${gameEntry}`;
+  modal.style.display = 'flex';
+}
+function closePreview() {
+  const modal = document.getElementById('previewModal');
+  const frame = document.getElementById('previewFrame');
+  if (modal) modal.style.display = 'none';
+  if (frame) frame.src = '';
+}
+
+async function approveGame(gid) {
+  if(!confirm("O'yinni tasdiqlaysizmi? Foydalanuvchiga bildirishnoma ketadi.")) return;
+  try {
+    await api(`/api/admin/games/${gid}/approve`, {method:'POST',body:JSON.stringify({})});
+    showToast("O'yin tasdiqlandi! ✅", 'success');
+    loadGames();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function rejectGame(gid, title) {
+  // Show reject reason modal
+  const html = `
+    <div style="padding:22px 24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <span style="font-size:1rem;font-weight:800;color:white;">❌ O'yinni Rad Etish</span>
+        <button onclick="closeRejectModal()" style="background:rgba(255,255,255,.08);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
+      </div>
+      <p style="color:rgba(255,255,255,.5);font-size:.88rem;margin-bottom:14px;">
+        "<strong style="color:white;">${title}</strong>" o'yinini rad etasizmi?
+      </p>
+      <label style="display:block;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Rad etish sababi (ixtiyoriy)</label>
+      <textarea id="rejectReason" rows="3" placeholder="Masalan: O'yin ishlamaydi, kontent mos emas..." style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;color:white;font-family:'Outfit',sans-serif;font-size:.88rem;resize:none;outline:none;box-sizing:border-box;"></textarea>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button onclick="closeRejectModal()" style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);padding:10px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.88rem;">Bekor qilish</button>
+        <button onclick="doRejectGame(${gid})" style="flex:1;background:linear-gradient(135deg,#7f1d1d,#991b1b);border:none;color:white;padding:10px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.88rem;">❌ Rad etish</button>
+      </div>
+    </div>`;
+  const div = document.createElement('div');
+  div.id = 'rejectModalWrap';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  div.innerHTML = `<div style="background:#111827;border:1px solid rgba(255,255,255,.12);border-radius:18px;width:100%;max-width:440px;">${html}</div>`;
+  div.addEventListener('click', e => { if(e.target===div) closeRejectModal(); });
+  document.body.appendChild(div);
+  setTimeout(() => document.getElementById('rejectReason')?.focus(), 100);
+}
+function closeRejectModal() { document.getElementById('rejectModalWrap')?.remove(); }
+
+async function doRejectGame(gid) {
+  const reason = document.getElementById('rejectReason')?.value.trim() || '';
+  closeRejectModal();
+  try {
+    await api(`/api/admin/games/${gid}/reject`, {method:'POST', body:JSON.stringify({reason})});
+    showToast("O'yin rad etildi", 'warning');
+    loadGames();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteGame(gid) {
+  if(!confirm("O'yinni butunlay o'chirasizmi? Bu amalni qaytarib bo'lmaydi.")) return;
+  try {
+    await api(`/api/admin/games/${gid}/delete`, {method:'POST',body:JSON.stringify({})});
+    showToast("O'yin o'chirildi", 'success');
+    loadGames();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── SUPPORT TICKETS ──
+async function loadTickets() {
+  const main = document.getElementById('adminMain');
+  main.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  try {
+    const tickets = await api('/api/support/tickets');
+    const typeIcon = {bug:'🐛', question:'❓', vacancy:'💼'};
+    const typeLabel = {bug:'Bug xabari', question:'Savol', vacancy:'Vakansiya'};
+    const typeColor = {bug:'rgba(248,113,113,.15)', question:'rgba(96,165,250,.15)', vacancy:'rgba(201,168,76,.15)'};
+    const typeBorder = {bug:'rgba(248,113,113,.3)', question:'rgba(96,165,250,.3)', vacancy:'rgba(201,168,76,.3)'};
+
+    const byType = {bug: tickets.filter(t=>t.ticket_type==='bug'), question: tickets.filter(t=>t.ticket_type==='question'), vacancy: tickets.filter(t=>t.ticket_type==='vacancy')};
+    const openCount = tickets.filter(t=>t.status==='open').length;
+
+    main.innerHTML = `
+      <div style="padding:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <h2 style="font-size:1.2rem;font-weight:900;color:#fff;">🎫 Foydalanuvchi Murojaatlari</h2>
+          <span style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24;padding:4px 14px;border-radius:999px;font-size:.8rem;font-weight:800;">${openCount} ta javobi kutilmoqda</span>
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+          ${['bug','question','vacancy'].map(type => `
+          <div style="background:${typeColor[type]};border:1px solid ${typeBorder[type]};border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:1.6rem;">${typeIcon[type]}</div>
+            <div style="font-size:1.4rem;font-weight:900;color:#fff;margin:4px 0;">${byType[type].length}</div>
+            <div style="font-size:.75rem;color:#aaa;">${typeLabel[type]}</div>
+          </div>`).join('')}
+        </div>
+
+        <!-- Filter tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+          <button onclick="filterTickets('all',this)" class="ticket-filter-btn active" style="padding:6px 14px;border-radius:20px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.1);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;">Hammasi (${tickets.length})</button>
+          <button onclick="filterTickets('open',this)" class="ticket-filter-btn" style="padding:6px 14px;border-radius:20px;border:1.5px solid rgba(251,191,36,.3);background:transparent;color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;">⏳ Ochiq (${openCount})</button>
+          <button onclick="filterTickets('bug',this)" class="ticket-filter-btn" style="padding:6px 14px;border-radius:20px;border:1.5px solid rgba(248,113,113,.3);background:transparent;color:#f87171;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;">🐛 Buglar (${byType.bug.length})</button>
+          <button onclick="filterTickets('question',this)" class="ticket-filter-btn" style="padding:6px 14px;border-radius:20px;border:1.5px solid rgba(96,165,250,.3);background:transparent;color:#60a5fa;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;">❓ Savollar (${byType.question.length})</button>
+          <button onclick="filterTickets('vacancy',this)" class="ticket-filter-btn" style="padding:6px 14px;border-radius:20px;border:1.5px solid rgba(201,168,76,.3);background:transparent;color:#C9A84C;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;">💼 Vakansiya (${byType.vacancy.length})</button>
+        </div>
+
+        <!-- Tickets list -->
+        <div id="ticketsList">
+          ${renderTicketList(tickets, 'all')}
+        </div>
+      </div>`;
+
+    window._allTickets = tickets;
+  } catch(e) {
+    main.innerHTML = `<div style="padding:40px;text-align:center;color:#f87171;">Xatolik: ${e.message}</div>`;
+  }
+}
+
+function renderTicketList(tickets, filter) {
+  const filtered = filter === 'all' ? tickets
+    : filter === 'open' ? tickets.filter(t=>t.status==='open')
+    : tickets.filter(t=>t.ticket_type===filter);
+
+  if(!filtered.length) return '<div style="text-align:center;padding:40px;color:#555;">Murojaatlar yo\'q</div>';
+
+  const typeIcon = {bug:'🐛', question:'❓', vacancy:'💼'};
+  return filtered.map(t => `
+    <div id="ticket-${t.id}" style="background:#161b22;border:1px solid ${t.status==='open'?'rgba(251,191,36,.2)':'rgba(74,222,128,.15)'};border-radius:14px;padding:16px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="font-size:1.4rem;flex-shrink:0;">${typeIcon[t.ticket_type]||'📩'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+            <div style="font-weight:800;color:#fff;font-size:.9rem;">${t.subject}</div>
+            <span style="font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:999px;background:${t.status==='open'?'rgba(251,191,36,.15)':'rgba(74,222,128,.12)'};color:${t.status==='open'?'#fbbf24':'#4ade80'};">${t.status==='open'?'⏳ Ochiq':'✅ Hal qilindi'}</span>
+          </div>
+          <div style="font-size:.78rem;color:#888;margin-top:4px;">@${t.username||'Mehmon'} · ${t.created_at?.split('T')[0]||''}</div>
+          <div style="font-size:.82rem;color:#d0d0d0;margin-top:8px;background:rgba(255,255,255,.03);border-radius:8px;padding:10px;white-space:pre-wrap;">${t.message}</div>
+          ${t.reply ? `<div style="margin-top:10px;background:rgba(74,222,128,.06);border-radius:8px;padding:10px;border-left:3px solid #4ade80;">
+            <div style="font-size:.72rem;font-weight:800;color:#4ade80;margin-bottom:4px;">✅ JAVOB:</div>
+            <div style="font-size:.82rem;color:#d0d0d0;">${t.reply}</div>
+          </div>` : ''}
+          ${t.status === 'open' ? `<div style="margin-top:10px;display:flex;gap:8px;">
+            <textarea id="reply-${t.id}" placeholder="Javob yozing..." rows="2" style="flex:1;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:8px 10px;color:#fff;font-family:inherit;font-size:.8rem;outline:none;resize:none;"></textarea>
+            <button onclick="sendTicketReply(${t.id})" style="padding:8px 14px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.78rem;white-space:nowrap;">Javob berish</button>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterTickets(filter, btn) {
+  document.querySelectorAll('.ticket-filter-btn').forEach(b => {
+    b.style.background = 'transparent'; b.style.fontWeight = '700';
+  });
+  btn.style.background = 'rgba(255,255,255,.1)';
+  document.getElementById('ticketsList').innerHTML = renderTicketList(window._allTickets||[], filter);
+}
+
+async function sendTicketReply(tid) {
+  const inp = document.getElementById(`reply-${tid}`);
+  const reply = inp?.value.trim();
+  if(!reply) { showToast('Javob yozing!','error'); return; }
+  try {
+    await api(`/api/support/reply/${tid}`, {method:'POST', body:JSON.stringify({reply})});
+    showToast('✅ Javob yuborildi!','success');
+    loadTickets();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+// ── VACANCIES ──
+async function loadVacancies() {
+  const main = document.getElementById('adminMain');
+  try {
+    const vacs = await api('/api/admin/vacancies');
+    main.innerHTML = `<div style="padding:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h2 style="font-size:1.2rem;font-weight:900;color:#fff;">💼 Vakansiya Lavozimlar</h2>
+        <button onclick="openVacancyCreateModal()" style="padding:9px 18px;background:linear-gradient(135deg,#1B3A6B,#C9A84C);border:none;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.83rem;">+ Lavozim qo'shish</button>
+      </div>
+      <div id="vacanciesList">
+        ${!vacs.length ? '<div style="text-align:center;padding:40px;color:#555;">Hali lavozim qo\'shilmagan</div>' :
+          vacs.map(v => `<div style="background:#161b22;border:1px solid #21262d;border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:900;color:#fff;font-size:.95rem;margin-bottom:4px;">${v.title}</div>
+              ${v.description ? `<div style="font-size:.82rem;color:#888;margin-bottom:6px;">${v.description}</div>` : ''}
+              ${v.requirements ? `<div style="font-size:.78rem;color:#C9A84C;">📋 ${v.requirements}</div>` : ''}
+              <div style="font-size:.7rem;color:#555;margin-top:6px;">${v.created_at?.split('T')[0]||''}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button onclick="deleteVacancy(${v.id})" style="padding:6px 12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:#f87171;cursor:pointer;font-family:inherit;font-size:.75rem;font-weight:700;">O'chirish</button>
+            </div>
+          </div>`).join('')
+        }
+      </div>
+    </div>`;
+  } catch(e) {
+    main.innerHTML = `<div style="padding:40px;text-align:center;color:#f87171;">${e.message}</div>`;
+  }
+}
+
+function openVacancyCreateModal() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  overlay.innerHTML = `<div style="background:#161b22;border:1px solid #21262d;border-radius:16px;width:100%;max-width:460px;padding:24px;">
+    <h3 style="font-weight:900;color:#fff;margin-bottom:16px;">💼 Yangi Lavozim</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Lavozim nomi *</label>
+        <input id="vacTitle" placeholder="Masalan: Frontend Dasturchi" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;">
+      </div>
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Tavsif</label>
+        <textarea id="vacDesc" rows="3" placeholder="Bu lavozim haqida..." style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;resize:none;"></textarea>
+      </div>
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#666;text-transform:uppercase;display:block;margin-bottom:4px;">Talablar</label>
+        <input id="vacReq" placeholder="Masalan: React, 1+ yil tajriba" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:10px;background:rgba(255,255,255,.06);border:1px solid #21262d;border-radius:10px;color:#aaa;cursor:pointer;font-family:inherit;font-weight:700;">Bekor</button>
+      <button onclick="createVacancy(this)" style="flex:2;padding:10px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;">✅ Saqlash</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+}
+
+async function createVacancy(btn) {
+  const title = document.getElementById('vacTitle').value.trim();
+  const desc = document.getElementById('vacDesc').value.trim();
+  const req = document.getElementById('vacReq').value.trim();
+  if(!title) { showToast('Lavozim nomini kiriting!','error'); return; }
+  try {
+    await api('/api/admin/vacancies', {method:'POST', body:JSON.stringify({title, description:desc, requirements:req})});
+    showToast('Lavozim qo\'shildi ✅','success');
+    btn.closest('[style*=fixed]').remove();
+    loadVacancies();
+    // Reload support widget vacancies
+    fetch('/api/vacancies').then(r=>r.json()).then(vacs => {
+      var list = document.getElementById('swVacancyList');
+      if(!list) return;
+      list.innerHTML = vacs.map(v => `<div class="sw-vacancy-item">
+        <div class="sw-vacancy-title">${v.title}</div>
+        ${v.description?`<div class="sw-vacancy-desc">${v.description}</div>`:''}
+        ${v.requirements?`<div class="sw-vacancy-req">📋 ${v.requirements}</div>`:''}
+        <button onclick="_swSelectVacancy(${JSON.stringify(v.title)})" style="margin-top:8px;padding:5px 12px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;cursor:pointer;font-family:inherit;">Ariza →</button>
+      </div>`).join('');
+    }).catch(()=>{});
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+async function deleteVacancy(id) {
+  if(!confirm('O\'chirmoqchimisiz?')) return;
+  await api('/api/admin/vacancies?id='+id, {method:'DELETE'});
+  showToast('O\'chirildi','success');
+  loadVacancies();
+}
+
+// ── MAVZU VIDEO UPLOAD (3 TIL) ──
+async function uploadMavzuVideo(input, mavzuId, lang) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!mavzuId) { showToast('Avval mavzuni saqlang!', 'error'); return; }
+
+  const mid = mavzuId;
+  const progEl = document.getElementById(`vprog_${lang}_${mid}`);
+  const barEl  = document.getElementById(`vbar_${lang}_${mid}`);
+  const statusEl = document.getElementById(`vstatus_${lang}_${mid}`);
+
+  if (progEl) progEl.style.display = '';
+  if (statusEl) statusEl.textContent = 'Yuklanmoqda...';
+  if (barEl) barEl.style.width = '0%';
+
+  // Animate progress bar
+  let fakeProgress = 0;
+  const interval = setInterval(() => {
+    fakeProgress = Math.min(fakeProgress + Math.random() * 15, 85);
+    if (barEl) barEl.style.width = fakeProgress + '%';
+  }, 300);
+
+  try {
+    const fd = new FormData();
+    fd.append('video', file);
+    fd.append('lang', lang);
+    const res = await fetch(`/api/admin/upload-video/${mid}`, { method: 'POST', body: fd });
+    const d = await res.json();
+    clearInterval(interval);
+    if (d.success) {
+      if (barEl) barEl.style.width = '100%';
+      if (statusEl) {
+        const langLabel = lang==='uz'?'O\'zbekcha':lang==='ru'?'Ruscha':'Inglizcha';
+        statusEl.innerHTML = `<span style="color:#4ade80;">✅ ${langLabel} video yuklandi: ${file.name}</span>`;
+      }
+      showToast(`${lang.toUpperCase()} video yuklandi ✅`, 'success');
+    } else {
+      clearInterval(interval);
+      if (statusEl) statusEl.innerHTML = `<span style="color:#f87171;">❌ ${d.error}</span>`;
+      showToast(d.error || 'Xato', 'error');
+    }
+  } catch(e) {
+    clearInterval(interval);
+    if (statusEl) statusEl.innerHTML = `<span style="color:#f87171;">❌ ${e.message}</span>`;
+    showToast(e.message, 'error');
+  }
+}
+
+// ── TEXT FORMATTER (Markdown shortcuts) ──
+function fmtText(id, cmd) {
+  const ta = document.getElementById(id);
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const sel = ta.value.substring(start, end) || 'matn';
+  let insert = '';
+  switch(cmd) {
+    case 'B':     insert = `**${sel}**`; break;
+    case 'I':     insert = `*${sel}*`; break;
+    case 'H2':    insert = `\n## ${sel}\n`; break;
+    case 'H3':    insert = `\n### ${sel}\n`; break;
+    case '• List':insert = `\n- ${sel}\n`; break;
+    case 'Code':  insert = `\`${sel}\``; break;
+    default:      insert = sel;
+  }
+  ta.value = ta.value.substring(0, start) + insert + ta.value.substring(end);
+  ta.focus();
+  ta.selectionStart = start + insert.length;
+  ta.selectionEnd = start + insert.length;
+}
+
+// ── ADMIN STORE ──
+async function loadAdminStore() {
+  document.getElementById('adminMain').innerHTML = `<div class="admin-section-title">🛒 Do'kon boshqaruvi</div><div id="storeAdminList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px;"><div style="color:#555;">Yuklanmoqda...</div></div>
+  <button onclick="openAddStoreItem()" style="margin-top:16px;padding:10px 22px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.88rem;">+ Yangi tovar</button>`;
+  const items = await api('/api/admin/store/items');
+  const list = document.getElementById('storeAdminList');
+  if(!items.length){list.innerHTML='<div style="color:#555;">Do\'konda tovar yo\'q</div>';return;}
+  list.innerHTML = items.map(it=>`
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;position:relative;">
+      ${it.image?`<img src="${it.image}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:10px;">`:`<div style="width:100%;height:80px;background:#1e1e1e;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;color:#555;font-size:2rem;">🖼️</div>`}
+      <div style="font-weight:800;color:#fff;margin-bottom:4px;">${it.name_uz}</div>
+      <div style="font-size:.78rem;color:#888;margin-bottom:8px;">${it.desc_uz||''}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="background:rgba(201,168,76,.15);color:#C9A84C;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;">${it.price_points} ball</span>
+        <span style="background:rgba(255,255,255,.07);color:#aaa;padding:2px 8px;border-radius:20px;font-size:.72rem;">${it.rarity||'common'}</span>
+        <span style="background:${it.is_active?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)'};color:${it.is_active?'#4ade80':'#f87171'};padding:2px 8px;border-radius:20px;font-size:.72rem;">${it.is_active?'Faol':'Nofaol'}</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="editStoreItem(${it.id},'${(it.name_uz||'').replace(/'/g,"\\'")}','${(it.desc_uz||'').replace(/'/g,"\\'")}',${it.price_points},'${it.rarity||'common'}',${it.is_active})" style="flex:1;padding:7px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:8px;color:#60a5fa;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:700;">✏️ Tahrir</button>
+        <label style="flex:1;padding:7px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;color:#4ade80;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:700;text-align:center;">
+          🖼️ Rasm<input type="file" accept="image/*" style="display:none;" onchange="uploadStoreImg(${it.id},this)">
+        </label>
+        <button onclick="deleteStoreItem(${it.id})" style="padding:7px 10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:#f87171;cursor:pointer;font-family:inherit;font-size:.78rem;">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function openAddStoreItem(){
+  const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#161b22;border:1px solid #21262d;border-radius:16px;padding:24px;width:380px;max-width:95vw;">
+    <div style="font-weight:800;color:#fff;font-size:1rem;margin-bottom:16px;">+ Yangi tovar qo'shish</div>
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Nomi (UZ)</label>
+    <input id="siName" placeholder="Tovar nomi..." style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Tavsif</label>
+    <input id="siDesc" placeholder="Qisqa tavsif..." style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Narx (ball)</label>
+    <input id="siPrice" type="number" value="100" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Noyoblik</label>
+    <select id="siRarity" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:16px;">
+      <option value="common">Common</option><option value="rare">Rare</option><option value="epic">Epic</option><option value="legendary">Legendary</option>
+    </select>
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:10px;background:rgba(255,255,255,.06);border:1px solid #21262d;border-radius:8px;color:#aaa;cursor:pointer;font-family:inherit;">Bekor</button>
+      <button onclick="submitAddStoreItem(this)" style="flex:2;padding:10px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:8px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;">✅ Qo'shish</button>
+    </div>
+  </div></div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+
+async function submitAddStoreItem(btn){
+  const name=document.getElementById('siName').value.trim();
+  const desc=document.getElementById('siDesc').value.trim();
+  const price=parseInt(document.getElementById('siPrice').value)||100;
+  const rarity=document.getElementById('siRarity').value;
+  if(!name){showToast('Nom kiriting!','error');return;}
+  btn.disabled=true;btn.textContent='⏳...';
+  try{
+    await api('/api/admin/store/items',{method:'POST',body:JSON.stringify({name_uz:name,name_ru:name,desc_uz:desc,desc_ru:desc,price_points:price,rarity,item_type:'cosmetic'})});
+    showToast('Tovar qo\'shildi ✅','success');
+    btn.closest('[style*=fixed]').remove();
+    loadAdminStore();
+  }catch(e){showToast(e.message,'error');btn.disabled=false;btn.textContent='✅ Qo\'shish';}
+}
+
+function editStoreItem(id,name,desc,price,rarity,active){
+  const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#161b22;border:1px solid #21262d;border-radius:16px;padding:24px;width:380px;max-width:95vw;">
+    <div style="font-weight:800;color:#fff;font-size:1rem;margin-bottom:16px;">✏️ Tovanni tahrirlash</div>
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Nomi</label>
+    <input id="eiName" value="${name}" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Tavsif</label>
+    <input id="eiDesc" value="${desc}" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Narx (ball)</label>
+    <input id="eiPrice" type="number" value="${price}" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <label style="font-size:.75rem;color:#666;font-weight:700;display:block;margin-bottom:4px;">Noyoblik</label>
+    <select id="eiRarity" style="width:100%;background:#0d1117;border:1.5px solid #21262d;border-radius:8px;padding:9px 12px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box;margin-bottom:10px;">
+      <option value="common" ${rarity==='common'?'selected':''}>Common</option><option value="rare" ${rarity==='rare'?'selected':''}>Rare</option><option value="epic" ${rarity==='epic'?'selected':''}>Epic</option><option value="legendary" ${rarity==='legendary'?'selected':''}>Legendary</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:16px;">
+      <input type="checkbox" id="eiActive" ${active?'checked':''} style="width:16px;height:16px;">
+      <span style="color:#aaa;font-size:.82rem;">Faol (do'konda ko'rinadi)</span>
+    </label>
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:10px;background:rgba(255,255,255,.06);border:1px solid #21262d;border-radius:8px;color:#aaa;cursor:pointer;font-family:inherit;">Bekor</button>
+      <button onclick="submitEditStoreItem(${id},this)" style="flex:2;padding:10px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:8px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;">💾 Saqlash</button>
+    </div>
+  </div></div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+
+async function submitEditStoreItem(id,btn){
+  const name=document.getElementById('eiName').value.trim();
+  const desc=document.getElementById('eiDesc').value.trim();
+  const price=parseInt(document.getElementById('eiPrice').value)||100;
+  const rarity=document.getElementById('eiRarity').value;
+  const active=document.getElementById('eiActive').checked?1:0;
+  btn.disabled=true;btn.textContent='⏳...';
+  try{
+    await api(`/api/admin/store/items/${id}`,{method:'PUT',body:JSON.stringify({name_uz:name,name_ru:name,desc_uz:desc,desc_ru:desc,price_points:price,rarity,is_active:active})});
+    showToast('Saqlandi ✅','success');
+    btn.closest('[style*=fixed]').remove();
+    loadAdminStore();
+  }catch(e){showToast(e.message,'error');btn.disabled=false;btn.textContent='💾 Saqlash';}
+}
+
+async function uploadStoreImg(id,input){
+  const file=input.files[0];if(!file)return;
+  const fd=new FormData();fd.append('image',file);
+  try{
+    const r=await fetch(`/api/admin/store/items/${id}/image`,{method:'POST',body:fd});
+    const d=await r.json();
+    if(d.success){showToast('Rasm yuklandi ✅','success');loadAdminStore();}
+    else showToast('Xato','error');
+  }catch(e){showToast(e.message,'error');}
+}
+
+async function deleteStoreItem(id){
+  if(!confirm('Tovanni o\'chirmoqchimisiz?'))return;
+  await api(`/api/admin/store/items/${id}`,{method:'DELETE'});
+  showToast('O\'chirildi','success');
+  loadAdminStore();
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  initAdminRole().then(() => loadStats());
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'uz' }}">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if lang == 'en' %}<title>Terms of Service — Bilimxon</title>
+  {% elif lang == 'ru' %}<title>Условия использования — Bilimxon</title>
+  {% else %}<title>Foydalanish Shartlari — Bilimxon</title>{% endif %}
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{background:#0d1117;}
+    .legal-page{max-width:800px;margin:0 auto;padding:calc(var(--topbar-h,64px)+36px) 24px 80px;}
+    .legal-hero{text-align:center;margin-bottom:36px;}
+    .legal-hero h1{font-size:1.8rem;font-weight:800;color:#fff;margin:0 0 10px;}
+    .legal-hero p{font-size:.82rem;color:rgba(255,255,255,.4);}
+    .ls{background:#161b22;border:2px solid #21262d;border-radius:16px;padding:22px;margin-bottom:12px;}
+    .ls h2{font-size:.92rem;font-weight:800;color:#C9A84C;margin:0 0 10px;border-left:3px solid #C9A84C;padding-left:10px;}
+    .ls p,.ls li{font-size:.84rem;color:rgba(255,255,255,.6);line-height:1.75;margin:0 0 8px;}
+    .ls ul{padding-left:18px;margin:0;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="legal-page">
+
+{% if lang == 'en' %}
+<div class="legal-hero"><div style="font-size:2.5rem;margin-bottom:12px;">📄</div><h1>Terms of Service</h1><p>Last updated: January 1, 2025 · Bilimxon platform</p></div>
+<div class="ls"><h2>1. Acceptance</h2><p>By using Bilimxon (bilimxon.uz), you agree to these terms. If you agree, you may continue.</p></div>
+<div class="ls"><h2>2. User Obligations</h2><ul><li>Provide accurate information when registering</li><li>Do not share your account with others</li><li>Do not attempt to hack or break the platform</li><li>Be respectful to other users</li><li>Do not spam, post inappropriate content or violate copyright</li></ul></div>
+<div class="ls"><h2>3. Content & Copyright</h2><p>All course materials, questions and designs on the platform belong to Bilimxon. For content posted by users in blog and social pages, the user is responsible.</p></div>
+<div class="ls"><h2>4. Account Suspension</h2><p>Bilimxon reserves the right to block or delete accounts for: violating terms, spam or harmful activity, harming other users.</p></div>
+<div class="ls"><h2>5. Limitation of Liability</h2><p>Bilimxon is not responsible for platform outages, data loss or third-party actions. The platform is provided "as is".</p></div>
+<div class="ls"><h2>6. Contact</h2><p>Questions: <a href="mailto:bilimxon5@gmail.com" style="color:#C9A84C;">bilimxon5@gmail.com</a> or <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a></p></div>
+
+{% elif lang == 'ru' %}
+<div class="legal-hero"><div style="font-size:2.5rem;margin-bottom:12px;">📄</div><h1>Условия использования</h1><p>Последнее обновление: 1 января 2025 · Платформа Bilimxon</p></div>
+<div class="ls"><h2>1. Принятие условий</h2><p>Используя Bilimxon (bilimxon.uz), вы соглашаетесь с этими условиями.</p></div>
+<div class="ls"><h2>2. Обязательства пользователя</h2><ul><li>Указывать правильную информацию при регистрации</li><li>Не передавать аккаунт другим лицам</li><li>Не предпринимать попытки взлома платформы</li><li>Уважительно общаться с другими пользователями</li><li>Не спамить, не публиковать неприемлемый контент</li></ul></div>
+<div class="ls"><h2>3. Контент и авторские права</h2><p>Все учебные материалы, задачи и дизайн платформы принадлежат Bilimxon. За контент, опубликованный пользователями в блоге, несёт ответственность сам пользователь.</p></div>
+<div class="ls"><h2>4. Блокировка аккаунта</h2><p>Bilimxon оставляет за собой право блокировать или удалять аккаунты за: нарушение условий, спам или вредоносную деятельность, причинение вреда другим пользователям.</p></div>
+<div class="ls"><h2>5. Ограничение ответственности</h2><p>Bilimxon не несёт ответственности за перебои в работе платформы, потерю данных или действия третьих лиц. Платформа предоставляется «как есть».</p></div>
+<div class="ls"><h2>6. Контакты</h2><p>Вопросы: <a href="mailto:bilimxon5@gmail.com" style="color:#C9A84C;">bilimxon5@gmail.com</a> или <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a></p></div>
+
+{% else %}
+<div class="legal-hero"><div style="font-size:2.5rem;margin-bottom:12px;">📄</div><h1>Foydalanish Shartlari</h1><p>Oxirgi yangilanish: 2025 yil 1 yanvar · Bilimxon platformasi</p></div>
+<div class="ls"><h2>1. Qabul qilish</h2><p>Bilimxon (bilimxon.uz) saytidan foydalanib, ushbu shartlarni qabul qilasiz.</p></div>
+<div class="ls"><h2>2. Foydalanuvchi majburiyatlari</h2><ul><li>Ro'yxatdan o'tishda to'g'ri ma'lumot kiritish</li><li>Hisobingizni boshqalarga bermaslik</li><li>Platformani buzishga urinmaslik</li><li>Boshqa foydalanuvchilarga hurmatli munosabatda bo'lish</li><li>Spam, noto'g'ri kontent yoki mualliflik huquqini buzmaslik</li></ul></div>
+<div class="ls"><h2>3. Kontent va mualliflik huquqi</h2><p>Platformadagi barcha kurs materiallari, savollar va dizayn Bilimxon mulki. Blog va ijtimoiy sahifadagi foydalanuvchi kontenti uchun foydalanuvchi javobgar.</p></div>
+<div class="ls"><h2>4. Hisob o'chirish</h2><p>Bilimxon quyidagi hollarda hisobni bloklash yoki o'chirish huquqini saqlaydi: shartlarni buzish, spam yoki zararli faoliyat, boshqa foydalanuvchilarga zarar yetkazish.</p></div>
+<div class="ls"><h2>5. Javobgarlik cheklovi</h2><p>Bilimxon platforma uzilishlari, ma'lumot yo'qolishi yoki uchinchi tomon harakatlari uchun javobgar emas. Platforma "mavjud holda" taqdim etiladi.</p></div>
+<div class="ls"><h2>6. Aloqa</h2><p>Savollar: <a href="mailto:bilimxon5@gmail.com" style="color:#C9A84C;">bilimxon5@gmail.com</a> yoki <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a></p></div>
+{% endif %}
+
+</div>
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

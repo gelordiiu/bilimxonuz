@@ -1,0 +1,41 @@
+{
+  "lesson": "PYTHON - To'plamlar (Set) va Kortejlar (Tuple)",
+  "questions": [
+    {
+      "id": 1,
+      "question": "To'plamlar (Set) va Kortejlar (Tuple) haqida asosiy tushuncha nima?",
+      "options": [
+        "Birinchi variant",
+        "Ikkinchi variant",
+        "To'g'ri javob",
+        "To'rtinchi variant"
+      ],
+      "correct": 2,
+      "explanation": "To'plamlar (Set) va Kortejlar (Tuple) mavzusining asosiy tushunchasi."
+    },
+    {
+      "id": 2,
+      "question": "Quyidagilardan qaysi biri To'plamlar (Set) va Kortejlar (Tuple) bilan bog'liq?",
+      "options": [
+        "Bog'liq emas",
+        "Bog'liq",
+        "Ba'zan bog'liq",
+        "Nomaqbul"
+      ],
+      "correct": 1,
+      "explanation": "Bu mavzu To'plamlar (Set) va Kortejlar (Tuple) bilan bevosita bog'liq."
+    },
+    {
+      "id": 3,
+      "question": "To'plamlar (Set) va Kortejlar (Tuple) qayerda qo'llaniladi?",
+      "options": [
+        "Hech qayerda",
+        "Dasturlashda",
+        "Faqat matematikada",
+        "Kundalik hayotda"
+      ],
+      "correct": 1,
+      "explanation": "To'plamlar (Set) va Kortejlar (Tuple) dasturlashda keng qo'llaniladi."
+    }
+  ]
+}

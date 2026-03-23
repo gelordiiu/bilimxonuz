@@ -1,0 +1,17 @@
+LESSON 1: Dasturlash nima? Kompyuter qanday ishlaydi?
+
+Bob: BOB 1: Dasturlashga Kirish (Junior)
+
+## Dasturlash nima? Kompyuter qanday ishlaydi?
+
+Dasturlash — bu kompyuterga tushunarli tilda ko'rsatmalar yozish jarayoni. Kompyuter faqat ikkilik tizim (0 va 1) ni tushunadi, lekin biz Python, JavaScript kabi yuqori darajali tillardan foydalanamiz. Kompilyator yoki interpretator bu kodni mashina tiliga o'giradi.
+
+## Kod Namunasi
+```
+# Salom dunyo!
+print("Salom, Dunyo!")
+print("1 + 1 =", 1 + 1)
+```
+
+## Amaliyot
+Yuqoridagi misolni o'rganing va o'zingizning variantingizni yozing!

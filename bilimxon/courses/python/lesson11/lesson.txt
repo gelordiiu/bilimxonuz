@@ -1,0 +1,24 @@
+LESSON 11: Inkapsulatsiya va Abstraksiya
+
+Bob: BOB 3: OOP — Ob'yektga Yo'naltirilgan Dasturlash (Middle)
+
+## Inkapsulatsiya va Abstraksiya
+
+Inkapsulatsiya — ma'lumotni himoya qilish, tashqaridan to'g'ridan-to'g'ri o'zgartirishni cheklash. _ (protected) va __ (private) prefikslar ishlatiladi. Property dekoratori — getter/setter yaratadi. Abstraksiya — muhim bo'lmagan detallarni yashirish.
+
+## Kod Namunasi
+```
+class BankHisobi:
+    def __init__(self):
+        self.__balans = 0
+    def kirim(self, summa):
+        self.__balans += summa
+    def balans(self): return self.__balans
+
+h = BankHisobi()
+h.kirim(1000)
+print(h.balans())
+```
+
+## Amaliyot
+Yuqoridagi misolni o'rganing va o'zingizning variantingizni yozing!

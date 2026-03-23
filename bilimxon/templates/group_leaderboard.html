@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Guruh Reytingi</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{font-family:'Outfit',sans-serif;background:#f0f2f5;}
+    .lb-wrap{padding-top:calc(var(--topbar-h) + 24px);max-width:800px;margin:0 auto;padding-left:20px;padding-right:20px;padding-bottom:60px;}
+    .page-header{margin-bottom:24px;}
+    .page-title{font-size:1.5rem;font-weight:900;color:var(--navy);}
+    .page-sub{color:var(--gray-400);font-size:.85rem;margin-top:3px;}
+    .lb-table{background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+    .lb-head{display:grid;grid-template-columns:50px 1fr 120px 130px 100px;padding:12px 20px;background:rgba(27,42,74,.04);border-bottom:1.5px solid #f3f4f6;font-size:.75rem;font-weight:800;color:var(--gray-500);text-transform:uppercase;gap:8px;}
+    .lb-row{display:grid;grid-template-columns:50px 1fr 120px 130px 100px;padding:14px 20px;border-bottom:1px solid #f9fafb;align-items:center;gap:8px;cursor:pointer;transition:.15s;}
+    .lb-row:last-child{border-bottom:none;}
+    .lb-row:hover{background:#f8f9ff;}
+    .lb-row.rank1{background:linear-gradient(135deg,#fffbeb,#fef9c3);}
+    .lb-row.rank2{background:linear-gradient(135deg,#f8fafc,#e5e7eb);}
+    .lb-row.rank3{background:linear-gradient(135deg,#fff7ed,#fed7aa);}
+    .rank-num{font-size:1rem;font-weight:900;color:var(--gray-400);text-align:center;}
+    .rank1 .rank-num{color:#f59e0b;}
+    .rank2 .rank-num{color:#6b7280;}
+    .rank3 .rank-num{color:#ea580c;}
+    .user-info{display:flex;align-items:center;gap:10px;}
+    .u-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:white;flex-shrink:0;overflow:hidden;}
+    .u-av img{width:100%;height:100%;object-fit:cover;}
+    .u-name{font-size:.88rem;font-weight:700;color:var(--navy);}
+    .u-sub{font-size:.73rem;color:var(--gray-400);}
+    .stat-val{font-size:.9rem;font-weight:800;color:var(--navy);}
+    .pts-val{font-size:.9rem;font-weight:800;color:#C9A84C;}
+    .empty{text-align:center;padding:60px;color:var(--gray-400);}
+    @media(max-width:600px){.lb-head,.lb-row{grid-template-columns:40px 1fr 90px 90px;}.lb-head .pts-val,.lb-row .pts-val{display:none;}}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="lb-wrap">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+      <a href="/group/{{ slug }}" style="color:var(--navy);text-decoration:none;font-weight:700;opacity:.6;">←</a>
+      <h1 class="page-title">🏆 Guruh Reytingi</h1>
+    </div>
+    <p class="page-sub" id="groupName">Yuklanmoqda...</p>
+  </div>
+
+  <div class="lb-table">
+    <div class="lb-head">
+      <span>#</span><span>Foydalanuvchi</span><span>Hal qilingan</span><span>To'g'ri javob</span><span>Bal</span>
+    </div>
+    <div id="lbList">
+      <div class="empty"><div class="spinner" style="margin:0 auto 12px;"></div>Yuklanmoqda...</div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const slug = '{{ slug }}';
+
+async function loadLeaderboard() {
+  try {
+    const data = await api(`/api/groups/${slug}/leaderboard`);
+    document.getElementById('groupName').textContent = `${data.group.name} — ${data.group.group_category === 'study' ? '📚 Study Guruh' : '👥 Guruh'}`;
+    const lb = data.leaderboard;
+    if(!lb.length) {
+      document.getElementById('lbList').innerHTML = '<div class="empty">😔 Hali hech kim masala hal qilmagan</div>';
+      return;
+    }
+    const rankEmoji = ['🥇','🥈','🥉'];
+    document.getElementById('lbList').innerHTML = lb.map((u,i)=>`
+      <div class="lb-row ${i<3?'rank'+(i+1):''}" onclick="window.location='/profile/${u.username}'">
+        <span class="rank-num">${rankEmoji[i]||i+1}</span>
+        <div class="user-info">
+          <div class="u-av">${u.avatar ? `<img src="${u.avatar}">` : (u.full_name||'?')[0]}</div>
+          <div>
+            <div class="u-name">${u.full_name||u.username} ${u.has_tick?'<span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;background:#3B82F6;border-radius:50%;color:white;font-size:.5rem;">✓</span>':''}</div>
+            <div class="u-sub">@${u.username}</div>
+          </div>
+        </div>
+        <span class="stat-val">✅ ${u.solved_problems||0}</span>
+        <span class="stat-val">📊 ${u.correct_submissions||0}</span>
+        <span class="pts-val">⭐ ${u.total_points||0}</span>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('lbList').innerHTML = `<div class="empty">Yuklab bo'lmadi: ${e.message}</div>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadLeaderboard);
+</script>
+</body>
+</html>

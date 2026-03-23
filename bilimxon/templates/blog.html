@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Blog & Shorts</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Outfit',sans-serif;background:#0f0f0f;color:#fff;}
+
+    /* ══ LAYOUT ══ */
+    .page{display:flex;padding-top:var(--topbar-h,60px);min-height:100vh;}
+    .sidebar{width:240px;flex-shrink:0;background:#0f0f0f;padding:16px 0;position:sticky;top:var(--topbar-h,60px);height:calc(100vh - var(--topbar-h,60px));overflow-y:auto;border-right:1px solid #272727;}
+    .sidebar::-webkit-scrollbar{width:6px;} .sidebar::-webkit-scrollbar-thumb{background:#444;border-radius:3px;}
+    .main{flex:1;overflow:hidden;}
+
+    /* ══ SIDEBAR ══ */
+    .sbar-section{padding:12px 0;border-bottom:1px solid #272727;}
+    .sbar-title{font-size:.72rem;font-weight:700;color:#aaa;padding:6px 20px;text-transform:uppercase;letter-spacing:.06em;}
+    .sbar-link{display:flex;align-items:center;gap:14px;padding:9px 20px;font-size:.88rem;font-weight:500;color:#e0e0e0;cursor:pointer;border-radius:10px;margin:1px 10px;transition:.15s;text-decoration:none;}
+    .sbar-link:hover,.sbar-link.active{background:#272727;color:#fff;}
+    .sbar-link .sbar-icon{font-size:1.1rem;width:22px;text-align:center;}
+    .sbar-sub{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:.82rem;color:#aaa;cursor:pointer;border-radius:10px;margin:1px 10px;}
+    .sbar-sub:hover{background:#272727;color:#fff;}
+    .sbar-sub-av{width:26px;height:26px;border-radius:50%;background:#444;object-fit:cover;}
+
+    /* ══ TOPBAR (overrides) ══ */
+    /* ══ CATEGORY CHIPS ══ */
+    .cat-bar{display:flex;gap:8px;overflow-x:auto;padding:14px 20px;background:#0f0f0f;border-bottom:1px solid #272727;scrollbar-width:none;}
+    .cat-bar::-webkit-scrollbar{display:none;}
+    .cat-chip{padding:7px 14px;border-radius:8px;background:#272727;color:#e0e0e0;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:.15s;border:none;flex-shrink:0;}
+    .cat-chip:hover{background:#3d3d3d;}
+    .cat-chip.active{background:#fff;color:#0f0f0f;}
+
+    /* ══ FEED TAB SWITCHER ══ */
+    .feed-tabs{display:flex;gap:0;border-bottom:1px solid #272727;padding:0 20px;}
+    .feed-tab{padding:12px 16px;font-size:.88rem;font-weight:700;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;}
+    .feed-tab:hover{color:#fff;}
+    .feed-tab.active{color:#fff;border-bottom-color:#fff;}
+
+    /* ══ VIDEO GRID ══ */
+    .section-head{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;}
+    .section-title{font-size:1rem;font-weight:700;color:#fff;}
+    .see-all{font-size:.8rem;color:#3ea6ff;cursor:pointer;font-weight:600;}
+    .see-all:hover{text-decoration:underline;}
+    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;padding:0 12px 20px;}
+    .video-card{padding:8px;cursor:pointer;border-radius:0;transition:.15s;}
+    .video-card:hover .vc-thumb-wrap{border-radius:12px;}
+    .vc-thumb-wrap{border-radius:10px;overflow:hidden;position:relative;padding-top:56.25%;background:#272727;}
+    .vc-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .vc-duration{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.85);color:#fff;font-size:.72rem;font-weight:700;padding:2px 5px;border-radius:4px;}
+    .vc-short-badge{position:absolute;top:6px;left:6px;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);color:#fff;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:12px;border:1px solid rgba(255,255,255,.25);}
+    .vc-info{display:flex;gap:10px;padding:10px 4px 4px;}
+    .vc-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:#444;object-fit:cover;}
+    .vc-meta{flex:1;min-width:0;}
+    .vc-title{font-size:.88rem;font-weight:600;color:#fff;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .vc-channel{font-size:.78rem;color:#aaa;margin-top:3px;}
+    .vc-stats{font-size:.75rem;color:#aaa;margin-top:2px;}
+
+    /* ══ SHORTS ROW ══ */
+    .shorts-row{display:flex;gap:8px;overflow-x:auto;padding:0 20px 20px;scrollbar-width:none;}
+    .shorts-row::-webkit-scrollbar{display:none;}
+    .short-card{flex-shrink:0;width:160px;cursor:pointer;}
+    .short-card-thumb{width:160px;height:285px;border-radius:12px;background:#272727;overflow:hidden;position:relative;}
+    .short-card-thumb video,.short-card-thumb img{width:100%;height:100%;object-fit:cover;}
+    .short-card-thumb:hover .sc-play{opacity:1;}
+    .sc-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);opacity:0;transition:.2s;font-size:2rem;}
+    .short-card-info{padding:6px 2px;}
+    .short-card-title{font-size:.78rem;font-weight:600;color:#fff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;}
+    .short-card-ch{font-size:.72rem;color:#aaa;margin-top:3px;}
+
+    /* ══ SHORTS PLAYER ══ */
+    #shortsPlayer{display:none;position:fixed;inset:0;background:#000;z-index:1000;top:var(--topbar-h,60px);}
+    .sp-inner{height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:#000;}
+    @media(min-width:900px){.sp-inner{background:#111;}}
+    .sp-video-wrap{position:relative;height:100%;width:100%;max-width:420px;overflow:hidden;}
+    @media(max-width:500px){.sp-video-wrap{max-width:100%;}}
+    .sp-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+    .sp-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#111;}
+    .sp-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8) 0%,rgba(0,0,0,.15) 45%,transparent 70%);pointer-events:none;}
+    /* Left info */
+    .sp-left-info{position:absolute;bottom:72px;left:12px;right:72px;color:#fff;z-index:10;}
+    .sp-username{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.88rem;cursor:pointer;margin-bottom:5px;flex-wrap:wrap;}
+    .sp-username:hover{text-decoration:underline;}
+    .sp-av{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.6);flex-shrink:0;}
+    .sp-sub-btn{padding:3px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,.8);background:transparent;color:#fff;font-size:.7rem;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;}
+    .sp-sub-btn.subbed{background:rgba(255,255,255,.2);}
+    .sp-title{font-size:.85rem;font-weight:700;line-height:1.4;margin-bottom:2px;}
+    .sp-desc{font-size:.75rem;opacity:.75;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .sp-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+    .sp-tag{background:rgba(255,255,255,.15);color:#fff;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:9px;}
+    /* Right actions */
+    .sp-right-actions{position:absolute;right:10px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:16px;z-index:10;}
+    .sp-action{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:#fff;cursor:pointer;font-family:inherit;}
+    .sp-action-icon{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:.15s;}
+    .sp-action-icon:hover,.sp-action-icon.active{background:rgba(255,255,255,.3);}
+    .sp-action-label{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.85);}
+    /* Nav arrows */
+    .sp-nav{position:absolute;right:-52px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;}
+    @media(max-width:500px){.sp-nav{right:8px;top:auto;bottom:50%;transform:none;}}
+    .sp-nav-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+    .sp-nav-btn:hover{background:rgba(255,255,255,.25);}
+    /* Promo / ad */
+    .sp-promo{position:absolute;bottom:14px;left:10px;right:10px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none;border:1px solid rgba(255,255,255,.1);z-index:10;}
+    .sp-promo-text{color:#fbbf24;font-size:.78rem;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    /* Top controls */
+    .sp-close{position:absolute;top:10px;left:10px;z-index:30;background:rgba(0,0,0,.45);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .sp-search-bar{position:absolute;top:10px;left:54px;right:10px;z-index:30;display:flex;gap:7px;}
+    .sp-search-input{flex:1;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:6px 13px;color:#fff;font-size:.8rem;font-family:inherit;outline:none;backdrop-filter:blur(6px);}
+    .sp-search-input::placeholder{color:rgba(255,255,255,.4);}
+    .sp-search-btn{padding:6px 13px;border-radius:18px;background:rgba(255,255,255,.9);color:#000;border:none;font-size:.76rem;font-weight:800;cursor:pointer;font-family:inherit;}
+
+    /* ══ CREATE POST BUTTON ══ */
+    .fab{position:fixed;bottom:24px;right:24px;z-index:200;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#C9A84C);color:#fff;border:none;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;transition:.2s;}
+    .fab:hover{transform:scale(1.08);}
+
+    /* ══ MODAL ══ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:#212121;border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+    .modal::-webkit-scrollbar{width:5px;} .modal::-webkit-scrollbar-thumb{background:#444;border-radius:3px;}
+    .modal-head{padding:16px 20px;border-bottom:1px solid #333;display:flex;align-items:center;justify-content:space-between;}
+    .modal-title{font-weight:800;font-size:1rem;color:#fff;}
+    .modal-close{background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:6px;}
+    .modal-close:hover{background:#333;color:#fff;}
+    .modal-body{padding:18px;}
+    .type-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+    .type-tab{padding:6px 12px;border-radius:20px;border:1.5px solid #444;font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s;background:transparent;color:#aaa;}
+    .type-tab.active{border-color:#fff;color:#fff;background:rgba(255,255,255,.1);}
+    .form-group{margin-bottom:13px;}
+    .form-label{font-size:.78rem;font-weight:700;color:#aaa;margin-bottom:5px;display:block;}
+    .form-input,.form-textarea{width:100%;padding:10px 13px;border:1.5px solid #333;border-radius:10px;font-size:.85rem;font-family:inherit;outline:none;background:#2d2d2d;color:#fff;transition:.15s;}
+    .form-input::placeholder,.form-textarea::placeholder{color:#666;}
+    .form-input:focus,.form-textarea:focus{border-color:#666;}
+    .form-textarea{resize:vertical;min-height:90px;}
+    .file-upload-area{border:2px dashed #444;border-radius:10px;padding:20px;text-align:center;cursor:pointer;color:#777;font-size:.83rem;font-weight:600;transition:.15s;}
+    .file-upload-area:hover{border-color:#888;color:#ccc;}
+    .tags-input{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;border:1.5px solid #333;border-radius:10px;cursor:text;min-height:40px;align-items:center;background:#2d2d2d;}
+    .tags-input-inner{border:none;outline:none;font-size:.82rem;font-family:inherit;flex:1;min-width:80px;background:transparent;color:#fff;}
+    .tag-chip{background:rgba(255,255,255,.1);color:#fff;padding:3px 8px;border-radius:12px;font-size:.73rem;font-weight:700;display:flex;align-items:center;gap:4px;}
+    .tag-chip-x{cursor:pointer;opacity:.6;} .tag-chip-x:hover{opacity:1;}
+    .submit-post-btn{width:100%;padding:12px;background:#fff;color:#0f0f0f;border:none;border-radius:10px;font-size:.9rem;font-weight:800;cursor:pointer;margin-top:6px;transition:.2s;}
+    .submit-post-btn:hover{background:#e0e0e0;}
+    .submit-post-btn:disabled{opacity:.4;cursor:not-allowed;}
+    .premium-note{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 12px;font-size:.75rem;color:#fbbf24;font-weight:600;margin-top:5px;}
+
+    /* ══ COMMENTS MODAL ══ */
+    .cm-list{max-height:300px;overflow-y:auto;padding-right:4px;}
+    .cm-list::-webkit-scrollbar{width:5px;} .cm-list::-webkit-scrollbar-thumb{background:#444;}
+    .comment-item{display:flex;gap:8px;margin-bottom:12px;}
+    .comment-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#333;flex-shrink:0;}
+    .comment-body{background:#2d2d2d;border-radius:10px;padding:8px 12px;flex:1;}
+    .comment-author{font-weight:700;font-size:.77rem;color:#fff;}
+    .comment-text{font-size:.82rem;color:#d0d0d0;margin-top:2px;}
+    .cm-input-row{display:flex;gap:8px;margin-top:12px;align-items:center;}
+    .cm-input{flex:1;padding:8px 12px;border-radius:20px;border:1.5px solid #333;font-size:.82rem;outline:none;background:#2d2d2d;color:#fff;font-family:inherit;}
+    .cm-input:focus{border-color:#666;}
+    .cm-input::placeholder{color:#666;}
+    .cm-send{padding:8px 14px;border-radius:20px;background:#fff;color:#000;border:none;font-size:.78rem;font-weight:800;cursor:pointer;}
+
+    /* ══ EMPTY ══ */
+    .empty-state{text-align:center;padding:60px 20px;color:#666;}
+    .empty-state .icon{font-size:3rem;margin-bottom:12px;}
+    .empty-state p{font-size:.88rem;font-weight:600;}
+
+    /* ══ LOADER ══ */
+    .feed-loader-txt{text-align:center;padding:20px;color:#666;font-size:.83rem;font-weight:600;}
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:900px){
+      .sidebar{display:none;}
+      .video-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+    }
+    @media(max-width:600px){
+      .video-grid{grid-template-columns:1fr 1fr;}
+      .sp-video-wrap{max-width:100%;}
+      .sp-right-actions{right:8px;}
+    }
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sbar-section">
+      <a class="sbar-link active" id="sbarAll" onclick="setSection('all')"><span class="sbar-icon">🏠</span>Bosh sahifa</a>
+      <a class="sbar-link" id="sbarFollowing" onclick="setSection('following')"><span class="sbar-icon">📺</span>Obunalar</a>
+    </div>
+    <div class="sbar-section">
+      <div class="sbar-title">Siz</div>
+      <a class="sbar-link" href="#" onclick="setSection('my')"><span class="sbar-icon">📝</span>Mening maqolalarim</a>
+      <a class="sbar-link" href="#" onclick="openCreateModal()"><span class="sbar-icon">➕</span>Maqola yozish</a>
+    </div>
+    <div class="sbar-section" id="sbarSubs">
+      <div class="sbar-title">Obunalar</div>
+      <div id="sbarSubsList"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Category chips -->
+    <div class="cat-bar" id="catBar">
+      <button class="cat-chip active" onclick="setCategory('',this)">Hammasi</button>
+      <button class="cat-chip" onclick="setCategory('dasturlash',this)">💻 Dasturlash</button>
+      <button class="cat-chip" onclick="setCategory('python',this)">🐍 Python</button>
+      <button class="cat-chip" onclick="setCategory('gaming',this)">🎮 O'yinlar</button>
+      <button class="cat-chip" onclick="setCategory('musiqa',this)">🎵 Musiqa</button>
+      <button class="cat-chip" onclick="setCategory('sport',this)">⚽ Sport</button>
+      <button class="cat-chip" onclick="setCategory('motivatsiya',this)">🔥 Motivatsiya</button>
+      <button class="cat-chip" onclick="setCategory('ta\'lim',this)">📚 Ta'lim</button>
+      <button class="cat-chip" onclick="setCategory('yumor',this)">😂 Yumor</button>
+      <button class="cat-chip" onclick="setCategory('texnologiya',this)">🤖 Texnologiya</button>
+    </div>
+
+    <!-- Feed tabs -->
+    <div class="feed-tabs">
+      <div class="feed-tab active" id="ftAll" onclick="setSection('all',this)">Tavsiyalar</div>
+      <div class="feed-tab" id="ftFollowing" onclick="setSection('following',this)">Obunalar</div>
+      <div class="feed-tab" id="ftMy" onclick="setSection('my',this)">Mening postlarim</div>
+    </div>
+
+    <!-- Feed container -->
+    <div id="feedContainer">
+      <!-- Posts/Videos section FIRST -->
+      <div id="videosSection">
+        <div class="section-head">
+          <span class="section-title" id="sectionLabel">Tavsiya etilgan</span>
+        </div>
+        <div class="video-grid" id="videoGrid"></div>
+        <div class="feed-loader-txt" id="feedLoaderTxt">Yuklanmoqda...</div>
+      </div>
+
+      <!-- Shorts row BELOW posts -->
+      <div id="shortsRow" style="display:none;border-top:1px solid #272727;margin-top:8px;">
+        <div class="section-head">
+          <span class="section-title">▶️ Shorts</span>
+          <span class="see-all" onclick="openShortsPlayer()">Hammasini ko'rish →</span>
+        </div>
+        <div class="shorts-row" id="shortsThumbs"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ══ SHORTS PLAYER ══ -->
+<div id="shortsPlayer">
+  <div class="sp-inner">
+    <button class="sp-close" onclick="closeShortsPlayer()">✕</button>
+    <div class="sp-search-bar">
+      <input class="sp-search-input" id="spSearchInput" placeholder="🔍 Shorts qidirish..." onkeydown="if(event.key==='Enter')searchShortsPlayer()">
+      <button class="sp-search-btn" onclick="searchShortsPlayer()">Qidirish</button>
+    </div>
+
+    <div class="sp-video-wrap">
+      <video id="spVideo" class="sp-video" loop playsinline></video>
+      <div id="spPlaceholder" class="sp-placeholder">
+        <div style="font-size:3rem;">📹</div>
+        <div style="font-size:.85rem;color:#666;margin-top:8px;">Shorts yo'q</div>
+      </div>
+      <div class="sp-overlay"></div>
+      <div class="sp-left-info" id="spLeftInfo"></div>
+      <div class="sp-right-actions" id="spRightActions"></div>
+      <div id="spPromoBar"></div>
+      <div id="spAdBar"></div>
+    </div>
+
+    <div class="sp-nav">
+      <button class="sp-nav-btn" onclick="prevShort()">↑</button>
+      <button class="sp-nav-btn" onclick="nextShort()">↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openCreateModal()" title="Yuklash">+</button>
+
+<!-- CREATE MODAL -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">📤 Yuklash</span>
+      <button class="modal-close" onclick="closeCreateModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="type-tabs">
+        <button class="type-tab active" onclick="setPostType('text',this)">📝 Maqola</button>
+        <button class="type-tab" onclick="setPostType('image',this)">🖼️ Rasm</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sarlavha</label>
+        <input class="form-input" id="postTitle" placeholder="Sarlavha kiriting...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tavsif</label>
+        <textarea class="form-textarea" id="postContent" placeholder="Tavsif..."></textarea>
+      </div>
+      <div class="form-group" id="imageUploadGroup" style="display:none;">
+        <label class="form-label">Rasm</label>
+        <div class="file-upload-area" onclick="document.getElementById('imageFile').click()">🖼️ Rasm tanlash (.jpg, .png, .webp)</div>
+        <input type="file" id="imageFile" accept="image/*" style="display:none;" onchange="previewFile(this,'imagePreview')">
+        <img id="imagePreview" style="display:none;max-width:100%;border-radius:8px;margin-top:8px;">
+      </div>
+      <div class="form-group" id="promoLinkGroup">
+        <label class="form-label">🔗 Promo Link <span style="color:#fbbf24;font-size:.72rem;">(Premium)</span></label>
+        <input class="form-input" id="postPromoLink" placeholder="https://example.com">
+        <div class="premium-note">⭐ Promo link faqat Premium foydalanuvchilar uchun. Video tagida ko'rsatiladi.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">🏷️ Teglar</label>
+        <div class="tags-input" id="tagsInput" onclick="document.getElementById('tagInputField').focus()">
+          <div id="tagChips"></div>
+          <input class="tags-input-inner" id="tagInputField" placeholder="Teg qo'shing (Enter)..." onkeydown="handleTagInput(event)">
+        </div>
+      </div>
+      <button class="submit-post-btn" id="submitPostBtn" onclick="submitPost()">📤 Yuklash</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENT MODAL -->
+<div class="modal-overlay" id="commentModal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">💬 Izohlar</span>
+      <button class="modal-close" onclick="document.getElementById('commentModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="commentModalBody"></div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+// ── STATE ──
+let currentSection = 'all';
+let currentCategory = '';
+let feedPage = 1, feedDone = false, feedLoading = false;
+let shortsData = [], shortsIdx = 0, shortsPage = 1, shortsDone = false;
+let shortsSearchQ = '';
+let tags = [];
+let currentPostType = 'text';
+let currentUser = null;
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', async () => {
+  try { currentUser = await api('/api/me'); } catch(e) {}
+  loadFeed();
+  loadShortsThumbs();
+  loadSidebarSubs();
+  setupKeyboard();
+});
+
+// ── SIDEBAR SUBS ──
+async function loadSidebarSubs() {
+  if(!currentUser?.logged_in) return;
+  try {
+    // Get following list from API
+    const follows = await api('/api/following-list').catch(()=>[]);
+    if(!follows?.length) return;
+    const list = document.getElementById('sbarSubsList');
+    list.innerHTML = follows.slice(0,8).map(u => {
+      const av = u.avatar ? `/assets/avatars/${u.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(u.username)}&background=333&color=fff&size=40`;
+      return `<a class="sbar-sub" href="/profile/${u.username}">
+        <img class="sbar-sub-av" src="${av}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.username)}&background=333&color=fff&size=40'">
+        <span style="font-size:.82rem;color:#e0e0e0;">${escHtml(u.username)}</span>
+      </a>`;
+    }).join('');
+  } catch(e) {}
+}
+
+// ── CATEGORY / SECTION ──
+function setCategory(cat, btn) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  resetFeed();
+}
+
+function setSection(sec) {
+  currentSection = sec;
+  document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('active'));
+  const tabMap = {all:'ftAll', following:'ftFollowing', my:'ftMy'};
+  if(tabMap[sec]) document.getElementById(tabMap[sec])?.classList.add('active');
+  const labels = {all:'Tavsiya etilgan', following:'Obunalar', my:'Mening postlarim'};
+  document.getElementById('sectionLabel').textContent = labels[sec]||'Postlar';
+  resetFeed();
+}
+
+function resetFeed() {
+  feedPage=1; feedDone=false; feedLoading=false;
+  document.getElementById('videoGrid').innerHTML='';
+  document.getElementById('feedLoaderTxt').textContent='Yuklanmoqda...';
+  loadFeed();
+}
+
+// ── LOAD FEED ──
+async function loadFeed() {
+  if(feedLoading || feedDone) return;
+  feedLoading = true;
+  try {
+    let url = `/api/blog/feed?page=${feedPage}`;
+    if(currentSection==='following') url += '&type=following';
+    else if(currentSection==='my' && currentUser?.id) url += `&type=my&uid=${currentUser.id}`;
+    else url += '&type=all';
+    if(currentCategory) url += `&q=${encodeURIComponent(currentCategory)}`;
+
+    const posts = await api(url);
+    if(!posts.length) {
+      feedDone = true;
+      document.getElementById('feedLoaderTxt').textContent = feedPage===1 ? '😕 Hali post yo\'q' : '✓ Hammasi ko\'rildi';
+    } else {
+      renderVideoPosts(posts);
+      feedPage++;
+      document.getElementById('feedLoaderTxt').textContent = '';
+    }
+  } catch(e) { document.getElementById('feedLoaderTxt').textContent = 'Yuklashda xato'; }
+  feedLoading = false;
+}
+
+// ── RENDER VIDEO CARDS ──
+function renderVideoPosts(posts) {
+  const grid = document.getElementById('videoGrid');
+  posts.forEach(p => {
+    if(p.post_type === 'short') return; // shorts go to row
+    const av = p.avatar ? `/assets/avatars/${p.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(p.username)}&background=333&color=fff&size=40`;
+    const thumb = p.thumbnail_url || (p.post_type==='image'?p.media_url:'');
+    const thumbHtml = thumb
+      ? `<img class="vc-thumb" src="${thumb}" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="vc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;">${p.post_type==='video'?'🎬':'📝'}</div>`;
+    const badge = p.post_type==='video'?'<span class="vc-short-badge">VIDEO</span>':'';
+
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      <div class="vc-thumb-wrap">
+        ${thumbHtml}${badge}
+      </div>
+      <div class="vc-info">
+        <img class="vc-av" src="${av}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.username)}&background=333&color=fff&size=40'" loading="lazy">
+        <div class="vc-meta">
+          <div class="vc-title">${escHtml(p.title||p.content||'Post')}</div>
+          <div class="vc-channel">${escHtml(p.full_name||p.username)}${p.has_tick?' ✓':''}${p.is_content_creator?'<span style="color:#00d4ff;margin-left:4px;" title="Content Creator">◈</span>':''}</div>
+          <div class="vc-stats">👁 ${p.views||0} · ❤️ ${p.likes_count||0} · 💬 ${p.comments_count||0} · ${timeAgo(p.created_at)}</div>
+        </div>
+        ${currentUser && currentUser.id === p.user_id && p.post_type==='video' ? `<button onclick="event.stopPropagation();openStatsModal(${p.id})" style="background:none;border:none;color:#666;cursor:pointer;font-size:.85rem;padding:4px;" title="Statistika">📊</button>` : ''}
+      </div>`;
+    card.onclick = () => openPostModal(p);
+    grid.appendChild(card);
+  });
+}
+
+// ── POST MODAL (video viewer) ──
+function openPostModal(p) {
+  const av = p.avatar ? `/assets/avatars/${p.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(p.username)}&background=333&color=fff&size=40`;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;top:var(--topbar-h,60px);';
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+
+  let mediaHtml = '';
+  if(p.media_url && p.post_type==='video') {
+    const thumb = p.thumbnail_url ? `poster="${p.thumbnail_url}"` : '';
+    mediaHtml = `<video controls autoplay ${thumb} style="width:100%;max-height:60vh;display:block;border-radius:10px;background:#000;"><source src="${p.media_url}"></video>`;
+  } else if(p.media_url && p.post_type==='image') {
+    mediaHtml = `<img src="${p.media_url}" style="max-width:100%;max-height:60vh;border-radius:10px;display:block;margin:0 auto;">`;
+  }
+
+  const promoHtml = p.promo_link ? `<a href="${escHtml(p.promo_link)}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:10px 14px;text-decoration:none;margin-top:12px;">
+    <span style="font-size:1rem;">🔗</span><span style="color:#fbbf24;font-size:.82rem;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(p.promo_link)}</span><span style="color:#fbbf24;">→</span></a>` : '';
+
+  const isMe = currentUser && currentUser.id === p.user_id;
+  overlay.innerHTML = `<div style="background:#212121;border-radius:16px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;position:relative;">
+    <button onclick="this.closest('[style*=fixed]').remove()" style="position:absolute;top:12px;right:12px;z-index:2;background:rgba(255,255,255,.1);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:.9rem;">✕</button>
+    <div style="padding:16px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <img src="${av}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.username)}&background=333&color=fff&size=40'">
+        <div>
+          <div style="font-weight:800;color:#fff;cursor:pointer;" onclick="window.location.href='/profile/${p.username}'">${escHtml(p.full_name||p.username)}${p.has_tick?' ✓':''}${p.is_content_creator?'<span style="color:#00d4ff;margin-left:4px;" title="Content Creator">◈</span>':''}</div>
+          <div style="font-size:.73rem;color:#aaa;">@${escHtml(p.username)} · ${timeAgo(p.created_at)}</div>
+        </div>
+        ${!isMe ? `<button onclick="doFollow(${p.user_id},this)" style="margin-left:auto;padding:6px 14px;border-radius:20px;border:1.5px solid #fff;background:transparent;color:#fff;font-size:.78rem;font-weight:800;cursor:pointer;">+ Obuna</button>` : ''}
+      </div>
+      ${p.title ? `<div style="font-weight:800;color:#fff;font-size:1rem;margin-bottom:8px;">${escHtml(p.title)}</div>` : ''}
+      ${mediaHtml}
+      ${p.content ? `<div style="color:#d0d0d0;font-size:.88rem;line-height:1.6;margin-top:12px;white-space:pre-wrap;">${escHtml(p.content)}</div>` : ''}
+      ${promoHtml}
+      <div id="postAdZone-${p.id}" style="margin-top:8px;"></div>
+      <div style="display:flex;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid #333;">
+        <button onclick="doLike(${p.id},this)" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:6px;">🤍 <span id="mlc-${p.id}">${p.likes_count||0}</span></button>
+        <button onclick="openComments(${p.id})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:.85rem;font-weight:700;">💬 ${p.comments_count||0}</button>
+        <button onclick="sharePost(${p.id})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:.85rem;font-weight:700;">🔄 Ulashish</button>
+        ${isMe && p.post_type==='video' ? `<button onclick="openStatsModal(${p.id})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:.85rem;">📊 Stats</button>` : ''}
+        ${isMe ? `<button onclick="deletePost(${p.id},this.closest('[style*=fixed]'))" style="margin-left:auto;background:none;border:none;color:#aaa;cursor:pointer;font-size:.85rem;">🗑️</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  fetch(`/api/blog/view/${p.id}`, {method:'POST'}).catch(()=>{});
+  fetch(`/api/video/watch/${p.id}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({seconds:0})}).catch(()=>{});
+  // Load ad for this video owner
+  if(p.user_id) {
+    fetch(`/api/monetization/ad/${p.user_id}`).then(r=>r.json()).then(ad => {
+      const zone = document.getElementById(`postAdZone-${p.id}`);
+      if(!zone || !ad.has_ad) return;
+      zone.innerHTML = `<a href="${escHtml(ad.ad_link)}" target="_blank" rel="noopener sponsored"
+         onclick="fetch('/api/ad/click/${p.id}',{method:'POST'})"
+         style="display:flex;align-items:center;gap:10px;background:${escHtml(ad.ad_bg_color||'#1a1a2e')};border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 14px;text-decoration:none;margin-bottom:4px;">
+        <span style="font-size:.62rem;font-weight:900;background:rgba(255,168,0,.25);color:#fbbf24;padding:1px 5px;border-radius:4px;flex-shrink:0;">AD</span>
+        <div style="flex:1;min-width:0;">
+          <div style="color:#fff;font-size:.82rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(ad.ad_title)}</div>
+          ${ad.ad_description?`<div style="color:rgba(255,255,255,.55);font-size:.73rem;">${escHtml(ad.ad_description)}</div>`:''}
+        </div>
+        <span style="color:#fbbf24;font-size:.78rem;font-weight:800;white-space:nowrap;">${escHtml(ad.ad_cta)} →</span>
+      </a>`;
+    }).catch(()=>{});
+  }
+}
+
+async function doLike(pid, btn) {
+  if(!currentUser?.logged_in) { showToast('Avval kiring!','error'); return; }
+  try {
+    const r = await api(`/api/blog/like/${pid}`, {method:'POST'});
+    const el = document.getElementById(`mlc-${pid}`);
+    if(el) el.textContent = parseInt(el.textContent||0) + (r.liked?1:-1);
+    btn.querySelector('span') && (btn.innerHTML = (r.liked?'❤️':'🤍') + ` <span id="mlc-${pid}">${parseInt(document.getElementById('mlc-'+pid)?.textContent||0)}</span>`);
+  } catch(e) {}
+}
+
+async function doFollow(uid, btn) {
+  if(!currentUser?.logged_in) { showToast('Avval kiring!','error'); return; }
+  const r = await api(`/api/follow/${uid}`, {method:'POST'});
+  btn.textContent = r.following ? '✓ Obuna' : '+ Obuna';
+  btn.style.background = r.following ? 'rgba(255,255,255,.15)' : 'transparent';
+  showToast(r.following ? '✅ Obuna bo\'ldingiz!' : 'Obuna bekor qilindi', 'success');
+}
+
+// ── SHORTS THUMBNAILS ROW ──
+async function loadShortsThumbs() {
+  try {
+    const res = await api('/api/shorts/feed?page=1');
+    if(!res.length) return;
+    document.getElementById('shortsRow').style.display = '';
+    const row = document.getElementById('shortsThumbs');
+    res.slice(0,10).forEach((s,i) => {
+      const thumb = s.thumbnail_url || '';
+      const div = document.createElement('div');
+      div.className = 'short-card';
+      div.innerHTML = `<div class="short-card-thumb">
+        ${thumb ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">▶️</div>`}
+        <div class="sc-play">▶️</div>
+      </div>
+      <div class="short-card-info">
+        <div class="short-card-title">${escHtml(s.title||s.content||'Short')}</div>
+        <div class="short-card-ch">${escHtml(s.full_name||s.username)}</div>
+      </div>`;
+      div.onclick = () => { shortsData = res; shortsIdx = i; openShortsPlayer(); };
+      row.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+// ── SHORTS PLAYER ──
+async function openShortsPlayer() {
+  document.getElementById('shortsPlayer').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  if(!shortsData.length) await loadMoreShorts();
+  if(shortsData.length) renderCurrentShort();
+}
+
+function closeShortsPlayer() {
+  document.getElementById('shortsPlayer').style.display = 'none';
+  document.body.style.overflow = '';
+  const vid = document.getElementById('spVideo');
+  vid.pause(); vid.src = '';
+}
+
+// ── USER-UPLOADED SHORTS ONLY ──
+async function loadMoreShorts() {
+  if(shortsDone) return;
+  try {
+    const url = shortsSearchQ 
+      ? `/api/shorts/feed?q=${encodeURIComponent(shortsSearchQ)}&page=${shortsPage}` 
+      : `/api/shorts/feed?page=${shortsPage}`;
+    const res = await api(url);
+    if(!res.length) { shortsDone = true; return; }
+    shortsData = shortsData.concat(res);
+    shortsPage++;
+  } catch(e) {}
+}
+
+function renderCurrentShort() {
+  const s = shortsData[shortsIdx];
+  if(!s) return;
+
+  const vid = document.getElementById('spVideo');
+  const placeholder = document.getElementById('spPlaceholder');
+
+  try { vid.pause(); vid.src = ''; } catch(e) {}
+
+  if(s.media_url) {
+    placeholder.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = s.media_url;
+    if(s.thumbnail_url) vid.poster = s.thumbnail_url;
+    vid.play().catch(()=>{});
+    fetch(`/api/blog/view/${s.id}`, {method:'POST'}).catch(()=>{});
+    fetch(`/api/video/watch/${s.id}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({seconds:0})}).catch(()=>{});
+  } else {
+    vid.style.display = 'none';
+    placeholder.style.display = 'flex';
+  }
+
+  // Left info
+  const av = s.avatar ? `/assets/avatars/${s.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(s.username||'U')}&background=1B3A6B&color=fff&size=80`;
+  const isMe = currentUser && currentUser.id === s.user_id;
+  const ccBadge = s.is_content_creator ? '<span style="color:#00d4ff;font-size:.85rem;" title="Content Creator">◈</span>' : '';
+
+  document.getElementById('spLeftInfo').innerHTML = `
+    <div class="sp-username" onclick="window.location.href='/profile/${s.username}'">
+      <img class="sp-av" src="${av}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(s.username||'U')}&background=1B3A6B&color=fff&size=80'">
+      <span>${escHtml(s.full_name||s.username)}${s.has_tick?' ✓':''}${ccBadge}</span>
+      ${!isMe ? `<button class="sp-sub-btn ${s.following?'subbed':''}" onclick="event.stopPropagation();spFollow(${s.user_id},this)">${s.following?'✓ Obuna':'+ Obuna'}</button>` : ''}
+    </div>
+    ${s.title?`<div class="sp-title">${escHtml(s.title)}</div>`:''}
+    ${s.content?`<div class="sp-desc">${escHtml(s.content)}</div>`:''}
+    ${(s.tags||[]).length?`<div class="sp-tags">${s.tags.map(t=>`<span class="sp-tag">#${escHtml(t)}</span>`).join('')}</div>`:''}`;
+
+  // Right actions
+  const statsBtn = isMe ? `<button class="sp-action" onclick="openStatsModal(${s.id})">
+    <div class="sp-action-icon">📊</div><span class="sp-action-label">Stats</span>
+  </button>` : '';
+
+  document.getElementById('spRightActions').innerHTML = `
+    <button class="sp-action" onclick="spLike(${s.id},this)" id="spLikeBtn">
+      <div class="sp-action-icon ${s.liked?'active':''}">${s.liked?'❤️':'🤍'}</div>
+      <span class="sp-action-label" id="spLikeCount">${s.likes_count||0}</span>
+    </button>
+    <button class="sp-action" onclick="openComments(${s.id})">
+      <div class="sp-action-icon">💬</div>
+      <span class="sp-action-label">${s.comments_count||0}</span>
+    </button>
+    <button class="sp-action" onclick="sharePost(${s.id})">
+      <div class="sp-action-icon">🔄</div>
+      <span class="sp-action-label">Ulash</span>
+    </button>
+    ${statsBtn}`;
+
+  // Promo bar
+  document.getElementById('spPromoBar').innerHTML = s.promo_link
+    ? `<a class="sp-promo" href="${escHtml(s.promo_link)}" target="_blank" rel="noopener"
+        style="${s.ad_link?'bottom:74px':'bottom:14px'}">
+        <span>🔗</span>
+        <span class="sp-promo-text">${escHtml(s.promo_link)}</span>
+        <span style="color:#fbbf24;font-weight:800;">→</span>
+      </a>` : '';
+
+  // Ad bar
+  if(s.user_id) {
+    fetch(`/api/monetization/ad/${s.user_id}`).then(r=>r.json()).then(ad => {
+      if(!ad.has_ad) { document.getElementById('spAdBar').innerHTML=''; return; }
+      document.getElementById('spAdBar').innerHTML = `
+        <a class="sp-promo" href="${escHtml(ad.ad_link)}" target="_blank" rel="noopener sponsored"
+           onclick="fetch('/api/ad/click/${s.id}',{method:'POST'})"
+           style="bottom:14px;background:${escHtml(ad.ad_bg_color||'rgba(0,0,0,.65)')};">
+          <span style="font-size:.6rem;font-weight:900;background:rgba(255,168,0,.2);color:#fbbf24;padding:1px 5px;border-radius:4px;flex-shrink:0;">AD</span>
+          <div style="flex:1;min-width:0;">
+            <div style="color:#fff;font-size:.76rem;font-weight:800;">${escHtml(ad.ad_title)}</div>
+            ${ad.ad_description?`<div style="color:rgba(255,255,255,.55);font-size:.68rem;">${escHtml(ad.ad_description)}</div>`:''}
+          </div>
+          <span style="color:#fbbf24;font-size:.72rem;font-weight:800;white-space:nowrap;">${escHtml(ad.ad_cta)} →</span>
+        </a>`;
+    }).catch(()=>{ document.getElementById('spAdBar').innerHTML=''; });
+  }
+}
+
+function nextShort() {
+  if(shortsIdx < shortsData.length-1) { shortsIdx++; renderCurrentShort(); }
+  else if(!shortsDone) { loadMoreShorts().then(()=>{ if(shortsIdx<shortsData.length-1){shortsIdx++;renderCurrentShort();} }); }
+}
+function prevShort() {
+  if(shortsIdx > 0) { shortsIdx--; renderCurrentShort(); }
+}
+
+async function spLike(pid, btn) {
+  if(!currentUser?.logged_in) { showToast('Avval kiring!','error'); return; }
+  const r = await api(`/api/blog/like/${pid}`, {method:'POST'});
+  const icon = btn.querySelector('.sp-action-icon');
+  const count = document.getElementById('spLikeCount');
+  if(icon) { icon.textContent = r.liked?'❤️':'🤍'; icon.classList.toggle('active',r.liked); }
+  if(count) count.textContent = parseInt(count.textContent||0)+(r.liked?1:-1);
+  const s = shortsData[shortsIdx];
+  if(s) s.liked = r.liked;
+}
+
+async function spFollow(uid, btn) {
+  if(!currentUser?.logged_in) { showToast('Avval kiring!','error'); return; }
+  const r = await api(`/api/follow/${uid}`, {method:'POST'});
+  btn.textContent = r.following ? '✓ Obuna' : '+ Obuna';
+  btn.classList.toggle('subbed', r.following);
+  showToast(r.following ? '✅ Obuna bo\'ldingiz!' : 'Bekor qilindi', 'success');
+}
+
+function searchShortsPlayer() {
+  shortsSearchQ = document.getElementById('spSearchInput').value.trim();
+  shortsData=[]; shortsIdx=0; shortsPage=1; shortsDone=false;
+  loadMoreShorts().then(()=>{ if(shortsData.length) renderCurrentShort(); });
+}
+
+function setupKeyboard() {
+  document.addEventListener('keydown', e => {
+    if(document.getElementById('shortsPlayer').style.display==='block') {
+      if(e.key==='ArrowDown'||e.key==='s') nextShort();
+      if(e.key==='ArrowUp'||e.key==='w') prevShort();
+      if(e.key==='Escape') closeShortsPlayer();
+    }
+  });
+}
+
+// ── COMMENTS ──
+async function openComments(pid) {
+  // Allow viewing comments without login
+  const modal = document.getElementById('commentModal');
+  modal.classList.add('open');
+  const body = document.getElementById('commentModalBody');
+  body.innerHTML = '<div style="text-align:center;padding:30px;color:#666;font-size:.85rem;">Yuklanmoqda...</div>';
+
+  try {
+    const cmts = await api(`/api/blog/comments/${pid}`);
+    let html = `<div class="cm-list" id="cmList-${pid}">`;
+    if(!cmts.length) {
+      html += '<div style="text-align:center;padding:24px;color:#666;font-size:.85rem;">💬 Hali izoh yo\'q. Birinchi bo\'ling!</div>';
+    } else {
+      cmts.forEach(c => {
+        const cav = c.avatar ? `/assets/avatars/${c.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.username||'U')}&background=333&color=fff&size=40`;
+        html += `<div class="comment-item">
+          <img class="comment-avatar" src="${cav}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.username||'U')}&background=333&color=fff&size=40'" loading="lazy">
+          <div class="comment-body">
+            <div class="comment-author">${escHtml(c.full_name||c.username)} ${c.has_tick?'✓':''}</div>
+            <div class="comment-text">${escHtml(c.content)}</div>
+            <div style="font-size:.65rem;color:#555;margin-top:3px;">${timeAgo(c.created_at)}</div>
+          </div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+
+    if(currentUser?.logged_in) {
+      html += `<div class="cm-input-row">
+        <input class="cm-input" id="cmInput-${pid}" placeholder="Izoh yozing..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendComment(${pid});}">
+        <button class="cm-send" onclick="sendComment(${pid})">Yuborish</button>
+      </div>`;
+    } else {
+      html += `<div style="text-align:center;padding:12px;background:#222;border-radius:10px;margin-top:12px;">
+        <a href="/login" style="color:#C9A84C;font-weight:700;font-size:.83rem;text-decoration:none;">🔐 Izoh yozish uchun kiring →</a>
+      </div>`;
+    }
+    body.innerHTML = html;
+
+    // Auto focus input
+    setTimeout(() => document.getElementById(`cmInput-${pid}`)?.focus(), 100);
+  } catch(e) {
+    body.innerHTML = `<div style="color:#f87171;text-align:center;padding:20px;">Yuklashda xato: ${e.message}</div>`;
+  }
+}
+
+async function sendComment(pid) {
+  if(!currentUser?.logged_in) { showToast('Avval kiring!','error'); return; }
+  const inp = document.getElementById(`cmInput-${pid}`);
+  if(!inp) return;
+  const txt = inp.value.trim();
+  if(!txt) { inp.focus(); return; }
+  const sendBtn = inp.nextElementSibling;
+  inp.disabled = true;
+  if(sendBtn) { sendBtn.disabled=true; sendBtn.textContent='...'; }
+  try {
+    await api(`/api/blog/comment/${pid}`, {method:'POST', body:JSON.stringify({content:txt})});
+    const av = currentUser?.avatar
+      ? `/assets/avatars/${currentUser.avatar}`
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.username||'U')}&background=333&color=fff&size=40`;
+    const list = document.getElementById(`cmList-${pid}`);
+    const noMsg = list?.querySelector('div[style*="Hali izoh"]');
+    if(noMsg) noMsg.remove();
+    list?.insertAdjacentHTML('beforeend', `<div class="comment-item">
+      <img class="comment-avatar" src="${av}">
+      <div class="comment-body">
+        <div class="comment-author">${escHtml(currentUser?.full_name||currentUser?.username||'Siz')}</div>
+        <div class="comment-text">${escHtml(txt)}</div>
+        <div style="font-size:.65rem;color:#555;margin-top:3px;">Hozir</div>
+      </div>
+    </div>`);
+    inp.value = '';
+    showToast('✓ Izoh qo\'shildi','success');
+    // Update comment count on all visible buttons
+    document.querySelectorAll(`[onclick*="openComments(${pid})"]`).forEach(btn => {
+      const text = btn.textContent;
+      const match = text.match(/(\d+)/);
+      if(match) btn.textContent = btn.textContent.replace(match[0], String(parseInt(match[0])+1));
+    });
+  } catch(e) { showToast('Xato: ' + (e.message||'Qayta urining'),'error'); }
+  inp.disabled = false;
+  inp.focus();
+  if(sendBtn) { sendBtn.disabled=false; sendBtn.textContent='Yuborish'; }
+}
+
+function sharePost(pidOrUrl) {
+  const url = typeof pidOrUrl === 'string' && pidOrUrl.startsWith('http') 
+    ? pidOrUrl 
+    : `${location.origin}/blog?post=${pidOrUrl}`;
+  if(navigator.share) navigator.share({title:'Bilimxon',url});
+  else navigator.clipboard.writeText(url).then(()=>showToast('Havola nusxalandi ✓','success'));
+}
+
+// ── VIDEO STATS MODAL ──
+async function openStatsModal(pid) {
+  const existing = document.getElementById('statsModal');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'statsModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;top:var(--topbar-h,60px);';
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  overlay.innerHTML = `<div style="background:#1a1a1a;border-radius:16px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;border:1px solid #333;">
+    <div style="padding:16px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:800;color:#fff;font-size:1rem;">📊 Video Statistikasi</span>
+      <button onclick="document.getElementById('statsModal').remove()" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px;" id="statsContent"><div style="text-align:center;color:#666;padding:30px;">Yuklanmoqda...</div></div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  try {
+    const s = await api(`/api/video/stats/${pid}`);
+    const fmtNum = n => n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n||0);
+
+    // Build mini chart
+    const maxV = Math.max(...(s.daily_views||[]).map(d=>d.views), 1);
+    const chartBars = (s.daily_views||[]).map(d => {
+      const h = Math.round((d.views/maxV)*60);
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;">
+        <div style="font-size:.6rem;color:#666;">${d.views||0}</div>
+        <div style="height:${h}px;min-height:3px;background:linear-gradient(to top,#7c3aed,#C9A84C);border-radius:3px 3px 0 0;width:100%;"></div>
+        <div style="font-size:.6rem;color:#555;white-space:nowrap;">${(d.day||'').slice(5)}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('statsContent').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+        <div style="background:#222;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:900;color:#fff;">${fmtNum(s.views)}</div>
+          <div style="font-size:.72rem;color:#888;margin-top:3px;">👁 Ko'rishlar</div>
+        </div>
+        <div style="background:#222;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:900;color:#fff;">${fmtNum(s.likes)}</div>
+          <div style="font-size:.72rem;color:#888;margin-top:3px;">❤️ Likes</div>
+        </div>
+        <div style="background:#222;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:900;color:#fff;">${fmtNum(s.comments)}</div>
+          <div style="font-size:.72rem;color:#888;margin-top:3px;">💬 Izohlar</div>
+        </div>
+        <div style="background:#222;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:900;color:#fff;">${fmtNum(s.unique_viewers)}</div>
+          <div style="font-size:.72rem;color:#888;margin-top:3px;">👥 Unikal tomoshabinlar</div>
+        </div>
+        <div style="background:#222;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:900;color:#fff;">${s.total_watch_min}</div>
+          <div style="font-size:.72rem;color:#888;margin-top:3px;">⏱ Daqiqa tomosha</div>
+        </div>
+        <div style="background:#222;border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:900;color:#fff;">${s.ad_clicks}</div>
+          <div style="font-size:.72rem;color:#888;margin-top:3px;">📣 Reklama kliklari</div>
+        </div>
+      </div>
+      ${s.daily_views?.length ? `
+      <div style="background:#222;border-radius:10px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:.8rem;font-weight:700;color:#aaa;margin-bottom:12px;">📈 So'nggi 14 kun — kunlik ko'rishlar</div>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:80px;">${chartBars}</div>
+      </div>` : ''}
+      <div style="background:#222;border-radius:10px;padding:14px;">
+        <div style="font-size:.8rem;font-weight:700;color:#aaa;margin-bottom:8px;">📋 Video ma'lumotlari</div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:6px 0;border-bottom:1px solid #2a2a2a;">
+          <span style="color:#888;">Tur</span><span style="color:#fff;font-weight:700;">${s.post_type==='short'?'▶️ Short':'🎬 Video'}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:6px 0;border-bottom:1px solid #2a2a2a;">
+          <span style="color:#888;">O'rtacha tomosha</span><span style="color:#fff;font-weight:700;">${s.avg_watch_sec} soniya</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:6px 0;">
+          <span style="color:#888;">Yuklangan</span><span style="color:#fff;font-weight:700;">${timeAgo(s.created_at)}</span>
+        </div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('statsContent').innerHTML = `<p style="color:#f87171;text-align:center;">Statistika yuklanmadi: ${e.message}</p>`;
+  }
+}
+
+async function deletePost(pid, overlay) {
+  if(!confirm("O'chirishni tasdiqlaysizmi?")) return;
+  await api(`/api/blog/post/${pid}`,{method:'DELETE'});
+  overlay?.remove(); showToast("O'chirildi",'success');
+  resetFeed();
+}
+
+// ── INFINITE SCROLL ──
+window.addEventListener('scroll', () => {
+  if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 400) loadFeed();
+});
+
+// ── CREATE POST ──
+function openCreateModal() {
+  if(!currentUser?.logged_in) { showToast('Avval kiring!','error'); window.location.href='/login'; return; }
+  document.getElementById('createModal').classList.add('open');
+}
+function closeCreateModal() { document.getElementById('createModal').classList.remove('open'); }
+
+function setPostType(type, btn) {
+  currentPostType = type;
+  document.querySelectorAll('.type-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('imageUploadGroup').style.display = type==='image'?'block':'none';
+  document.getElementById('videoUploadGroup').style.display = (type==='video'||type==='short')?'block':'none';
+}
+
+function previewFile(input, previewId, mediaType='img') {
+  const file = input.files[0]; if(!file) return;
+  const el = document.getElementById(previewId);
+  el.src = URL.createObjectURL(file);
+  el.style.display = 'block';
+}
+
+function handleTagInput(e) {
+  if(e.key==='Enter'||e.key===',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/^#/,'');
+    if(val && !tags.includes(val) && tags.length<8) { tags.push(val); renderTagChips(); }
+    e.target.value = '';
+  } else if(e.key==='Backspace' && !e.target.value) { tags.pop(); renderTagChips(); }
+}
+function renderTagChips() {
+  document.getElementById('tagChips').innerHTML = tags.map((t,i)=>
+    `<span class="tag-chip">#${escHtml(t)}<span class="tag-chip-x" onclick="removeTag(${i})">✕</span></span>`).join('');
+}
+function removeTag(i) { tags.splice(i,1); renderTagChips(); }
+
+async function submitPost() {
+  const btn = document.getElementById('submitPostBtn');
+  btn.disabled=true; btn.textContent='⏳ Yuklanmoqda...';
+  const fd = new FormData();
+  const ptype = currentPostType || 'text';
+
+  fd.append('post_type', ptype);
+  fd.append('content', document.getElementById('postContent').value.trim());
+  fd.append('title', document.getElementById('postTitle').value.trim());
+  fd.append('tags', JSON.stringify(tags));
+  const promoEl = document.getElementById('postPromoLink');
+  if(promoEl) fd.append('promo_link', promoEl.value.trim());
+  if(ptype==='image') {
+    const f = document.getElementById('imageFile')?.files[0];
+    if(f) fd.append('image', f);
+  }
+  try {
+    const res = await fetch('/api/blog/post', {method:'POST', body:fd});
+    const d = await res.json();
+    if(d.error) showToast(d.error,'error');
+    else { showToast('✅ Muvaffaqiyatli yuklandi!','success'); closeCreateModal(); resetFeed(); }
+  } catch(e) { showToast('Xato: '+e.message,'error'); }
+  btn.disabled=false; btn.textContent='📤 Yuklash';
+}
+
+// Get video width/height ratio (width/height) < 0.7 = portrait/9:16
+function getVideoRatio(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const vid = document.createElement('video');
+    vid.preload = 'metadata';
+    vid.onloadedmetadata = () => { URL.revokeObjectURL(url); resolve(vid.videoWidth / vid.videoHeight); };
+    vid.onerror = () => reject(new Error('Video o\'lchamini aniqlab bo\'lmadi'));
+    vid.src = url;
+  });
+}
+
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

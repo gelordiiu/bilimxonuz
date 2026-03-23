@@ -1,0 +1,41 @@
+{
+  "lesson": "PYTHON - Inkapsulatsiya va Abstraksiya",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Inkapsulatsiya va Abstraksiya haqida asosiy tushuncha nima?",
+      "options": [
+        "Birinchi variant",
+        "Ikkinchi variant",
+        "To'g'ri javob",
+        "To'rtinchi variant"
+      ],
+      "correct": 2,
+      "explanation": "Inkapsulatsiya va Abstraksiya mavzusining asosiy tushunchasi."
+    },
+    {
+      "id": 2,
+      "question": "Quyidagilardan qaysi biri Inkapsulatsiya va Abstraksiya bilan bog'liq?",
+      "options": [
+        "Bog'liq emas",
+        "Bog'liq",
+        "Ba'zan bog'liq",
+        "Nomaqbul"
+      ],
+      "correct": 1,
+      "explanation": "Bu mavzu Inkapsulatsiya va Abstraksiya bilan bevosita bog'liq."
+    },
+    {
+      "id": 3,
+      "question": "Inkapsulatsiya va Abstraksiya qayerda qo'llaniladi?",
+      "options": [
+        "Hech qayerda",
+        "Dasturlashda",
+        "Faqat matematikada",
+        "Kundalik hayotda"
+      ],
+      "correct": 1,
+      "explanation": "Inkapsulatsiya va Abstraksiya dasturlashda keng qo'llaniladi."
+    }
+  ]
+}

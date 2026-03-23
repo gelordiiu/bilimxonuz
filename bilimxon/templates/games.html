@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — O'yinlar</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Outfit',sans-serif;background:#111;color:#fff;min-height:100vh;}
+
+    /* ══ LAYOUT ══ */
+    .g-page{display:flex;padding-top:var(--topbar-h,60px);}
+
+    /* ══ LEFT SIDEBAR ══ */
+    /* Animated sidebar */
+    .g-sidebar{
+      width:220px;flex-shrink:0;background:#141414;
+      border-right:1px solid #1e1e1e;display:flex;flex-direction:column;
+      position:sticky;top:var(--topbar-h,60px);
+      height:calc(100vh - var(--topbar-h,60px));overflow-y:auto;overflow-x:hidden;
+      transition:width .25s cubic-bezier(.4,0,.2,1);
+    }
+    .g-sidebar.collapsed{width:56px;}
+    .g-sidebar::-webkit-scrollbar{width:3px;}
+    .g-sidebar::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px;}
+
+    /* Sidebar header */
+    .gs-bar-head{display:flex;align-items:center;justify-content:space-between;padding:14px 12px 10px;border-bottom:1px solid #1e1e1e;flex-shrink:0;}
+    .gs-bar-title{font-size:.85rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;opacity:1;transition:opacity .2s;}
+    .g-sidebar.collapsed .gs-bar-title{opacity:0;width:0;}
+    .gs-toggle{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);border:none;color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:.15s;flex-shrink:0;}
+    .gs-toggle:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+    /* Sidebar section */
+    .gs-section-title{font-size:.65rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px 4px;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+    .g-sidebar.collapsed .gs-section-title{opacity:0;}
+
+    /* Sidebar item */
+    .g-sitem{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:.15s;border-radius:0;position:relative;margin:1px 6px;border-radius:10px;}
+    .g-sitem:hover,.g-sitem.active{background:rgba(255,255,255,.07);}
+    .g-sitem.active{background:rgba(255,255,255,.1);}
+    .g-sitem.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:#C9A84C;border-radius:0 3px 3px 0;}
+    .g-sitem-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(255,255,255,.05);}
+    .g-sitem.active .g-sitem-icon{background:rgba(201,168,76,.15);}
+    .g-sitem-label{font-size:.82rem;font-weight:600;color:#ccc;white-space:nowrap;overflow:hidden;transition:opacity .2s,width .25s;opacity:1;}
+    .g-sidebar.collapsed .g-sitem-label{opacity:0;width:0;}
+    .g-sitem.active .g-sitem-label{color:#fff;font-weight:700;}
+    .g-sitem-count{margin-left:auto;font-size:.65rem;color:#555;background:rgba(255,255,255,.05);padding:2px 6px;border-radius:999px;white-space:nowrap;transition:opacity .2s;}
+    .g-sidebar.collapsed .g-sitem-count{opacity:0;}
+    .g-sitem-sep{height:1px;background:#1e1e1e;margin:5px 12px;}
+
+    /* ══ MAIN ══ */
+    .g-main{flex:1;overflow:hidden;padding-bottom:60px;}
+
+    /* ══ TOP BAR ══ */
+    .g-topbar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#111;border-bottom:1px solid #1e1e1e;position:sticky;top:var(--topbar-h,60px);z-index:50;}
+    .g-search-wrap{flex:1;max-width:600px;position:relative;}
+    .g-search{width:100%;background:#222;border:1px solid #333;border-radius:10px;padding:9px 14px 9px 36px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:.15s;}
+    .g-search:focus{border-color:#555;background:#2a2a2a;}
+    .g-search::placeholder{color:#666;}
+    .g-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#666;font-size:.9rem;}
+    .upload-btn{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;font-family:'Outfit',sans-serif;}
+    .upload-btn:hover{opacity:.9;transform:translateY(-1px);}
+
+    /* ══ CATEGORIES ROW ══ */
+    .g-cats{display:flex;gap:6px;overflow-x:auto;padding:10px 20px;scrollbar-width:none;background:#111;border-bottom:1px solid #1e1e1e;}
+    .g-cats::-webkit-scrollbar{display:none;}
+    .g-cat{padding:6px 14px;border-radius:20px;background:#222;color:#aaa;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s;border:none;font-family:'Outfit',sans-serif;flex-shrink:0;}
+    .g-cat:hover{background:#333;color:#fff;}
+    .g-cat.active{background:#fff;color:#111;}
+
+    /* ══ SECTION ══ */
+    .g-section{padding:20px 20px 0;}
+    .g-section-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+    /* ══ GAME GRID — tight like Yandex ══ */
+    .g-grid{display:grid;gap:4px;padding:0 20px 20px;}
+    .g-grid-lg{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px;}
+    .g-grid-sm{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;}
+
+    /* ══ GAME CARD ══ */
+    .g-card{position:relative;cursor:pointer;border-radius:10px;overflow:hidden;background:#1e1e1e;aspect-ratio:4/3;transition:.15s;}
+    .g-card:hover{transform:scale(1.03);z-index:2;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+    .g-card img{width:100%;height:100%;object-fit:cover;display:block;}
+    .g-card-noimg{width:100%;height:100%;background:linear-gradient(135deg,#1a1035,#2a1060);display:flex;align-items:center;justify-content:center;font-size:2.8rem;}
+    /* Rating badge (Yandex style - circle with number) */
+    .g-rating{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);color:#fff;font-size:.72rem;font-weight:800;padding:2px 7px;border-radius:6px;line-height:1.4;}
+    .g-rating.high{background:rgba(74,222,128,.85);color:#000;}
+    .g-rating.mid{background:rgba(250,204,21,.85);color:#000;}
+    .g-rating.low{background:rgba(239,68,68,.75);color:#fff;}
+    /* Top badge */
+    .g-top-badge{position:absolute;top:6px;left:6px;background:rgba(239,68,68,.9);color:#fff;font-size:.65rem;font-weight:900;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.04em;}
+    /* Play overlay */
+    .g-play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:.15s;}
+    .g-card:hover .g-play-overlay{opacity:1;}
+    .g-play-circle{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:2px solid rgba(255,255,255,.5);}
+    /* Card title bar */
+    .g-card-bar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 100%);padding:20px 8px 8px;}
+    .g-card-name{font-size:.8rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .g-card-cat{font-size:.68rem;color:rgba(255,255,255,.6);margin-top:1px;}
+
+    /* ══ RECENTLY PLAYED ROW ══ */
+    .g-recent-row{display:flex;gap:8px;overflow-x:auto;padding:0 20px 16px;scrollbar-width:none;}
+    .g-recent-row::-webkit-scrollbar{display:none;}
+    .g-recent-card{flex-shrink:0;width:120px;cursor:pointer;}
+    .g-recent-thumb{width:120px;height:90px;border-radius:10px;background:#1e1e1e;overflow:hidden;position:relative;transition:.15s;}
+    .g-recent-card:hover .g-recent-thumb{transform:scale(1.04);}
+    .g-recent-thumb img{width:100%;height:100%;object-fit:cover;}
+    .g-recent-name{font-size:.72rem;font-weight:700;color:#ccc;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    /* ══ EMPTY ══ */
+    .g-empty{text-align:center;padding:60px 20px;color:#555;}
+    .g-empty-icon{font-size:3rem;margin-bottom:12px;}
+    .g-empty p{font-weight:600;font-size:.9rem;}
+
+    /* ══ UPLOAD MODAL ══ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+    .upload-modal{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+    .upload-modal::-webkit-scrollbar{width:5px;} .upload-modal::-webkit-scrollbar-thumb{background:#333;border-radius:3px;}
+    .um-header{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;}
+    .um-header h2{font-size:1.1rem;font-weight:800;color:#fff;}
+    .um-close{background:#2a2a2a;border:none;color:#aaa;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;}
+    .um-close:hover{background:#333;color:#fff;}
+    .um-body{padding:20px 24px 24px;}
+    .um-field{margin-bottom:14px;}
+    .um-label{display:block;font-size:.78rem;font-weight:700;color:#888;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+    .um-input{width:100%;background:#222;border:1px solid #333;border-radius:10px;padding:10px 13px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;}
+    .um-input:focus{border-color:#555;}
+    .um-input::placeholder{color:#555;}
+    .um-textarea{resize:vertical;min-height:70px;}
+    .um-select{appearance:none;cursor:pointer;}
+    .um-file-zone{border:2px dashed #333;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:.15s;position:relative;}
+    .um-file-zone:hover{border-color:#555;background:rgba(255,255,255,.03);}
+    .um-file-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .um-file-zone-icon{font-size:1.8rem;margin-bottom:6px;}
+    .um-file-zone p{color:#666;font-size:.82rem;margin:0;}
+    .um-file-zone p strong{color:#aaa;}
+    .um-file-info{margin-top:6px;font-size:.78rem;color:#7c3aed;font-weight:600;}
+    .um-submit{width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;padding:12px;border-radius:10px;font-size:.92rem;font-weight:800;cursor:pointer;transition:.2s;margin-top:6px;font-family:'Outfit',sans-serif;}
+    .um-submit:hover:not(:disabled){opacity:.9;}
+    .um-submit:disabled{opacity:.4;cursor:not-allowed;}
+    .um-progress{margin-top:12px;background:#222;border-radius:999px;height:5px;overflow:hidden;display:none;}
+    .um-progress-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#C9A84C);border-radius:999px;transition:width .3s;width:0%;}
+    .um-note{font-size:.75rem;color:#555;text-align:center;margin-top:10px;}
+
+    @media(max-width:700px){
+      .g-sidebar{display:none;}
+      .g-grid-lg{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+    }
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="g-page">
+  <!-- LEFT SIDEBAR -->
+  <aside class="g-sidebar" id="gameSidebar">
+    <div class="gs-bar-head">
+      <span class="gs-bar-title">🎮 O'yinlar</span>
+      <button class="gs-toggle" onclick="toggleGameSidebar()" id="sbarToggleBtn" title="Yopish">◀</button>
+    </div>
+
+    <div class="gs-section-title">JANRLAR</div>
+    <div class="g-sitem active" onclick="setCat('',this)" data-cat="" id="sbarAll">
+      <span class="g-sitem-label">Hammasi</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Aksiya',this)" data-cat="Aksiya">
+      <span class="g-sitem-label">Aksiya</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Jumboq',this)" data-cat="Jumboq">
+      <span class="g-sitem-label">Jumboq</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Sport',this)" data-cat="Sport">
+      <span class="g-sitem-label">Sport</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Poyga',this)" data-cat="Poyga">
+      <span class="g-sitem-label">Poyga</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Strategiya',this)" data-cat="Strategiya">
+      <span class="g-sitem-label">Strategiya</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Qorquv',this)" data-cat="Qorquv">
+      <span class="g-sitem-label">Qo'rqinchli</span>
+    </div>
+    <div class="g-sitem" onclick="setSidebarCat('Boshqa',this)" data-cat="Boshqa">
+      <span class="g-sitem-label">Boshqa</span>
+    </div>
+
+    <div class="g-sitem-sep"></div>
+    <div class="gs-section-title">SARALASH</div>
+    <div class="g-sitem" onclick="setSort('newest')" id="sortNew">
+      <span class="g-sitem-label">Yangi</span>
+    </div>
+    <div class="g-sitem" onclick="setSort('popular')" id="sortPop">
+      <span class="g-sitem-label">Mashhur</span>
+    </div>
+    <div class="g-sitem" onclick="setSort('top_rated')" id="sortTop">
+      <span class="g-sitem-label">Top Rated</span>
+    </div>
+
+    <div class="g-sitem-sep"></div>
+    <div class="g-sitem" onclick="openUpload()">
+      <span class="g-sitem-label" style="color:#C9A84C;font-weight:700;">+ O'yin Yuklash</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="g-main">
+    <!-- TOP BAR -->
+    <div class="g-topbar">
+      <div class="g-search-wrap">
+        <span class="g-search-icon">🔍</span>
+        <input class="g-search" id="searchInput" placeholder="O'yin nomi yoki janr..." oninput="debounceSearch()">
+      </div>
+      <button class="upload-btn" onclick="openUpload()">🚀 O'yin Yuklash</button>
+      <div style="font-size:.78rem;color:#555;" id="sizeBadge">Max: 50MB</div>
+    </div>
+
+    <!-- CATEGORY ROW -->
+    <div class="g-cats">
+      <button class="g-cat active" data-cat="" onclick="setCat('',this)">Hammasi</button>
+      <button class="g-cat" data-cat="Aksiya" onclick="setCat('Aksiya',this)">⚔️ Aksiya</button>
+      <button class="g-cat" data-cat="Jumboq" onclick="setCat('Jumboq',this)">🧩 Jumboq</button>
+      <button class="g-cat" data-cat="Sport" onclick="setCat('Sport',this)">🏆 Sport</button>
+      <button class="g-cat" data-cat="Poyga" onclick="setCat('Poyga',this)">🏎️ Poyga</button>
+      <button class="g-cat" data-cat="Strategiya" onclick="setCat('Strategiya',this)">🗺️ Strategiya</button>
+      <button class="g-cat" data-cat="Boshqa" onclick="setCat('Boshqa',this)">🎲 Boshqa</button>
+      <button class="g-cat" onclick="setSort('newest')" style="margin-left:auto;">🆕 Yangi</button>
+      <button class="g-cat" onclick="setSort('popular')">🔥 Mashhur</button>
+      <button class="g-cat" onclick="setSort('top_rated')">⭐ Top</button>
+    </div>
+
+    <!-- RECENTLY PLAYED (hidden if empty) -->
+    <div id="recentSection" style="display:none;">
+      <div class="g-section">
+        <div class="g-section-title">🕹️ Yaqinda o'ynagan</div>
+      </div>
+      <div class="g-recent-row" id="recentRow"></div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="g-section">
+      <div class="g-section-title" id="gridTitle">🎮 Tavsiya etilgan o'yinlar <span id="gCount" style="font-size:.78rem;font-weight:600;color:#666;"></span></div>
+    </div>
+    <div class="g-grid g-grid-lg" id="gGrid">
+      <div class="g-empty" style="grid-column:1/-1;">
+        <div style="font-size:2rem;margin-bottom:8px;">⏳</div>
+        <p style="color:#555;">Yuklanmoqda...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="uploadModal" style="display:none;" onclick="closeUploadOnBg(event)">
+  <div class="upload-modal" onclick="event.stopPropagation()">
+    <div class="um-header">
+      <h2>🚀 O'yin Yuklash</h2>
+      <button class="um-close" onclick="closeUpload()">✕</button>
+    </div>
+    <div class="um-body">
+      <div class="um-field">
+        <label class="um-label">O'yin nomi *</label>
+        <input class="um-input" id="umTitle" placeholder="Masalan: Snake Game">
+      </div>
+      <div class="um-field">
+        <label class="um-label">Tavsif</label>
+        <textarea class="um-input um-textarea" id="umDesc" placeholder="O'yin haqida qisqacha..."></textarea>
+      </div>
+      <div class="um-field">
+        <label class="um-label">Kategoriya</label>
+        <select class="um-input um-select" id="umCat">
+          <option value="Aksiya">⚔️ Aksiya</option>
+          <option value="Jumboq">🧩 Jumboq</option>
+          <option value="Sport">🏆 Sport</option>
+          <option value="Poyga">🏎️ Poyga</option>
+          <option value="Strategiya">🗺️ Strategiya</option>
+          <option value="Boshqa" selected>🎲 Boshqa</option>
+        </select>
+      </div>
+      <div class="um-field">
+        <label class="um-label">Thumbnail rasm</label>
+        <div class="um-file-zone">
+          <input type="file" id="umThumb" accept="image/*" onchange="thumbChanged(this)">
+          <div class="um-file-zone-icon">🖼️</div>
+          <p><strong>Rasm tanlash</strong> — PNG, JPG, WEBP</p>
+          <div class="um-file-info" id="thumbInfo"></div>
+        </div>
+      </div>
+      <div class="um-field">
+        <label class="um-label">O'yin fayli * <span id="sizeHint" style="color:#a78bfa;">(Max 50MB)</span></label>
+        <div class="um-file-zone">
+          <input type="file" id="umGame" accept=".zip,.html" onchange="gameChanged(this)">
+          <div class="um-file-zone-icon">🎮</div>
+          <p><strong>ZIP yoki HTML</strong> — ZIP ichida index.html bo'lsin</p>
+          <div class="um-file-info" id="gameInfo"></div>
+        </div>
+      </div>
+      <div class="um-progress" id="umProg"><div class="um-progress-fill" id="umFill"></div></div>
+      <button class="um-submit" id="umBtn" onclick="submitGame()">🚀 Moderatsiyaga yuborish</button>
+      <p class="um-note">⏳ O'yin moderatsiyadan o'tgandan keyin ko'rinadi</p>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+let currentCat = '';
+let currentSort = 'newest';
+let searchTimer = null;
+
+function ratingClass(avg) {
+  if(!avg) return '';
+  if(avg >= 4) return 'high';
+  if(avg >= 2.5) return 'mid';
+  return 'low';
+}
+function ratingNum(avg, cnt) {
+  if(!cnt) return null;
+  return Math.round(avg * 10);  // 0-50 scale like Yandex
+}
+
+async function loadGames() {
+  const grid = document.getElementById('gGrid');
+  grid.innerHTML = `<div class="g-empty" style="grid-column:1/-1;"><div style="font-size:2rem;">⏳</div><p style="color:#555;">Yuklanmoqda...</p></div>`;
+
+  const q = document.getElementById('searchInput').value.trim();
+  let url = `/api/games?sort=${currentSort}`;
+  if (currentCat) url += `&cat=${encodeURIComponent(currentCat)}`;
+  if (q) url += `&q=${encodeURIComponent(q)}`;
+
+  try {
+    const games = await api(url);
+    document.getElementById('gCount').textContent = games.length ? `(${games.length})` : '';
+
+    const labels = {newest:'🆕 Yangi o\'yinlar', popular:'🔥 Mashhur o\'yinlar', top_rated:'⭐ Top o\'yinlar'};
+    document.getElementById('gridTitle').innerHTML = `${labels[currentSort]||'🎮 O\'yinlar'} ${currentCat?'— '+currentCat:''} <span id="gCount" style="font-size:.78rem;font-weight:600;color:#666;">(${games.length})</span>`;
+
+    if (!games.length) {
+      grid.innerHTML = `<div class="g-empty" style="grid-column:1/-1;"><div class="g-empty-icon">🎮</div><p>Hali o'yin yo'q yoki topilmadi</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = games.map(g => {
+      const rNum = ratingNum(g.rating_avg, g.rating_count);
+      const rClass = ratingClass(g.rating_avg);
+      const isTop = g.rating_avg >= 4.5 && g.rating_count >= 5;
+      return `<div class="g-card" onclick="window.location='/game/${g.id}'" title="${g.title}">
+        ${g.thumbnail
+          ? `<img src="${g.thumbnail}" alt="${g.title}" loading="lazy">`
+          : `<div class="g-card-noimg">🎮</div>`}
+        ${isTop ? `<span class="g-top-badge">TOP</span>` : ''}
+        ${rNum !== null ? `<span class="g-rating ${rClass}">${rNum}</span>` : ''}
+        <div class="g-play-overlay"><div class="g-play-circle">▶</div></div>
+        <div class="g-card-bar">
+          <div class="g-card-name">${g.title}</div>
+          <div class="g-card-cat">${g.category||''} · 👁 ${g.views||0}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Load recently played from localStorage
+    loadRecent(games);
+  } catch(e) {
+    grid.innerHTML = `<div class="g-empty" style="grid-column:1/-1;"><p style="color:#f87171;">Xatolik: ${e.message}</p></div>`;
+  }
+}
+
+function loadRecent(allGames) {
+  try {
+    const recent = JSON.parse(localStorage.getItem('bx_recent_games') || '[]');
+    if(!recent.length) return;
+    const recentGames = recent.map(id => allGames.find(g => g.id == id)).filter(Boolean);
+    if(!recentGames.length) return;
+    document.getElementById('recentSection').style.display = '';
+    document.getElementById('recentRow').innerHTML = recentGames.map(g => `
+      <div class="g-recent-card" onclick="window.location='/game/${g.id}'">
+        <div class="g-recent-thumb">
+          ${g.thumbnail ? `<img src="${g.thumbnail}" loading="lazy">` : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1035,#2a1060);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🎮</div>`}
+        </div>
+        <div class="g-recent-name">${g.title}</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+function trackRecent(gameId) {
+  try {
+    let r = JSON.parse(localStorage.getItem('bx_recent_games') || '[]');
+    r = [gameId, ...r.filter(id => id != gameId)].slice(0, 8);
+    localStorage.setItem('bx_recent_games', JSON.stringify(r));
+  } catch(e) {}
+}
+
+function setCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.g-cat').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.g-sitem[data-cat]').forEach(b=>b.classList.remove('active'));
+  const sbarItem = document.querySelector(`.g-sitem[data-cat="${cat}"]`);
+  if(sbarItem) sbarItem.classList.add('active');
+  loadGames();
+}
+
+function setSidebarCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.g-sitem[data-cat]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.g-cat').forEach(b=>{
+    b.classList.toggle('active', b.dataset.cat===cat);
+  });
+  loadGames();
+}
+
+function setSort(sort) {
+  currentSort = sort;
+  document.querySelectorAll('.g-sitem[id^="sort"]').forEach(b=>b.classList.remove('active'));
+  const ids = {newest:'sortNew', popular:'sortPop', top_rated:'sortTop'};
+  if(ids[sort]) document.getElementById(ids[sort])?.classList.add('active');
+  loadGames();
+}
+
+let sidebarCollapsed = false;
+function toggleGameSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  const sb = document.getElementById('gameSidebar');
+  const btn = document.getElementById('sbarToggleBtn');
+  sb.classList.toggle('collapsed', sidebarCollapsed);
+  btn.textContent = sidebarCollapsed ? '▶' : '◀';
+  btn.title = sidebarCollapsed ? 'Ochish' : 'Yopish';
+}
+
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(loadGames, 380);
+}
+
+// ── UPLOAD MODAL ──
+function openUpload() {
+  document.getElementById('uploadModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  api('/api/me').then(me => {
+    const sz = me.is_premium ? '100MB' : '50MB';
+    document.getElementById('sizeHint').textContent = `(Max ${sz})`;
+    document.getElementById('sizeBadge').textContent = `Max: ${sz}`;
+  });
+}
+function closeUpload() {
+  document.getElementById('uploadModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function closeUploadOnBg(e) { if(e.target === document.getElementById('uploadModal')) closeUpload(); }
+function thumbChanged(i) { if(i.files[0]) document.getElementById('thumbInfo').textContent = `✅ ${i.files[0].name}`; }
+function gameChanged(i) { if(i.files[0]) document.getElementById('gameInfo').textContent = `✅ ${i.files[0].name} (${(i.files[0].size/1024/1024).toFixed(2)}MB)`; }
+
+async function submitGame() {
+  const title = document.getElementById('umTitle').value.trim();
+  const desc  = document.getElementById('umDesc').value.trim();
+  const cat   = document.getElementById('umCat').value;
+  const thumb = document.getElementById('umThumb').files[0];
+  const gfile = document.getElementById('umGame').files[0];
+  if(!title) { showToast("O'yin nomini kiriting", 'error'); return; }
+  if(!gfile) { showToast("O'yin faylini tanlang", 'error'); return; }
+  const btn = document.getElementById('umBtn');
+  btn.disabled = true; btn.textContent = '⏳ Yuklanmoqda...';
+  const prog = document.getElementById('umProg'); const fill = document.getElementById('umFill');
+  prog.style.display = 'block';
+  let pct = 0;
+  const iv = setInterval(() => { pct = Math.min(pct + Math.random()*12, 88); fill.style.width = pct+'%'; }, 300);
+  try {
+    const fd = new FormData();
+    fd.append('title', title); fd.append('description', desc); fd.append('category', cat);
+    if(thumb) fd.append('thumbnail', thumb); fd.append('game_file', gfile);
+    const res = await fetch('/api/games/upload', {method:'POST', body:fd});
+    const data = await res.json();
+    clearInterval(iv); fill.style.width = '100%';
+    if(data.success) {
+      showToast(data.message || "O'yin yuborildi!", 'success');
+      setTimeout(() => { closeUpload(); loadGames(); }, 1200);
+      ['umTitle','umDesc'].forEach(id => document.getElementById(id).value = '');
+      ['umThumb','umGame'].forEach(id => document.getElementById(id).value = '');
+      ['thumbInfo','gameInfo'].forEach(id => document.getElementById(id).textContent = '');
+    } else { throw new Error(data.error || 'Xatolik'); }
+  } catch(e) { clearInterval(iv); showToast(e.message, 'error'); }
+  finally {
+    btn.disabled = false; btn.textContent = '🚀 Moderatsiyaga yuborish';
+    setTimeout(() => { prog.style.display='none'; fill.style.width='0'; }, 2000);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadGames);
+</script>
+</body>
+</html>

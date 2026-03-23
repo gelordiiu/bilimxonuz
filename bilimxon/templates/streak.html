@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilimxon — Streak Statistika</title>
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{background:#0d1117;}
+    .sk-wrap{max-width:700px;margin:0 auto;padding:calc(var(--topbar-h,64px)+28px) 16px 80px;}
+
+    /* HERO */
+    .sk-hero{text-align:center;padding:32px 20px 24px;background:linear-gradient(135deg,rgba(255,200,0,.08),rgba(255,200,0,.02));border:2px solid rgba(255,200,0,.2);border-radius:24px;margin-bottom:24px;}
+    .sk-flame{font-size:5rem;display:block;margin-bottom:12px;animation:skPulse 2s ease-in-out infinite;}
+    @keyframes skPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+    .sk-days{font-size:4rem;font-weight:900;color:#ffc800;line-height:1;margin-bottom:6px;}
+    .sk-days-lbl{font-size:.9rem;color:#888;font-weight:600;margin-bottom:20px;}
+    .sk-badges{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .sk-badge{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 16px;text-align:center;}
+    .sk-badge .val{font-size:1.2rem;font-weight:800;color:#fff;}
+    .sk-badge .lbl{font-size:.68rem;color:#555;font-weight:700;margin-top:2px;}
+
+    /* STATUS */
+    .sk-status{display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:16px;margin-bottom:20px;font-size:.88rem;font-weight:700;}
+    .sk-status.active{background:rgba(88,204,2,.1);border:2px solid rgba(88,204,2,.25);color:#4ade80;}
+    .sk-status.risk{background:rgba(249,115,22,.1);border:2px solid rgba(249,115,22,.25);color:#fb923c;}
+    .sk-status.inactive{background:rgba(255,255,255,.04);border:2px solid #21262d;color:#555;}
+
+    /* CALENDAR */
+    .sk-section{background:#161b22;border:2px solid #21262d;border-radius:16px;padding:20px;margin-bottom:16px;}
+    .sk-section-title{font-size:.75rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+    .sk-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+    .sk-cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#333;background:#0d1117;}
+    .sk-cal-day.active{background:#ffc800;color:#000;}
+    .sk-cal-day.today{background:rgba(255,200,0,.3);color:#ffc800;border:1.5px solid #ffc800;}
+    .sk-cal-day.empty{background:transparent;}
+    .sk-cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+    .sk-cal-hday{font-size:.62rem;color:#333;text-align:center;font-weight:700;}
+
+    /* MILESTONES */
+    .sk-milestones{display:flex;flex-direction:column;gap:8px;}
+    .sk-milestone{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:#0d1117;border:1.5px solid #21262d;}
+    .sk-milestone.reached{border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.06);}
+    .sk-milestone-icon{font-size:1.5rem;flex-shrink:0;}
+    .sk-milestone-info{flex:1;}
+    .sk-milestone-title{font-size:.85rem;font-weight:800;color:#fff;margin-bottom:2px;}
+    .sk-milestone-sub{font-size:.72rem;color:#555;}
+    .sk-milestone.reached .sk-milestone-sub{color:#C9A84C;}
+    .sk-milestone-reward{font-size:.75rem;font-weight:800;color:#C9A84C;flex-shrink:0;}
+    .sk-milestone .sk-check{font-size:1.1rem;flex-shrink:0;}
+
+    /* CTA */
+    .sk-cta{text-align:center;padding:24px;background:linear-gradient(135deg,rgba(88,204,2,.08),rgba(88,204,2,.02));border:2px solid rgba(88,204,2,.2);border-radius:16px;}
+    .sk-cta a{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:linear-gradient(135deg,#58cc02,#46a302);border-radius:14px;color:#fff;font-weight:800;text-decoration:none;font-size:.9rem;box-shadow:0 4px 0 #2d7a00;transition:.15s;}
+    .sk-cta a:active{transform:translateY(2px);box-shadow:none;}
+    .sk-cta p{font-size:.82rem;color:#888;margin-bottom:16px;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="sk-wrap">
+  <div id="skLoading" style="text-align:center;padding:60px 0;color:#555;">
+    <div style="font-size:2rem;animation:spin 1s linear infinite;display:inline-block;margin-bottom:12px;">⏳</div>
+    <div>Yuklanmoqda...</div>
+  </div>
+  <div id="skContent" style="display:none;"></div>
+</div>
+
+<style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const MILESTONES = [
+  {days:3,  icon:'🌱', title:'3 kun streak',  reward:'+20 ball',  bonus:20},
+  {days:7,  icon:'🔥', title:'1 hafta streak', reward:'+50 ball',  bonus:50},
+  {days:14, icon:'💪', title:'2 hafta streak', reward:'+100 ball', bonus:100},
+  {days:30, icon:'🏆', title:'1 oy streak',    reward:'+250 ball', bonus:250},
+  {days:60, icon:'👑', title:'2 oy streak',    reward:'+500 ball', bonus:500},
+  {days:100,icon:'🌟', title:'100 kun streak', reward:'+1000 ball',bonus:1000},
+];
+
+async function init() {
+  try {
+    const [sk, logs] = await Promise.all([
+      api('/api/streak/status'),
+      api('/api/streak/log').catch(() => ({dates:[]}))
+    ]);
+    render(sk, logs.dates || []);
+  } catch(e) {
+    document.getElementById('skLoading').innerHTML =
+      `<div style="color:#f87171;padding:40px;">${e.message}</div>`;
+  }
+}
+
+function render(sk, activeDates) {
+  document.getElementById('skLoading').style.display = 'none';
+  const el = document.getElementById('skContent');
+  el.style.display = '';
+
+  const days = sk.streak_days || 0;
+  const longest = sk.longest_streak || 0;
+  const activeToday = sk.active_today;
+  const atRisk = sk.at_risk;
+
+  // Status
+  let statusHtml = '';
+  if (activeToday) {
+    statusHtml = `<div class="sk-status active">✅ Bugun dars qildingiz! Streak davom etmoqda.</div>`;
+  } else if (atRisk) {
+    statusHtml = `<div class="sk-status risk">⚠️ Bugun dars qilmasangiz, streak uziladi!</div>`;
+  } else if (days === 0) {
+    statusHtml = `<div class="sk-status inactive">💤 Hali streak boshlangan emas. Birinchi darsni boshlang!</div>`;
+  } else {
+    statusHtml = `<div class="sk-status inactive">💤 Kecha dars qilingan. Bugun ham davom eting!</div>`;
+  }
+
+  // Calendar — last 28 days
+  const today = new Date();
+  const activeSet = new Set(activeDates);
+  const calDays = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const iso = d.toISOString().split('T')[0];
+    const isToday = i === 0;
+    const isActive = activeSet.has(iso);
+    calDays.push({iso, isToday, isActive, num: d.getDate()});
+  }
+
+  // First day of week offset
+  const firstDay = new Date(today);
+  firstDay.setDate(today.getDate() - 27);
+  const offset = firstDay.getDay(); // 0=Sun
+
+  const calHtml = calDays.map(d =>
+    `<div class="sk-cal-day ${d.isToday ? 'today' : d.isActive ? 'active' : ''}" title="${d.iso}">${d.num}</div>`
+  ).join('');
+
+  // Milestones
+  const msHtml = MILESTONES.map(m => {
+    const reached = days >= m.days;
+    return `<div class="sk-milestone ${reached ? 'reached' : ''}">
+      <div class="sk-milestone-icon">${m.icon}</div>
+      <div class="sk-milestone-info">
+        <div class="sk-milestone-title">${m.title}</div>
+        <div class="sk-milestone-sub">${reached ? '✅ Erishildi!' : `${m.days - days} kun qoldi`}</div>
+      </div>
+      <div class="sk-milestone-reward">${m.reward}</div>
+      ${reached ? '<div class="sk-check">🏅</div>' : ''}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="sk-hero">
+      <span class="sk-flame">${days > 0 ? '🔥' : '💤'}</span>
+      <div class="sk-days">${days}</div>
+      <div class="sk-days-lbl">kunlik streak</div>
+      <div class="sk-badges">
+        <div class="sk-badge"><div class="val">${longest}</div><div class="lbl">Eng uzun streak</div></div>
+        <div class="sk-badge"><div class="val">${activeDates.length}</div><div class="lbl">Jami faol kunlar</div></div>
+        <div class="sk-badge"><div class="val">${activeToday ? '✅' : '❌'}</div><div class="lbl">Bugun faol</div></div>
+      </div>
+    </div>
+
+    ${statusHtml}
+
+    <div class="sk-section">
+      <div class="sk-section-title">📅 So'nggi 28 kun</div>
+      <div class="sk-cal-header">
+        ${['Ya','Du','Se','Ch','Pa','Sh','Ya'].map(d=>`<div class="sk-cal-hday">${d}</div>`).join('')}
+      </div>
+      <div class="sk-cal-grid">
+        ${Array(offset).fill('<div class="sk-cal-day empty"></div>').join('')}
+        ${calHtml}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:10px;font-size:.7rem;color:#555;">
+        <span>🟡 Faol kun</span>
+        <span style="border:1.5px solid #ffc800;border-radius:4px;padding:0 4px;">Bugun</span>
+        <span>⬛ Faol emas</span>
+      </div>
+    </div>
+
+    <div class="sk-section">
+      <div class="sk-section-title">🏆 Streak Mukofotlar</div>
+      <div class="sk-milestones">${msHtml}</div>
+    </div>
+
+    ${!activeToday ? `
+    <div class="sk-cta">
+      <p>Streakni davom ettirish uchun bugun dars qiling!</p>
+      <a href="/dashboard">▶ Dars boshlash</a>
+    </div>` : `
+    <div class="sk-cta">
+      <p>Ajoyib! Bugun ham dars qildingiz. 🎉</p>
+      <a href="/dashboard">📚 Yana dars qilish</a>
+    </div>`}
+  `;
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

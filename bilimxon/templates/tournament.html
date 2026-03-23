@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Musobaqalar</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{font-family:'Outfit',sans-serif;background:#0f172a;min-height:100vh;padding-top:var(--topbar-h);}
+    .hero{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#1e3a5f 100%);padding:52px 20px 60px;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(99,102,241,.25) 0%,transparent 65%);}
+    .hero-icon{font-size:3.5rem;margin-bottom:12px;position:relative;}
+    .hero-title{font-size:2.6rem;font-weight:900;color:white;margin-bottom:8px;position:relative;}
+    .hero-sub{font-size:1rem;color:rgba(255,255,255,.55);position:relative;}
+    .hero-actions{margin-top:24px;display:flex;justify-content:center;gap:12px;position:relative;flex-wrap:wrap;}
+    .btn-create{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:12px 28px;border-radius:14px;font-weight:800;font-size:.95rem;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:.2s;}
+    .btn-create:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,.4);}
+    .container{max-width:1040px;margin:0 auto;padding:32px 20px;}
+    .section-title{font-size:1.05rem;font-weight:800;color:rgba(255,255,255,.85);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+    .t-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;cursor:pointer;transition:.2s;text-decoration:none;display:block;}
+    .t-card:hover{background:rgba(255,255,255,.08);transform:translateY(-2px);border-color:rgba(99,102,241,.4);}
+    .t-card-top{padding:20px 20px 12px;display:flex;align-items:flex-start;gap:12px;}
+    .t-emoji{font-size:2rem;flex-shrink:0;width:48px;height:48px;background:rgba(255,255,255,.07);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+    .t-card-info{flex:1;min-width:0;}
+    .t-card-title{font-size:.95rem;font-weight:800;color:white;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .t-card-creator{font-size:.72rem;color:rgba(255,255,255,.35);}
+    .t-status{padding:3px 10px;border-radius:999px;font-size:.66rem;font-weight:800;letter-spacing:.5px;flex-shrink:0;align-self:flex-start;}
+    .s-active{background:#22c55e22;color:#4ade80;border:1px solid #22c55e44;}
+    .s-upcoming{background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b44;}
+    .s-finished{background:#6b728022;color:#9ca3af;border:1px solid #6b728044;}
+    .t-card-body{padding:0 20px 14px;}
+    .t-meta-row{display:flex;gap:14px;flex-wrap:wrap;}
+    .t-meta{font-size:.73rem;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:4px;}
+    .t-meta b{color:rgba(255,255,255,.65);}
+    .t-card-bottom{padding:10px 20px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+    .t-teams-preview{display:flex;gap:5px;flex-wrap:wrap;}
+    .t-team-chip{padding:2px 8px;border-radius:999px;font-size:.67rem;font-weight:700;}
+    .empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;color:rgba(255,255,255,.25);}
+    .empty-icon{font-size:4rem;margin-bottom:16px;}
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:center;justify-content:center;padding:20px;}
+    .modal-bg.open{display:flex;}
+    .modal{background:#1e293b;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-size:1.1rem;font-weight:800;color:white;margin-bottom:22px;}
+    .form-label{display:block;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:6px;}
+    .form-input,.form-textarea{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:.88rem;color:white;font-family:'Outfit',sans-serif;outline:none;transition:.2s;box-sizing:border-box;}
+    .form-input:focus,.form-textarea:focus{border-color:#6366f1;}
+    .form-textarea{resize:vertical;min-height:68px;}
+    .form-row{margin-bottom:14px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;}
+    .btn-cancel{padding:10px 18px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.55);font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+    .btn-submit{padding:10px 22px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="hero">
+  <div class="hero-icon">⚔️</div>
+  <div class="hero-title">Musobaqalar</div>
+  <div class="hero-sub">Kahoot-style bellashuvlar — jamoangiz bilan g'alaba qozonin!</div>
+  <div class="hero-actions">
+    <button class="btn-create" onclick="openCreateModal()">➕ Musobaqa yaratish</button>
+  </div>
+</div>
+<div class="container">
+  <div class="section-title">⚡ Barcha musobaqalar</div>
+  <div class="t-grid" id="tournamentGrid">
+    <div class="empty-state"><div class="spinner" style="margin:0 auto;border-color:rgba(255,255,255,.15);border-top-color:white;"></div></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="createModal">
+  <div class="modal">
+    <div class="modal-title">⚔️ Yangi musobaqa yaratish</div>
+    <div class="form-row"><label class="form-label">Sarlavha *</label><input class="form-input" id="cTitle" placeholder="Masalan: Python Dueli"></div>
+    <div class="form-row"><label class="form-label">Tavsif</label><textarea class="form-textarea" id="cDesc" placeholder="Qisqacha tavsif..."></textarea></div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">Boshlanish sanasi</label><input class="form-input" id="cStart" type="date"></div>
+      <div class="form-row"><label class="form-label">Tugash sanasi</label><input class="form-input" id="cEnd" type="date"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">🎁 Mukofot (ochko)</label><input class="form-input" id="cPrize" type="number" value="0" min="0"></div>
+      <div class="form-row"><label class="form-label">🎟️ Kirish narxi (ochko)</label><input class="form-input" id="cFee" type="number" value="0" min="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('createModal')">Bekor</button>
+      <button class="btn-submit" onclick="createTournament()">Yaratish →</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const SL={active:'Jonli ⚡',upcoming:'Kutilmoqda',finished:'Tugagan'};
+const SC={active:'s-active',upcoming:'s-upcoming',finished:'s-finished'};
+const EMOJIS=['⚔️','🎯','🧠','🔥','🏆','💡','🚀','⭐','🎮','🌟'];
+const COLORS=['#6366f1','#f59e0b','#22c55e','#ef4444','#ec4899','#14b8a6','#f97316','#8b5cf6'];
+let myId=null;
+
+async function init(){
+  const me=await getMe(); myId=me.user_id; await loadTournaments();
+}
+
+async function loadTournaments(){
+  const grid=document.getElementById('tournamentGrid');
+  try{
+    const data=await api('/api/tournaments');
+    if(!data.length){
+      grid.innerHTML='<div class="empty-state"><div class="empty-icon">⚔️</div><p>Hozircha musobaqalar yo\'q.<br>Birinchi bo\'lib yarating!</p></div>';
+      return;
+    }
+    grid.innerHTML=data.map(t=>renderCard(t)).join('');
+  }catch(e){grid.innerHTML='<div class="empty-state">⚠️ '+e.message+'</div>';}
+}
+
+function renderCard(t){
+  const teams=t.teams||[];
+  const chips=teams.slice(0,3).map((tm,i)=>
+    '<span class="t-team-chip" style="background:'+(tm.color||COLORS[i%8])+'33;color:'+(tm.color||COLORS[i%8])+';">'+tm.name+'</span>'
+  ).join('');
+  const myTeam=teams.find(tm=>tm.id===t.my_team_id);
+  const emoji=EMOJIS[t.id%EMOJIS.length];
+  return '<a class="t-card" href="/tournament/'+t.id+'">'
+    +'<div class="t-card-top"><div class="t-emoji">'+emoji+'</div>'
+    +'<div class="t-card-info"><div class="t-card-title">'+t.title+'</div><div class="t-card-creator">👤 '+(t.creator_name||'?')+'</div></div>'
+    +'<span class="t-status '+(SC[t.status]||'s-upcoming')+'">'+(SL[t.status]||t.status)+'</span></div>'
+    +'<div class="t-card-body"><div class="t-meta-row">'
+    +'<div class="t-meta">❓ <b>'+(t.question_count||0)+'</b> savol</div>'
+    +(t.prize_points?'<div class="t-meta">🎁 <b>'+t.prize_points+'</b></div>':'')
+    +(t.entry_fee?'<div class="t-meta">🎟️ <b>'+t.entry_fee+'</b> ochko</div>':'<div class="t-meta">🎟️ <b>Bepul</b></div>')
+    +'<div class="t-meta">👥 <b>'+teams.reduce((a,tm)=>a+(tm.member_count||0),0)+'</b> ishtirokchi</div>'
+    +'</div></div>'
+    +'<div class="t-card-bottom"><div class="t-teams-preview">'+(chips||'<span style="font-size:.7rem;color:rgba(255,255,255,.25);">Jamoa yo\'q</span>')+'</div>'
+    +(myTeam?'<span style="font-size:.7rem;color:#4ade80;font-weight:700;">✓ '+myTeam.name+'</span>':'')
+    +'</div></a>';
+}
+
+async function createTournament(){
+  const title=document.getElementById('cTitle').value.trim();
+  if(!title){showToast('Sarlavha kiriting','error');return;}
+  const data={title,description:document.getElementById('cDesc').value.trim(),
+    start_date:document.getElementById('cStart').value,end_date:document.getElementById('cEnd').value,
+    prize_points:parseInt(document.getElementById('cPrize').value)||0,
+    entry_fee:parseInt(document.getElementById('cFee').value)||0};
+  try{
+    const r=await api('/api/tournaments/create',{method:'POST',body:JSON.stringify(data)});
+    if(r.success){closeModal('createModal');window.location.href='/tournament/'+r.tournament_id;}
+    else showToast(r.error,'error');
+  }catch(e){showToast(e.message,'error');}
+}
+
+function openCreateModal(){
+  const today=new Date().toISOString().slice(0,10);
+  const week=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  document.getElementById('cStart').value=today;
+  document.getElementById('cEnd').value=week;
+  document.getElementById('createModal').classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

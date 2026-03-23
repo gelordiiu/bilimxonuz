@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'uz' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if lang == 'en' %}<title>Contact — Bilimxon</title>
+  {% elif lang == 'ru' %}<title>Контакты — Bilimxon</title>
+  {% else %}<title>Aloqa — Bilimxon</title>{% endif %}
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{background:#0d1117;}
+    .contact-page{max-width:860px;margin:0 auto;padding:calc(var(--topbar-h,64px)+36px) 20px 80px;}
+    .contact-hero{text-align:center;margin-bottom:40px;}
+    .contact-hero h1{font-size:2rem;font-weight:800;color:#fff;margin:0 0 12px;}
+    .contact-hero p{font-size:.9rem;color:rgba(255,255,255,.55);line-height:1.7;}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;}
+    .contact-card{background:#161b22;border:2px solid #21262d;border-radius:18px;padding:28px;text-align:center;transition:.2s;}
+    .contact-card:hover{border-color:rgba(201,168,76,.3);}
+    .contact-card .icon{font-size:2.2rem;margin-bottom:14px;}
+    .contact-card h3{font-size:.95rem;font-weight:800;color:#fff;margin:0 0 8px;}
+    .contact-card p{font-size:.82rem;color:rgba(255,255,255,.5);margin:0 0 16px;line-height:1.6;}
+    .contact-card a{display:inline-block;padding:9px 22px;background:linear-gradient(135deg,#C9A84C,#8B6914);border-radius:10px;color:#fff;font-weight:700;text-decoration:none;font-size:.85rem;}
+    .faq{background:#161b22;border:2px solid #21262d;border-radius:18px;padding:28px;}
+    .faq h2{font-size:.95rem;font-weight:800;color:#fff;margin:0 0 20px;}
+    .faq-item{border-bottom:1px solid rgba(255,255,255,.06);padding:14px 0;}
+    .faq-item:last-child{border:none;}
+    .faq-q{font-size:.88rem;font-weight:700;color:rgba(255,255,255,.85);margin-bottom:6px;}
+    .faq-a{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.7;}
+    @media(max-width:600px){.contact-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="contact-page">
+
+{% if lang == 'en' %}
+<div class="contact-hero">
+  <div style="font-size:3rem;margin-bottom:16px;">💬</div>
+  <h1>Contact Us</h1>
+  <p>Have questions or suggestions? We always welcome your messages!</p>
+</div>
+<div class="contact-grid">
+  <div class="contact-card"><div class="icon">✈️</div><h3>Telegram</h3><p>For quick communication, write to our Telegram channel.</p><a href="https://t.me/bilimxonuz" target="_blank">@bilimxonuz</a></div>
+  <div class="contact-card"><div class="icon">📧</div><h3>Email</h3><p>For official requests, partnerships and other matters.</p><a href="mailto:bilimxon5@gmail.com">bilimxon5@gmail.com</a></div>
+  <div class="contact-card"><div class="icon">🐛</div><h3>Bug Report</h3><p>Found a bug on the site? Let us know, we'll fix it quickly.</p><a href="#" onclick="document.getElementById('supportWidgetBtn')?.click();return false;">Report Bug</a></div>
+  <div class="contact-card"><div class="icon">💼</div><h3>Partnership</h3><p>Want to join our team? Apply for a vacancy!</p><a href="#" onclick="document.getElementById('supportWidgetBtn')?.click();return false;">Apply</a></div>
+</div>
+<div class="faq">
+  <h2>💡 Frequently Asked Questions</h2>
+  <div class="faq-item"><div class="faq-q">Is Bilimxon free?</div><div class="faq-a">Yes, core courses and features are completely free. Premium subscription provides additional benefits.</div></div>
+  <div class="faq-item"><div class="faq-q">Do you issue certificates?</div><div class="faq-a">Yes, after successfully completing a course, a digital certificate is issued.</div></div>
+  <div class="faq-item"><div class="faq-q">I forgot my password, what should I do?</div><div class="faq-a">Click "Forgot password" on the login page or contact us by email.</div></div>
+  <div class="faq-item"><div class="faq-q">For advertising or sponsorship?</div><div class="faq-a">Please write to <a href="mailto:bilimxon5@gmail.com" style="color:#C9A84C;">bilimxon5@gmail.com</a> or Telegram <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a>.</div></div>
+</div>
+
+{% elif lang == 'ru' %}
+<div class="contact-hero">
+  <div style="font-size:3rem;margin-bottom:16px;">💬</div>
+  <h1>Контакты</h1>
+  <p>Есть вопросы или предложения? Мы всегда рады вашим сообщениям!</p>
+</div>
+<div class="contact-grid">
+  <div class="contact-card"><div class="icon">✈️</div><h3>Telegram</h3><p>Для быстрого общения пишите в наш Telegram-канал.</p><a href="https://t.me/bilimxonuz" target="_blank">@bilimxonuz</a></div>
+  <div class="contact-card"><div class="icon">📧</div><h3>Email</h3><p>Для официальных запросов, партнёрства и других вопросов.</p><a href="mailto:bilimxon5@gmail.com">bilimxon5@gmail.com</a></div>
+  <div class="contact-card"><div class="icon">🐛</div><h3>Сообщить об ошибке</h3><p>Нашли баг на сайте? Сообщите нам, мы быстро исправим.</p><a href="#" onclick="document.getElementById('supportWidgetBtn')?.click();return false;">Сообщить</a></div>
+  <div class="contact-card"><div class="icon">💼</div><h3>Партнёрство</h3><p>Хотите присоединиться к команде? Подайте заявку!</p><a href="#" onclick="document.getElementById('supportWidgetBtn')?.click();return false;">Подать заявку</a></div>
+</div>
+<div class="faq">
+  <h2>💡 Часто задаваемые вопросы</h2>
+  <div class="faq-item"><div class="faq-q">Bilimxon бесплатный?</div><div class="faq-a">Да, основные курсы и функции полностью бесплатны. Премиум-подписка предоставляет дополнительные преимущества.</div></div>
+  <div class="faq-item"><div class="faq-q">Выдаёте ли сертификаты?</div><div class="faq-a">Да, после успешного завершения курса выдаётся цифровой сертификат.</div></div>
+  <div class="faq-item"><div class="faq-q">Забыл пароль, что делать?</div><div class="faq-a">Нажмите "Забыл пароль" на странице входа или свяжитесь с нами по email.</div></div>
+  <div class="faq-item"><div class="faq-q">По вопросам рекламы или спонсорства?</div><div class="faq-a">Пожалуйста, напишите на <a href="mailto:bilimxon5@gmail.com" style="color:#C9A84C;">bilimxon5@gmail.com</a> или Telegram <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a>.</div></div>
+</div>
+
+{% else %}
+<div class="contact-hero">
+  <div style="font-size:3rem;margin-bottom:16px;">💬</div>
+  <h1>Biz bilan bog'laning</h1>
+  <p>Savol yoki takliflaringiz bormi? Xabarlaringizni har doim qabul qilamiz!</p>
+</div>
+<div class="contact-grid">
+  <div class="contact-card"><div class="icon">✈️</div><h3>Telegram</h3><p>Tez muloqot uchun Telegram kanalimizga yozing.</p><a href="https://t.me/bilimxonuz" target="_blank">@bilimxonuz</a></div>
+  <div class="contact-card"><div class="icon">📧</div><h3>Email</h3><p>Rasmiy so'rovlar, hamkorlik va boshqa masalalar uchun.</p><a href="mailto:bilimxon5@gmail.com">bilimxon5@gmail.com</a></div>
+  <div class="contact-card"><div class="icon">🐛</div><h3>Bug Xabari</h3><p>Saytda xatolik topdingizmi? Bizga xabar bering.</p><a href="#" onclick="document.getElementById('supportWidgetBtn')?.click();return false;">Xabar berish</a></div>
+  <div class="contact-card"><div class="icon">💼</div><h3>Hamkorlik</h3><p>Jamoamizga qo'shilmoqchimisiz? Ariza qoldiring!</p><a href="#" onclick="document.getElementById('supportWidgetBtn')?.click();return false;">Ariza qoldirish</a></div>
+</div>
+<div class="faq">
+  <h2>💡 Ko'p so'raladigan savollar</h2>
+  <div class="faq-item"><div class="faq-q">Bilimxon bepulmi?</div><div class="faq-a">Ha, asosiy kurslar va funksiyalar to'liq bepul. Premium obuna qo'shimcha imtiyozlar beradi.</div></div>
+  <div class="faq-item"><div class="faq-q">Sertifikat berasizmi?</div><div class="faq-a">Ha, kursni muvaffaqiyatli tugatgandan so'ng raqamli sertifikat beriladi.</div></div>
+  <div class="faq-item"><div class="faq-q">Parolimni unutdim, nima qilaman?</div><div class="faq-a">Kirish sahifasidagi "Parolni unutdim" tugmasini bosing yoki email orqali bog'laning.</div></div>
+  <div class="faq-item"><div class="faq-q">Reklama yoki sponsorlik bo'yicha?</div><div class="faq-a"><a href="mailto:bilimxon5@gmail.com" style="color:#C9A84C;">bilimxon5@gmail.com</a> yoki <a href="https://t.me/bilimxonuz" style="color:#C9A84C;">@bilimxonuz</a> ga yozing.</div></div>
+</div>
+{% endif %}
+
+</div>
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

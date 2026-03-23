@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Do'kon</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+body{font-family:'Outfit',sans-serif;background:#0a0e1a;}
+.store-wrap{padding-top:var(--topbar-h);min-height:100vh;}
+.store-hero{background:linear-gradient(135deg,#0d1b2e,#1a2a4a,#0d1b2e);padding:36px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+.hero-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.star-dot{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle 3s infinite;}
+@keyframes twinkle{0%,100%{opacity:.15;}50%{opacity:1;}}
+.store-hero h1{font-size:2.2rem;font-weight:900;color:white;position:relative;text-shadow:0 0 30px rgba(201,168,76,.5);}
+.store-hero p{color:rgba(255,255,255,.5);font-size:.9rem;position:relative;margin-top:4px;}
+.pts-badge{display:inline-flex;align-items:center;gap:8px;margin-top:14px;position:relative;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:999px;padding:9px 24px;font-size:1.1rem;font-weight:900;color:#FFD700;box-shadow:0 0 20px rgba(201,168,76,.15);}
+.store-tabs{display:flex;background:#111827;border-bottom:1px solid rgba(255,255,255,.06);padding:0 20px;overflow-x:auto;}
+.stab{padding:13px 20px;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.35);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.2s;white-space:nowrap;}
+.stab.active{color:#C9A84C;border-bottom-color:#C9A84C;}
+.store-content{max-width:1100px;margin:0 auto;padding:28px 20px 80px;}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:14px;}
+.item-card{background:linear-gradient(145deg,#1a2035,#111827);border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.07);transition:.25s;cursor:pointer;}
+.item-card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.5);}
+.item-card.legendary{border-color:#F59E0B55;box-shadow:0 0 20px rgba(245,158,11,.15);}
+.item-card.epic{border-color:#8B5CF655;box-shadow:0 0 16px rgba(139,92,246,.15);}
+.item-card.rare{border-color:#3B82F655;}
+.item-card.uncommon{border-color:#22C55E55;}
+.item-img{height:110px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;}
+.item-img.legendary{background:linear-gradient(135deg,#78350F,#B45309);}
+.item-img.epic{background:linear-gradient(135deg,#2E1065,#5B21B6);}
+.item-img.rare{background:linear-gradient(135deg,#1E3A5F,#1D4ED8);}
+.item-img.uncommon{background:linear-gradient(135deg,#14532D,#15803D);}
+.item-img.common{background:linear-gradient(135deg,#1F2937,#374151);}
+.rarity-pip{position:absolute;top:8px;right:8px;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:999px;}
+.rp-legendary{background:#F59E0B;color:#451A03;}.rp-epic{background:#8B5CF6;color:white;}
+.rp-rare{background:#3B82F6;color:white;}.rp-uncommon{background:#22C55E;color:white;}.rp-common{background:#6B7280;color:white;}
+.item-body{padding:12px;}
+.item-name{font-weight:800;color:white;font-size:.88rem;margin-bottom:3px;}
+.item-desc{font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:10px;line-height:1.4;}
+.item-footer{display:flex;align-items:center;justify-content:space-between;}
+.price-tag{font-weight:800;font-size:.9rem;color:#FFD700;}
+.owned-pill{background:rgba(34,197,94,.12);color:#22C55E;padding:3px 9px;border-radius:7px;font-size:.69rem;font-weight:700;border:1px solid rgba(34,197,94,.25);}
+.buy-btn-s{background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;border:none;border-radius:8px;padding:5px 12px;font-size:.75rem;font-weight:800;cursor:pointer;transition:.2s;}
+.buy-btn-s:hover{transform:scale(1.05);}
+.boxes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:18px;}
+.box-card{background:linear-gradient(145deg,#1a2035,#111827);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.07);transition:.3s;cursor:pointer;text-align:center;}
+.box-card:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.box-img{height:145px;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden;}
+.box-shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.12) 50%,transparent 75%);animation:shine 2.5s ease-in-out infinite;}
+@keyframes shine{0%{transform:translateX(-150%);}100%{transform:translateX(150%);}}
+.box-body{padding:14px;}
+.box-name{font-weight:900;color:white;font-size:.9rem;margin-bottom:4px;}
+.box-price{color:#FFD700;font-weight:800;font-size:.95rem;margin-bottom:10px;}
+.open-btn-s{width:100%;padding:9px;background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;border:none;border-radius:10px;font-weight:800;font-size:.85rem;cursor:pointer;}
+/* OVERLAY */
+.box-overlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);}
+.box-overlay.show{display:flex;}
+.particles-canvas{position:fixed;inset:0;pointer-events:none;z-index:10000;}
+.box-container{position:relative;width:160px;height:160px;margin:0 auto 20px;}
+.box-glow-ring{position:absolute;inset:-24px;border-radius:50%;animation:glowPulse 1.2s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:.35;transform:scale(1);}50%{opacity:.9;transform:scale(1.15);}}
+@keyframes bsShake{0%,100%{transform:rotate(-3deg) scale(1);}25%{transform:rotate(3deg) scale(1.04);}50%{transform:rotate(-2deg) scale(.97);}75%{transform:rotate(4deg) scale(1.05);}}
+@keyframes bsExplode{0%{transform:scale(1) rotate(0);opacity:1;}30%{transform:scale(1.5) rotate(-15deg);opacity:1;}60%{transform:scale(1.8) rotate(20deg);opacity:.4;}100%{transform:scale(0) rotate(720deg);opacity:0;}}
+@keyframes rewardPop{0%{transform:scale(0) rotate(-20deg);opacity:0;}55%{transform:scale(1.15) rotate(4deg);opacity:1;}80%{transform:scale(.95) rotate(-1deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+@keyframes shimmerText{0%{background-position:0%;}100%{background-position:200%;}}
+.box-emoji-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6.5rem;}
+.tap-hint{color:rgba(255,255,255,.45);font-size:.9rem;animation:glowPulse 1.5s infinite;}
+.reward-card{background:linear-gradient(145deg,#1a2035,#0d1b2e);border-radius:24px;padding:32px 28px;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 80px rgba(0,0,0,.6);animation:rewardPop .6s cubic-bezier(0.175,0.885,0.32,1.275) forwards;text-align:center;}
+.reward-emoji-big{font-size:5.5rem;display:block;margin-bottom:16px;}
+.reward-shimmer{font-size:1.5rem;font-weight:900;background:linear-gradient(90deg,#FFD700,#F59E0B,#FFD700,#FEF3C7,#FFD700);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerText 2s linear infinite;margin-bottom:8px;}
+.reward-sub{color:rgba(255,255,255,.55);font-size:.9rem;margin-bottom:20px;}
+.reward-item-pill{display:inline-block;padding:6px 18px;border-radius:999px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:#FFD700;font-weight:700;font-size:.88rem;margin-bottom:14px;}
+.claim-btn{background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;border:none;border-radius:12px;padding:13px 40px;font-weight:800;font-size:1rem;cursor:pointer;}
+.howto-card{background:linear-gradient(145deg,#1a2035,#111827);border-radius:16px;padding:22px;margin-bottom:16px;border:1px solid rgba(255,255,255,.07);}
+.howto-row{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+.howto-icon{width:36px;height:36px;border-radius:10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.howto-text{color:rgba(255,255,255,.65);font-size:.87rem;}
+.howto-text strong{color:white;}
+.effect-chip{display:inline-flex;padding:2px 8px;border-radius:6px;font-size:.62rem;font-weight:700;background:rgba(59,130,246,.12);color:#60A5FA;margin-bottom:6px;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="store-wrap">
+  <div class="store-hero">
+    <div class="hero-stars" id="heroStars"></div>
+    <div style="position:relative;">
+      <h1>🛒 Do'kon</h1>
+      <p>Ochkolaringizni ajoyib sovg'alarga alishtirib oling!</p>
+      <div class="pts-badge">⭐ <span id="myPoints">—</span> ochko</div>
+    </div>
+  </div>
+
+  <div class="store-tabs">
+    <div class="stab active" data-tab="items" onclick="switchTab('items')">🎁 Tovarlar</div>
+    <div class="stab" data-tab="premium" onclick="switchTab('premium')">💎 Premium</div>
+    <div class="stab" data-tab="ads" onclick="switchTab('ads')">📺 Reklama</div>
+    <div class="stab" data-tab="boxes" onclick="switchTab('boxes')">📦 Mystery Boxes</div>
+    <div class="stab" data-tab="howto" onclick="switchTab('howto')">❓ Ochko topish</div>
+  </div>
+
+  <div class="store-content">
+    <div id="tab-items">
+      <!-- Gift banner -->
+      <div style="background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="openGiftPanel()">
+        <span style="font-size:2rem;">🎁</span>
+        <div style="flex:1;">
+          <div style="color:white;font-weight:800;font-size:.92rem;">Do'stingga hadya yunat!</div>
+          <div style="color:rgba(255,255,255,.45);font-size:.75rem;margin-top:2px;">Ochko yoki Premium hadya qilish</div>
+        </div>
+        <span style="color:#C9A84C;font-size:1.2rem;">→</span>
+      </div>
+      <div id="giftPanel" style="display:none;background:linear-gradient(145deg,#1a2035,#111827);border-radius:16px;padding:22px;margin-bottom:20px;border:1px solid rgba(201,168,76,.2);">
+        <h3 style="color:white;font-weight:900;margin-bottom:16px;">🎁 Dostingga Hadya Yunat</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;display:block;margin-bottom:4px;">Do'st username</label>
+            <input id="giftToUser" placeholder="@username" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:white;font-size:.88rem;box-sizing:border-box;outline:none;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;display:block;margin-bottom:4px;">Hadya turi</label>
+              <select id="giftType" onchange="updateGiftVal()" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);background:#1a2035;color:white;font-size:.85rem;">
+                <option value="points">⭐ Ochko</option>
+                <option value="premium">💎 Premium (kun)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;display:block;margin-bottom:4px;" id="giftValLabel">Miqdor</label>
+              <input id="giftVal" type="number" value="50" min="10" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:white;font-size:.88rem;box-sizing:border-box;outline:none;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;display:block;margin-bottom:4px;">Xabar (ixtiyoriy)</label>
+            <input id="giftMsg" placeholder="Tabriklayman! 🎉" maxlength="100" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:white;font-size:.85rem;box-sizing:border-box;outline:none;">
+          </div>
+          <button onclick="sendGift()" style="padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;font-weight:900;font-size:.9rem;cursor:pointer;">🎁 Yuborish</button>
+        </div>
+      </div>
+      <div class="items-grid" id="itemsGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:rgba(255,255,255,.35);">
+          <div class="spinner" style="margin:0 auto 12px;width:32px;height:32px;border-width:3px;border-color:rgba(255,255,255,.1);border-top-color:#C9A84C;"></div>Yuklanmoqda...
+        </div>
+      </div>
+    </div>
+    <div id="tab-boxes" style="display:none;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <h2 style="color:white;font-weight:900;font-size:1.3rem;">📦 Mystery Boxes</h2>
+        <p style="color:rgba(255,255,255,.4);font-size:.85rem;">Har bir qutidan tasodifiy sovg'a chiqadi!</p>
+      </div>
+      <div class="boxes-grid" id="boxesGrid"></div>
+    </div>
+    <div id="tab-premium" style="display:none;">
+      <div style="max-width:700px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:3rem;margin-bottom:10px;">💎</div>
+          <h2 style="color:white;font-weight:900;font-size:1.4rem;">Premium Obuna</h2>
+          <p style="color:rgba(255,255,255,.5);font-size:.88rem;">Premium foydalanuvchilarga maxsus imtiyozlar!</p>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(236,72,153,0.08));border:1px solid rgba(168,85,247,0.3);border-radius:18px;padding:20px;margin-bottom:24px;">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:rgba(255,255,255,.8);"><span>🤖</span> AI Assistant cheksiz</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:rgba(255,255,255,.8);"><span>💎</span> "Premium Foydalanuvchi" titul</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:rgba(255,255,255,.8);"><span>🚫</span> Reklama yo'q</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:rgba(255,255,255,.8);"><span>⚡</span> 2x XP bonus</div>
+          </div>
+        </div>
+        <div id="premiumStatusBlock" style="margin-bottom:20px;"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;" id="premiumPlansGrid">
+          <div style="text-align:center;padding:40px;color:rgba(255,255,255,.3);">Yuklanmoqda...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-ads" style="display:none;">
+      <div style="max-width:600px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="font-size:3rem;margin-bottom:10px;">📺</div>
+          <h2 style="color:white;font-weight:900;font-size:1.4rem;">Reklama orqali qozing</h2>
+          <p style="color:rgba(255,255,255,.5);font-size:.88rem;">5 ta reklama ko'ring va sovg'a oling!</p>
+        </div>
+        <div id="adProgress" style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:18px;padding:24px;margin-bottom:20px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:10px;">📊</div>
+          <div style="color:white;font-weight:700;margin-bottom:6px;">Ko'rilgan reklamalar: <span id="adCount" style="color:#C9A84C;">0</span> / 5</div>
+          <div style="background:rgba(255,255,255,.1);border-radius:999px;height:10px;overflow:hidden;margin:12px 0;">
+            <div id="adProgressBar" style="height:100%;background:linear-gradient(90deg,#C9A84C,#F59E0B);border-radius:999px;width:0%;transition:width .5s;"></div>
+          </div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.4);">5 ta reklama = 1 soatlik AI yoki +50 ochko</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+          <div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:16px;padding:20px;text-align:center;border:1px solid rgba(139,92,246,.3);">
+            <div style="font-size:2rem;margin-bottom:8px;">🤖</div>
+            <div style="font-weight:800;color:white;margin-bottom:4px;">AI Assistant</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:12px;">1 soatlik kirish</div>
+            <button onclick="watchAdsReward('ai')" style="width:100%;padding:9px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;font-weight:800;font-size:.82rem;cursor:pointer;">5 reklama → AI</button>
+          </div>
+          <div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:16px;padding:20px;text-align:center;border:1px solid rgba(201,168,76,.3);">
+            <div style="font-size:2rem;margin-bottom:8px;">⭐</div>
+            <div style="font-weight:800;color:white;margin-bottom:4px;">+50 Ochko</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:12px;">Bal hisobingizga</div>
+            <button onclick="watchAdsReward('points')" style="width:100%;padding:9px;border-radius:10px;border:none;background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;font-weight:800;font-size:.82rem;cursor:pointer;">5 reklama → Ochko</button>
+          </div>
+        </div>
+        <div id="aiStatusBlock" style="margin-bottom:16px;"></div>
+        <!-- Simulated ad block -->
+        <div id="adSimBlock" style="display:none;background:linear-gradient(145deg,#111827,#1a2035);border-radius:16px;padding:24px;text-align:center;border:2px solid rgba(201,168,76,.3);">
+          <div style="font-size:1.5rem;margin-bottom:10px;">📢</div>
+          <div style="color:white;font-weight:700;margin-bottom:6px;" id="adSimTitle">Reklama ko'rilmoqda...</div>
+          <div style="background:rgba(255,255,255,.1);border-radius:999px;height:8px;overflow:hidden;margin:10px 0;">
+            <div id="adSimBar" style="height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:999px;width:0%;transition:width 5s linear;"></div>
+          </div>
+          <div style="font-size:.78rem;color:rgba(255,255,255,.4);" id="adSimTimer">5 soniya...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-howto" style="display:none;">
+      <div class="howto-card">
+        <h3 style="color:white;font-weight:900;margin-bottom:18px;">⭐ Ochko qanday topiladi?</h3>
+        <div class="howto-row"><div class="howto-icon">📚</div><div class="howto-text">Har bir darsni tugatganda <strong>+10 ochko</strong></div></div>
+        <div class="howto-row"><div class="howto-icon">📝</div><div class="howto-text">Test 80%+ ball bilan o'tkazilganda <strong>+5 bonus</strong></div></div>
+        <div class="howto-row"><div class="howto-icon">💻</div><div class="howto-text">Kod yozganda <strong>+5 bonus</strong></div></div>
+        <div class="howto-row"><div class="howto-icon">👥</div><div class="howto-text">Do'st qo'shganda <strong>+10 ochko</strong></div></div>
+        <div class="howto-row"><div class="howto-icon">🎉</div><div class="howto-text">Ro'yxatdan o'tganda <strong>+50 ochko</strong> (bir martalik)</div></div>
+        <div class="howto-row" style="margin-bottom:0;"><div class="howto-icon">🏆</div><div class="howto-text">Kurs to'liq tugallanganda <strong>+50 ochko</strong></div></div>
+      </div>
+      <div class="howto-card">
+        <h3 style="color:white;font-weight:900;margin-bottom:14px;">🎯 Nadir darajalari</h3>
+        <div id="rarityInfo" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOX OPENING OVERLAY -->
+<div class="box-overlay" id="boxOverlay">
+  <canvas class="particles-canvas" id="particlesCanvas"></canvas>
+  <div id="boxStage" style="text-align:center;position:relative;width:100%;max-width:400px;padding:20px;"></div>
+</div>
+
+<!-- ITEM BUY POPUP -->
+<div class="box-overlay" id="buyOverlay">
+  <canvas class="particles-canvas" id="buyCanvas"></canvas>
+  <div class="reward-card" id="buyCard" style="max-width:360px;width:90%;"></div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+// Stars background
+(function(){
+  const c=document.getElementById('heroStars');
+  for(let i=0;i<45;i++){
+    const s=document.createElement('div');s.className='star-dot';
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;`;
+    c.appendChild(s);
+  }
+})();
+
+const RARITIES=[
+  {k:'common',label:'Oddiy — keng tarqalgan',color:'#9CA3AF'},
+  {k:'uncommon',label:'Kam uchraydi',color:'#22C55E'},
+  {k:'rare',label:'Nadir',color:'#3B82F6'},
+  {k:'epic',label:'Epik — juda kam',color:'#8B5CF6'},
+  {k:'legendary',label:'Afsonaviy — eng nadir!',color:'#F59E0B'},
+];
+const BOX_CFG={
+  common:{emoji:'📦',glow:'rgba(107,114,128,.5)',bg:'linear-gradient(135deg,#1F2937,#374151)'},
+  rare:{emoji:'💠',glow:'rgba(59,130,246,.6)',bg:'linear-gradient(135deg,#1E3A5F,#1E40AF)'},
+  epic:{emoji:'🔮',glow:'rgba(139,92,246,.6)',bg:'linear-gradient(135deg,#2E1065,#5B21B6)'},
+  legendary:{emoji:'✨',glow:'rgba(245,158,11,.7)',bg:'linear-gradient(135deg,#78350F,#B45309)'},
+};
+const EFFECT_LABELS={cosmetic:'🎨 Kosmetik',title:'🏆 Unvon',premium:'👑 Premium',boost:'⚡ XP Boost'};
+
+let adWatchCount = 0;
+let pendingAdReward = null;
+
+function switchTab(n){
+  ['items','premium','ads','boxes','howto'].forEach(t=>document.getElementById('tab-'+t).style.display=t===n?'':'none');
+  document.querySelectorAll('.stab').forEach(b=>b.classList.toggle('active',b.dataset.tab===n));
+  if(n==='premium') loadPremiumPlans();
+  if(n==='ads') loadAiStatus();
+}
+
+async function loadPremiumPlans(){
+  const res = await api('/api/store/items');
+  const paid = res.items.filter(i=>i.is_paid);
+  const statusEl = document.getElementById('premiumStatusBlock');
+  try {
+    const st = await api('/api/user/premium-status');
+    if(st.is_premium && st.premium_until){
+      const d = new Date(st.premium_until);
+      statusEl.innerHTML = `<div style="background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(236,72,153,.08));border:1px solid rgba(168,85,247,.3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;"><span style="font-size:1.5rem;">💎</span><div><div style="color:white;font-weight:800;">Premium Faol ✓</div><div style="font-size:.78rem;color:rgba(255,255,255,.5);">Muddat: ${d.toLocaleDateString('uz-UZ')}</div></div></div>`;
+    } else {
+      statusEl.innerHTML = '';
+    }
+  } catch(e){}
+  const PLAN_ICONS = {'1':'🌙','7':'🌟','30':'💎'};
+  const grid = document.getElementById('premiumPlansGrid');
+  grid.innerHTML = paid.map(p=>{
+    const days = p.name.includes('1 kun')?1:p.name.includes('7 kun')?7:30;
+    const icon = PLAN_ICONS[days+''] || '💎';
+    return `<div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:18px;padding:22px;text-align:center;border:1px solid rgba(168,85,247,.3);cursor:pointer;transition:.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+      <div style="font-size:2.5rem;margin-bottom:10px;">${icon}</div>
+      <div style="font-weight:900;color:white;font-size:1rem;margin-bottom:4px;">${p.name}</div>
+      <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:14px;">${p.desc}</div>
+      <div style="font-size:1.4rem;font-weight:900;color:#a855f7;margin-bottom:14px;">$${p.price_usd}</div>
+      <button onclick="buyPremiumPaid(${p.id},'${p.name}')"
+        style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#a855f7,#ec4899);color:white;font-weight:800;font-size:.85rem;cursor:pointer;">
+        💳 Sotib Olish
+      </button>
+    </div>`;
+  }).join('');
+}
+
+async function buyPremiumPaid(itemId, name){
+  if(!confirm(`"${name}" ni sotib olmoqchimisiz?`)) return;
+  try {
+    const res = await api('/api/store/buy-paid',{method:'POST',body:JSON.stringify({item_id:itemId})});
+    if(res.success){
+      const d = new Date(res.premium_until);
+      document.getElementById('buyCard').innerHTML = `
+        <span class="reward-emoji-big">💎</span>
+        <div class="reward-shimmer">Premium Faollashtirildi!</div>
+        <div class="reward-item-pill">${name}</div>
+        <div class="reward-sub">Muddat: ${d.toLocaleDateString('uz-UZ')}<br>"Premium Foydalanuvchi" titul berildi!</div>
+        <button class="claim-btn" onclick="document.getElementById('buyOverlay').classList.remove('show');loadPremiumPlans()">🎉 Ajoyib!</button>`;
+      document.getElementById('buyOverlay').classList.add('show');
+      launchParticles('buyCanvas','legendary');
+    } else showToast(res.error,'error');
+  } catch(e){showToast(e.message,'error');}
+}
+
+async function loadAiStatus(){
+  try {
+    const st = await api('/api/user/premium-status');
+    const el = document.getElementById('aiStatusBlock');
+    if(st.ai_active && st.ai_until){
+      const d = new Date(st.ai_until);
+      el.innerHTML = `<div style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;"><span style="font-size:1.3rem;">🤖</span><div style="color:white;font-size:.85rem;font-weight:700;">AI faol — ${d.toLocaleTimeString('uz-UZ')} gacha</div></div>`;
+    } else {
+      el.innerHTML = '';
+    }
+  } catch(e){}
+}
+
+function watchAdsReward(rewardType){
+  pendingAdReward = rewardType;
+  adWatchCount = 0;
+  simulateNextAd();
+}
+
+function simulateNextAd(){
+  if(adWatchCount >= 5){
+    claimAdReward();
+    return;
+  }
+  const simBlock = document.getElementById('adSimBlock');
+  const simBar = document.getElementById('adSimBar');
+  const simTitle = document.getElementById('adSimTitle');
+  const simTimer = document.getElementById('adSimTimer');
+  simBlock.style.display = '';
+  simBar.style.width = '0%';
+  simTitle.textContent = `Reklama #${adWatchCount+1} ko'rilmoqda...`;
+  simTimer.textContent = '5 soniya...';
+  const adNames = ['Texnologiya kursi','Yangi dastur','Online ta'lim','Raqamli dunyо','IT akademiya'];
+  simTitle.textContent = `📢 ${adNames[adWatchCount % adNames.length]}`;
+  setTimeout(()=>{simBar.style.width='100%';},100);
+  let secs = 5;
+  const timer = setInterval(()=>{
+    secs--;
+    simTimer.textContent = secs > 0 ? `${secs} soniya...` : '✅ Tayyor!';
+    if(secs <= 0){
+      clearInterval(timer);
+      adWatchCount++;
+      document.getElementById('adCount').textContent = adWatchCount;
+      document.getElementById('adProgressBar').style.width = (adWatchCount/5*100)+'%';
+      simBlock.style.display = 'none';
+      if(adWatchCount < 5){
+        showToast(`${adWatchCount}/5 reklama ko'rildi`, 'success');
+        setTimeout(simulateNextAd, 800);
+      } else {
+        claimAdReward();
+      }
+    }
+  },1000);
+}
+
+async function claimAdReward(){
+  try {
+    const res = await api('/api/store/watch-ad',{method:'POST',body:JSON.stringify({reward:pendingAdReward})});
+    if(res.success){
+      adWatchCount = 0;
+      document.getElementById('adCount').textContent = '0';
+      document.getElementById('adProgressBar').style.width = '0%';
+      document.getElementById('buyCard').innerHTML = `
+        <span class="reward-emoji-big">${pendingAdReward==='ai'?'🤖':'⭐'}</span>
+        <div class="reward-shimmer">${res.message}</div>
+        <div class="reward-sub">${pendingAdReward==='ai'?'1 soat davomida AI assistant bilan suhbatlashing!':'+50 ochko hisobingizga qo\'shildi!'}</div>
+        <button class="claim-btn" onclick="document.getElementById('buyOverlay').classList.remove('show');loadAiStatus()">🎉 Ajoyib!</button>`;
+      document.getElementById('buyOverlay').classList.add('show');
+      launchParticles('buyCanvas', pendingAdReward==='ai'?'epic':'rare');
+    }
+  } catch(e){showToast(e.message,'error');}
+}
+
+function getItemEmoji(item){
+  const n=(item.name||'').toLowerCase();
+  if(n.includes('premium')||n.includes('obuna'))return'👑';
+  if(n.includes('tick')||n.includes('galochka')||n.includes('tasdiqlangan'))return'✅';
+  if(n.includes('frame')||n.includes('animatsiya'))return'🖼️';
+  if(n.includes('banner'))return'🎨';
+  if(n.includes('xp')||n.includes('boost'))return'⚡';
+  if(n.includes('junior'))return'🌱';
+  if(n.includes('senior'))return'💎';
+  if(n.includes('rangli'))return'🎨';
+  return'🎁';
+}
+
+async function loadItems(){
+  try{
+    const res=await api('/api/store/items');
+    document.getElementById('myPoints').textContent=res.my_points.toLocaleString();
+    const grid=document.getElementById('itemsGrid');
+    const pointsItems = res.items.filter(i=>!i.is_paid);
+    if(!pointsItems.length){grid.innerHTML='<p style="color:rgba(255,255,255,.4);">Hali tovar yo\'q</p>';return;}
+    grid.innerHTML=pointsItems.map(item=>`
+      <div class="item-card ${item.rarity}">
+        <div class="item-img ${item.rarity}">
+          ${item.image?`<img src="${item.image}" style="max-width:72px;max-height:72px;object-fit:contain;">`:getItemEmoji(item)}
+          <span class="rarity-pip rp-${item.rarity}">${item.rarity}</span>
+        </div>
+        <div class="item-body">
+          <div class="item-name">${item.name}</div>
+          <div class="effect-chip">${EFFECT_LABELS[item.item_type]||item.item_type}</div>
+          <div class="item-desc">${item.desc}</div>
+          <div class="item-footer">
+            <span class="price-tag">⭐ ${item.price_points}</span>
+            ${item.owned
+              ?'<span class="owned-pill">✅ Mavjud</span>'
+              :`<button class="buy-btn-s" onclick="buyItem(${item.id},'${item.name.replace(/'/g,"\'")}',${item.price_points},'${item.item_type}')">Sotib Ol</button>`}
+          </div>
+        </div>
+      </div>`).join('');
+  }catch(e){showToast(e.message,'error');}
+}
+
+async function loadBoxes(){
+  try{
+    const res=await api('/api/store/boxes');
+    document.getElementById('myPoints').textContent=res.my_points.toLocaleString();
+    const grid=document.getElementById('boxesGrid');
+    if(!res.boxes.length){grid.innerHTML='<p style="color:rgba(255,255,255,.4);">Hali quti yo\'q</p>';return;}
+    grid.innerHTML=res.boxes.map(b=>{
+      const cfg=BOX_CFG[b.rarity]||BOX_CFG.common;
+      return`<div class="box-card" onclick="startBoxOpen(${b.id},'${b.name.replace(/'/g,"\\'")}',${b.price_points},'${b.rarity}')">
+        <div class="box-img" style="background:${cfg.bg}">
+          <div class="box-shine"></div>
+          <span style="position:relative;z-index:1;">${cfg.emoji}</span>
+        </div>
+        <div class="box-body">
+          <div class="box-name">${b.name}</div>
+          <div class="box-price">⭐ ${b.price_points}</div>
+          <button class="open-btn-s">📦 Ochish</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){}
+}
+
+function buildRarityList(){
+  document.getElementById('rarityInfo').innerHTML=RARITIES.map(r=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);">
+      <span style="font-size:.62rem;font-weight:800;text-transform:uppercase;padding:2px 10px;border-radius:999px;background:${r.color}22;color:${r.color};border:1px solid ${r.color}44;">${r.k}</span>
+      <span style="font-size:.85rem;color:rgba(255,255,255,.55);">${r.label}</span>
+    </div>`).join('');
+}
+
+// ── BUY ITEM ──
+async function buyItem(id,name,price,itype){
+  if(!confirm(`"${name}" ni ${price} ochkoga sotib olasizmi?`))return;
+  try{
+    const res=await api('/api/store/buy',{method:'POST',body:JSON.stringify({item_id:id})});
+    if(res.success){
+      const icons={title:'🏆',cosmetic:'🎨',premium:'👑',boost:'⚡'};
+      const effects={
+        title:'Unvon profilingizga qollanildi!',
+        cosmetic:name.toLowerCase().includes('tasdiqlangan')||name.toLowerCase().includes('galochka')
+          ?'Tasdiqlangan belgi profilingizga qoshildi!'
+          :'Kosmetik narsa inventaringizga qoshildi!',
+        premium:'Premium faollashtirildi va +200 bonus ochko berildi!',
+        boost:'XP Boost faollashtirildi!',
+      };
+      document.getElementById('buyCard').innerHTML=`
+        <span class="reward-emoji-big">${icons[itype]||'🎁'}</span>
+        <div class="reward-shimmer">Sotib olindi!</div>
+        <div class="reward-item-pill">${name}</div>
+        <div class="reward-sub">${effects[itype]||'Inventaringizga qoshildi!'}</div>
+        <button class="claim-btn" onclick="document.getElementById('buyOverlay').classList.remove('show')">🎉 Ajoyib!</button>`;
+      document.getElementById('buyOverlay').classList.add('show');
+      launchParticles('particlesCanvas','legendary');
+      setTimeout(()=>loadItems(),1800);
+    }else showToast(res.error||'Xato','error');
+  }catch(e){showToast(e.message,'error');}
+}
+
+// ── BOX OPEN (Brawl Stars style) ──
+async function startBoxOpen(id,name,price,rarity){
+  if(!confirm(`"${name}" ni ${price} ochkoga ochmoqchimisiz?`))return;
+  const cfg=BOX_CFG[rarity]||BOX_CFG.common;
+  const overlay=document.getElementById('boxOverlay');
+  const stage=document.getElementById('boxStage');
+  overlay.classList.add('show');
+
+  stage.innerHTML=`
+    <div style="color:rgba(255,255,255,.6);font-size:.95rem;margin-bottom:20px;font-weight:600;">${name}</div>
+    <div class="box-container">
+      <div class="box-glow-ring" id="glowRing" style="background:radial-gradient(circle,${cfg.glow},transparent 65%);"></div>
+      <div class="box-emoji-wrap" id="boxEmoji" style="animation:bsShake .6s ease-in-out infinite;filter:drop-shadow(0 0 24px ${cfg.glow});">${cfg.emoji}</div>
+    </div>
+    <div class="tap-hint" id="tapHint">👆 Bosib oching!</div>`;
+
+  // Pre-fetch result
+  const resultPromise=api('/api/store/open-box',{method:'POST',body:JSON.stringify({box_id:id})});
+
+  overlay.onclick=(ev)=>{
+    if(!ev.target.closest('.claim-btn')){
+      overlay.onclick=null;
+      triggerBoxExplosion(stage,cfg,rarity,resultPromise);
+    }
+  };
+}
+
+async function triggerBoxExplosion(stage,cfg,rarity,resultPromise){
+  const wrap=document.getElementById('boxEmoji');
+  const hint=document.getElementById('tapHint');
+  if(hint)hint.remove();
+  if(wrap){
+    wrap.style.animation='none';
+    setTimeout(()=>{wrap.style.animation='bsExplode 1s ease forwards';},10);
+  }
+  launchParticles('particlesCanvas',rarity);
+  try{
+    const res=await resultPromise;
+    setTimeout(()=>{
+      const isPoints=!!res.reward_points;
+      stage.innerHTML=`
+        <div class="reward-card">
+          <span class="reward-emoji-big">${isPoints?'⭐':'🎁'}</span>
+          <div class="reward-shimmer">${res.reward_msg}</div>
+          ${res.reward_item_name?`<div class="reward-item-pill">${res.reward_item_name}</div>`:''}
+          ${res.reward_points?`<div class="reward-sub">+${res.reward_points} ochko qoshildi!</div>`:'<div class="reward-sub">Inventaringizga qoshildi!</div>'}
+          <button class="claim-btn" onclick="document.getElementById('boxOverlay').classList.remove('show')">🎉 Ajoyib!</button>
+        </div>`;
+      launchParticles('particlesCanvas',rarity);
+      loadItems();loadBoxes();
+    },1100);
+  }catch(e){
+    setTimeout(()=>{
+      stage.innerHTML=`<div style="color:#EF4444;margin-bottom:20px;">${e.message}</div>
+        <button style="padding:10px 28px;border-radius:12px;border:1px solid rgba(255,255,255,.2);color:white;background:transparent;cursor:pointer;"
+          onclick="document.getElementById('boxOverlay').classList.remove('show')">Yopish</button>`;
+    },1100);
+  }
+}
+
+// ── PARTICLE ENGINE ──
+function launchParticles(canvasId,rarity){
+  const COLORS={
+    common:['#9CA3AF','#D1D5DB'],
+    uncommon:['#22C55E','#86EFAC'],
+    rare:['#3B82F6','#60A5FA'],
+    epic:['#8B5CF6','#A78BFA','#C4B5FD'],
+    legendary:['#F59E0B','#FCD34D','#FFD700','#FF6B35','#FEF3C7'],
+  };
+  const colors=COLORS[rarity]||COLORS.common;
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const cx=window.innerWidth/2,cy=window.innerHeight*.42;
+  const particles=[];
+  for(let i=0;i<90;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=2+Math.random()*9;
+    particles.push({
+      x:cx,y:cy,
+      vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-4,
+      size:4+Math.random()*10,
+      color:colors[i%colors.length],
+      alpha:1,gravity:.22,
+      rot:Math.random()*360,rotSpeed:(Math.random()-.5)*10,
+      shape:Math.random()>.4?'circle':'rect',
+    });
+  }
+  let frame=0;
+  (function anim(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    for(const p of particles){
+      p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;
+      p.alpha-=.012;p.rot+=p.rotSpeed;
+      if(p.alpha<=0)continue;alive=true;
+      ctx.save();ctx.globalAlpha=Math.max(0,p.alpha);ctx.fillStyle=p.color;
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      if(p.shape==='circle'){ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}
+      else{ctx.fillRect(-p.size/2,-p.size*.3,p.size,p.size*.6);}
+      ctx.restore();
+    }
+    frame++;
+    if(alive&&frame<130)requestAnimationFrame(anim);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  })();
+}
+
+function openGiftPanel(){
+  const p=document.getElementById('giftPanel');
+  p.style.display=p.style.display==='none'?'':'none';
+}
+function updateGiftVal(){
+  const t=document.getElementById('giftType').value;
+  const lbl=document.getElementById('giftValLabel');
+  const inp=document.getElementById('giftVal');
+  if(t==='points'){lbl.textContent='Ochko miqdori';inp.value='50';inp.min='10';}
+  else{lbl.textContent='Kun soni';inp.value='1';inp.min='1';}
+}
+async function sendGift(){
+  const to=document.getElementById('giftToUser').value.replace('@','').trim();
+  const type=document.getElementById('giftType').value;
+  const val=document.getElementById('giftVal').value;
+  const msg=document.getElementById('giftMsg').value;
+  if(!to){showToast("Username kiriting",'error');return;}
+  try{
+    const res=await api('/api/gifts/send',{method:'POST',body:JSON.stringify({to_username:to,gift_type:type,gift_value:val,message:msg})});
+    if(res.success){
+      showToast('Hadya yuborildi! 🎁','success');
+      document.getElementById('giftPanel').style.display='none';
+      document.getElementById('giftToUser').value='';
+      document.getElementById('giftMsg').value='';
+      loadItems();
+    }else showToast(res.error,'error');
+  }catch(e){showToast(e.message,'error');}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{loadItems();loadBoxes();buildRarityList();});
+</script>
+</body>
+</html>

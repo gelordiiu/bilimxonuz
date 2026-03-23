@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Musobaqa — Bilimxon</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    :root{--ink:#0f172a;--surface:#1e293b;--border:rgba(255,255,255,.1);--muted:rgba(255,255,255,.45);}
+    *{box-sizing:border-box;}
+    body{font-family:'Outfit',sans-serif;background:var(--ink);color:white;min-height:100vh;padding-top:var(--topbar-h);}
+
+    /* ── HEADER ── */
+    .t-header{background:linear-gradient(135deg,#1e1b4b,#312e81 60%,#1e3a5f);padding:28px 24px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+    .t-back{color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.07);margin-bottom:10px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;}
+    .t-back:hover{color:white;}
+    .t-header-info{flex:1;}
+    .t-title-big{font-size:1.8rem;font-weight:900;margin-bottom:4px;}
+    .t-desc{font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:10px;}
+    .t-pills{display:flex;gap:8px;flex-wrap:wrap;}
+    .pill{padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:700;}
+    .pill-green{background:#22c55e22;color:#4ade80;border:1px solid #22c55e44;}
+    .pill-yellow{background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b44;}
+    .pill-gray{background:#6b728022;color:#9ca3af;border:1px solid #6b728044;}
+    .pill-purple{background:#8b5cf622;color:#a78bfa;border:1px solid #8b5cf644;}
+    .pill-red{background:#ef444422;color:#f87171;border:1px solid #ef444444;}
+    .t-header-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+    .btn{padding:10px 20px;border-radius:12px;font-weight:700;font-size:.85rem;border:none;cursor:pointer;font-family:'Outfit',sans-serif;transition:.15s;white-space:nowrap;}
+    .btn:hover{opacity:.88;}
+    .btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;}
+    .btn-success{background:linear-gradient(135deg,#16a34a,#22c55e);color:white;}
+    .btn-danger{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;}
+    .btn-outline{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:white;}
+    .btn-sm{padding:7px 14px;font-size:.78rem;}
+
+    /* ── LAYOUT ── */
+    .layout{max-width:1100px;margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:1fr 320px;gap:24px;}
+    @media(max-width:800px){.layout{grid-template-columns:1fr;}}
+
+    /* ── QUIZ PANEL ── */
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
+    .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .panel-title{font-size:.9rem;font-weight:800;}
+    .panel-body{padding:20px;}
+
+    /* Questions list (creator view) */
+    .q-list{display:flex;flex-direction:column;gap:10px;}
+    .q-item{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);border-radius:14px;padding:16px;transition:.15s;}
+    .q-item:hover{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.05);}
+    .q-num{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.3);margin-bottom:6px;}
+    .q-text{font-size:.92rem;font-weight:700;color:white;margin-bottom:10px;}
+    .q-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+    .q-opt{padding:6px 10px;border-radius:8px;font-size:.75rem;font-weight:600;display:flex;align-items:center;gap:6px;}
+    .q-opt-A{background:#6366f122;color:#818cf8;}
+    .q-opt-B{background:#f59e0b22;color:#fbbf24;}
+    .q-opt-C{background:#22c55e22;color:#4ade80;}
+    .q-opt-D{background:#ef444422;color:#f87171;}
+    .q-opt.correct{ring:2px solid;}
+    .q-meta{display:flex;gap:12px;align-items:center;}
+    .q-meta span{font-size:.7rem;color:rgba(255,255,255,.35);}
+    .q-actions{display:flex;gap:6px;margin-left:auto;}
+
+    /* Answer card (player view) */
+    .answer-card{border-radius:20px;overflow:hidden;margin-bottom:16px;}
+    .answer-question{background:linear-gradient(135deg,#312e81,#4c1d95);padding:28px 24px;text-align:center;}
+    .answer-q-num{font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .answer-q-text{font-size:1.2rem;font-weight:800;line-height:1.4;}
+    .answer-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;}
+    @media(max-width:500px){.answer-opts{grid-template-columns:1fr;}}
+    .opt-btn{padding:16px 14px;border-radius:14px;font-size:.88rem;font-weight:700;border:2px solid transparent;cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;gap:10px;transition:.15s;color:white;text-align:left;}
+    .opt-btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.1);}
+    .opt-btn:disabled{cursor:default;}
+    .opt-A{background:#4f46e5;}
+    .opt-B{background:#d97706;}
+    .opt-C{background:#16a34a;}
+    .opt-D{background:#dc2626;}
+    .opt-btn.answered-correct{outline:3px solid #4ade80;filter:brightness(1.2);}
+    .opt-btn.answered-wrong{opacity:.5;}
+    .opt-icon{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;}
+    .q-progress{display:flex;align-items:center;gap:10px;padding:0 16px 16px;}
+    .q-prog-bar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:999px;}
+    .q-prog-fill{height:6px;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:999px;transition:width .4s;}
+    .answered-badge{text-align:center;padding:8px 16px;font-size:.78rem;font-weight:700;}
+
+    /* Add question modal */
+    .add-q-area{border:2px dashed rgba(255,255,255,.1);border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:16px;}
+    .add-q-area:hover{border-color:#6366f1;background:rgba(99,102,241,.05);}
+
+    /* ── SIDEBAR ── */
+    .teams-section{display:flex;flex-direction:column;gap:16px;}
+    .team-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;cursor:pointer;transition:.15s;position:relative;}
+    .team-card:hover{border-color:rgba(255,255,255,.2);}
+    .team-card.mine{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06);}
+    .team-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .team-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+    .team-name-big{font-size:.92rem;font-weight:800;}
+    .team-pts{font-size:1.1rem;font-weight:900;margin-left:auto;}
+    .team-members-list{display:flex;flex-wrap:wrap;gap:4px;}
+    .mem-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:white;overflow:hidden;}
+    .mem-av img{width:100%;height:100%;object-fit:cover;}
+    .lock-badge{position:absolute;top:12px;right:12px;font-size:.65rem;background:rgba(255,255,255,.1);padding:2px 7px;border-radius:999px;color:rgba(255,255,255,.4);}
+    .join-team-btn{width:100%;margin-top:10px;padding:8px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-weight:700;font-size:.78rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+    .join-team-btn:hover{background:rgba(255,255,255,.12);color:white;}
+    .create-team-btn{width:100%;padding:10px;border-radius:12px;background:rgba(99,102,241,.15);border:1.5px dashed rgba(99,102,241,.4);color:#818cf8;font-weight:700;font-size:.82rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+    .create-team-btn:hover{background:rgba(99,102,241,.25);}
+
+    /* ── MODALS ── */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;align-items:center;justify-content:center;padding:20px;}
+    .modal-bg.open{display:flex;}
+    .modal{background:#1e293b;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-size:1rem;font-weight:800;color:white;margin-bottom:18px;}
+    .form-label{display:block;font-size:.76rem;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:5px;}
+    .form-input,.form-textarea,.form-select{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:9px 12px;font-size:.86rem;color:white;font-family:'Outfit',sans-serif;outline:none;transition:.2s;}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:#6366f1;}
+    .form-textarea{resize:vertical;min-height:60px;}
+    .form-select option{background:#1e293b;}
+    .form-row{margin-bottom:12px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+    .btn-cancel{padding:9px 16px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+    .btn-submit{padding:9px 20px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
+    .opt-labels{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+    /* LEADERBOARD */
+    .lb-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .lb-rank{font-size:1.1rem;width:28px;text-align:center;}
+    .lb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .lb-name{flex:1;font-size:.85rem;font-weight:700;}
+    .lb-pts{font-size:.85rem;font-weight:800;color:#fbbf24;}
+
+    /* Waiting state */
+    .waiting-banner{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.3);border-radius:16px;padding:32px;text-align:center;margin-bottom:20px;}
+    .waiting-icon{font-size:3rem;margin-bottom:12px;}
+
+    /* Finished banner */
+    .finished-banner{background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(245,158,11,.05));border:1px solid rgba(251,191,36,.3);border-radius:16px;padding:32px;text-align:center;margin-bottom:20px;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<!-- Header -->
+<div class="t-header" id="tHeader">
+  <div style="width:100%;"><a class="t-back" href="/tournament">← Musobaqalar</a></div>
+  <div class="t-header-info">
+    <div class="t-title-big" id="tTitle">Yuklanmoqda...</div>
+    <div class="t-desc" id="tDesc"></div>
+    <div class="t-pills" id="tPills"></div>
+  </div>
+  <div class="t-header-actions" id="tActions"></div>
+</div>
+
+<div class="layout">
+  <!-- LEFT: Quiz / Questions -->
+  <div>
+    <div id="mainContent">
+      <div style="text-align:center;padding:60px;color:rgba(255,255,255,.3);">
+        <div class="spinner" style="margin:0 auto;border-color:rgba(255,255,255,.12);border-top-color:#6366f1;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Teams + Leaderboard -->
+  <div>
+    <!-- My status -->
+    <div id="myStatus" style="margin-bottom:16px;"></div>
+
+    <!-- Leaderboard -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-header">
+        <span class="panel-title">🏆 Natijalar</span>
+        <button class="btn btn-outline btn-sm" onclick="refreshLB()">↻</button>
+      </div>
+      <div class="panel-body" id="leaderboard" style="padding:8px 16px;">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:.8rem;">Hali natija yo'q</div>
+      </div>
+    </div>
+
+    <!-- Teams -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">👥 Jamoalar</span>
+        <button class="btn btn-outline btn-sm" onclick="loadData()">↻</button>
+      </div>
+      <div class="panel-body">
+        <div class="teams-section" id="teamsList">
+          <div style="text-align:center;padding:16px;color:var(--muted);font-size:.8rem;">Yuklanmoqda...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Question Modal -->
+<div class="modal-bg" id="addQModal">
+  <div class="modal">
+    <div class="modal-title">❓ Savol qo'shish</div>
+    <div class="form-row"><label class="form-label">Savol matni *</label><textarea class="form-textarea" id="qText" rows="2" placeholder="Savol matni..."></textarea></div>
+    <div class="opt-labels">
+      <div class="form-row"><label class="form-label" style="color:#818cf8;">🟣 A variant</label><input class="form-input" id="qA" placeholder="A javob"></div>
+      <div class="form-row"><label class="form-label" style="color:#fbbf24;">🟡 B variant</label><input class="form-input" id="qB" placeholder="B javob"></div>
+      <div class="form-row"><label class="form-label" style="color:#4ade80;">🟢 C variant</label><input class="form-input" id="qC" placeholder="C javob"></div>
+      <div class="form-row"><label class="form-label" style="color:#f87171;">🔴 D variant</label><input class="form-input" id="qD" placeholder="D javob"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label class="form-label">✅ To'g'ri javob</label>
+        <select class="form-select" id="qCorrect">
+          <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">⏱️ Vaqt (soniya)</label><input class="form-input" id="qTime" type="number" value="30" min="5" max="120"></div>
+    </div>
+    <div class="form-row"><label class="form-label">⭐ Ochko</label><input class="form-input" id="qPts" type="number" value="10" min="1"></div>
+    <div id="editQId" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addQModal')">Bekor</button>
+      <button class="btn-submit" onclick="saveQuestion()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Team Modal -->
+<div class="modal-bg" id="createTeamModal">
+  <div class="modal">
+    <div class="modal-title">➕ Yangi jamoa yaratish</div>
+    <div class="form-row"><label class="form-label">Jamoa nomi *</label><input class="form-input" id="tmName" placeholder="Masalan: Yolqinlar"></div>
+    <div class="form-row"><label class="form-label">Rang</label><input class="form-input" id="tmColor" type="color" value="#6366f1" style="height:42px;padding:4px;cursor:pointer;"></div>
+    <div class="form-row">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="tmPrivate" style="width:16px;height:16px;accent-color:#6366f1;">
+        <span style="font-size:.85rem;color:white;">🔒 Maxsus kod bilan kirish</span>
+      </label>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:4px;">Yoqsangiz avtomatik maxsus kod yaratiladi</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('createTeamModal')">Bekor</button>
+      <button class="btn-submit" onclick="createTeam()">Yaratish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join Private Team Modal -->
+<div class="modal-bg" id="joinPrivateModal">
+  <div class="modal">
+    <div class="modal-title">🔒 Maxsus kod bilan kirish</div>
+    <div style="font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:16px;" id="joinPrivateTeamName"></div>
+    <div class="form-row"><label class="form-label">Maxsus kod</label><input class="form-input" id="joinCode" placeholder="Masalan: ABC123" maxlength="10" style="text-transform:uppercase;letter-spacing:3px;font-size:1.1rem;text-align:center;"></div>
+    <div id="joinFeeNote" style="font-size:.78rem;color:#fbbf24;margin-bottom:8px;display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('joinPrivateModal')">Bekor</button>
+      <button class="btn-submit" onclick="confirmJoinPrivate()">Kirish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join Public Team Confirm -->
+<div class="modal-bg" id="joinPublicModal">
+  <div class="modal">
+    <div class="modal-title" id="joinPublicTitle">Jamoaga qo'shilish</div>
+    <div id="joinPublicBody" style="font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:20px;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('joinPublicModal')">Bekor</button>
+      <button class="btn-submit" onclick="confirmJoinPublic()">Qo'shilish ✓</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const T_ID = {{ t_id }};
+const COLORS = ['#6366f1','#f59e0b','#22c55e','#ef4444','#ec4899','#14b8a6','#f97316','#8b5cf6'];
+let tourData = null, myId = null, isCreator = false, isAdmin = false;
+let pendingJoinTeamId = null, pendingJoinIsPrivate = false;
+let pollInterval = null;
+
+async function init() {
+  const me = await getMe();
+  myId = me.user_id;
+  isAdmin = me.role === 'admin';
+  await loadData();
+  // Poll when active
+  if (tourData && tourData.status === 'active') startPoll();
+}
+
+async function loadData() {
+  try {
+    tourData = await api('/api/tournaments/' + T_ID);
+    isCreator = (tourData.created_by === myId) || isAdmin;
+    renderHeader();
+    renderMainContent();
+    renderTeams();
+    refreshLB();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function startPoll() {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(() => { refreshLB(); }, 5000);
+}
+
+// ─── HEADER ───────────────────────────────────────────────
+function renderHeader() {
+  const t = tourData;
+  document.getElementById('tTitle').textContent = t.title;
+  document.getElementById('tDesc').textContent = t.description || '';
+  const sc = {active:'pill-green',upcoming:'pill-yellow',finished:'pill-gray'};
+  const sl = {active:'⚡ Jonli',upcoming:'⏳ Kutilmoqda',finished:'🏁 Tugagan'};
+  let pills = '<span class="pill '+(sc[t.status]||'pill-gray')+'">'+(sl[t.status]||t.status)+'</span>';
+  if (t.prize_points) pills += '<span class="pill pill-purple">🎁 '+t.prize_points+' ochko</span>';
+  if (t.entry_fee)    pills += '<span class="pill pill-red">🎟️ '+t.entry_fee+' ochko</span>';
+  pills += '<span class="pill pill-gray">❓ '+(t.question_count||0)+' savol</span>';
+  if (t.start_date) pills += '<span class="pill pill-gray">📅 '+t.start_date+'</span>';
+  document.getElementById('tPills').innerHTML = pills;
+
+  let actions = '';
+  if (isCreator) {
+    if (t.status === 'upcoming') actions += '<button class="btn btn-success" onclick="activateTournament()">▶️ Musobaqani boshlash</button>';
+    if (t.status === 'active')   actions += '<button class="btn btn-danger" onclick="finishTournament()">🏁 Yakunlash</button>';
+    if (t.status !== 'finished') actions += '<button class="btn btn-primary" onclick="openAddQ()">➕ Savol qo\'shish</button>';
+  }
+  if (t.status === 'active' && !isCreator && t.my_team_id) {
+    actions += '<span style="color:#4ade80;font-size:.82rem;font-weight:700;">✓ Musobaqadasiz</span>';
+  }
+  document.getElementById('tActions').innerHTML = actions;
+}
+
+// ─── MAIN CONTENT ─────────────────────────────────────────
+async function renderMainContent() {
+  const t = tourData;
+  const el = document.getElementById('mainContent');
+
+  if (t.status === 'upcoming') {
+    el.innerHTML = '<div class="waiting-banner"><div class="waiting-icon">⏳</div>'
+      +'<div style="font-size:1.1rem;font-weight:800;margin-bottom:8px;">Musobaqa hali boshlanmagan</div>'
+      +'<div style="font-size:.85rem;color:rgba(255,255,255,.5);">'+(isCreator ? 'Savollar qo\'shib, "Boshlash" tugmasini bosing.' : 'Tashkilotchi musobaqani boshlaguncha kuting.')+'</div>'
+      + (isCreator ? '<div style="margin-top:20px;"><button class="btn btn-primary" onclick="openAddQ()">➕ Savol qo\'shish</button></div>' : '')
+      +'</div>';
+    if (isCreator) await renderQuestionsList();
+  } else if (t.status === 'active') {
+    if (!t.my_team_id) {
+      el.innerHTML = '<div class="waiting-banner"><div class="waiting-icon">👥</div>'
+        +'<div style="font-size:1.1rem;font-weight:800;margin-bottom:8px;">Biror jamoaga qo\'shiling</div>'
+        +'<div style="font-size:.85rem;color:rgba(255,255,255,.5);">O\'ngdagi jamoalardan birini tanlang yoki yangi jamoa yarating.</div></div>';
+    } else {
+      await renderQuizPlayer();
+    }
+    if (isCreator) await renderQuestionsList(true);
+  } else if (t.status === 'finished') {
+    el.innerHTML = '<div class="finished-banner"><div style="font-size:3rem;margin-bottom:12px;">🏆</div>'
+      +'<div style="font-size:1.3rem;font-weight:900;margin-bottom:6px;">Musobaqa yakunlandi!</div>'
+      +'<div style="font-size:.88rem;color:rgba(255,255,255,.5);">'+(t.prize_points ? 'G\'olib jamoa har bir a\'zosi '+t.prize_points+' ochko oldi!' : '')+'</div></div>';
+    await renderFinalLeaderboard();
+  }
+}
+
+// ─── QUESTION LIST (creator) ──────────────────────────────
+async function renderQuestionsList(compact=false) {
+  const el = document.getElementById('mainContent');
+  let questions = [];
+  try { questions = await api('/api/tournaments/' + T_ID + '/questions'); } catch(e) {}
+  const addBtn = isCreator && tourData.status !== 'finished'
+    ? '<div class="add-q-area" onclick="openAddQ()"><div style="font-size:1.5rem;margin-bottom:6px;">➕</div><div style="font-size:.82rem;color:rgba(255,255,255,.4);">Yangi savol qo\'shish</div></div>' : '';
+  if (!questions.length && !compact) {
+    el.innerHTML += '<div class="panel"><div class="panel-header"><span class="panel-title">❓ Savollar</span></div><div class="panel-body">'
+      + addBtn
+      + '<div style="text-align:center;padding:20px;color:rgba(255,255,255,.3);font-size:.85rem;">Hali savol qo\'shilmagan</div></div></div>';
+    return;
+  }
+  const qhtml = questions.map((q,i) => {
+    const opts = ['A','B','C','D'].map(k =>
+      '<div class="q-opt q-opt-'+k+(q.correct_option===k?' correct':'')+'">'
+      +(q.correct_option===k?'✅ ':'')+k+'. '+(q['option_'+k.toLowerCase()]||'—')+'</div>'
+    ).join('');
+    return '<div class="q-item">'
+      +'<div class="q-num">SAVOL '+(i+1)+'</div>'
+      +'<div class="q-text">'+q.question_text+'</div>'
+      +'<div class="q-opts">'+opts+'</div>'
+      +'<div class="q-meta"><span>⏱️ '+q.time_limit+'s</span><span>⭐ '+q.points+' ochko</span>'
+      + (isCreator ? '<div class="q-actions">'
+        +'<button class="btn btn-outline btn-sm" onclick="openEditQ('+JSON.stringify(q).replace(/"/g,"&quot;")+')" style="padding:4px 10px;font-size:.7rem;">✏️</button>'
+        +'<button class="btn btn-danger btn-sm" onclick="deleteQ('+q.id+')" style="padding:4px 10px;font-size:.7rem;">🗑️</button>'
+        +'</div>' : '')
+      +'</div></div>';
+  }).join('');
+  if (!compact) {
+    el.innerHTML += '<div class="panel"><div class="panel-header"><span class="panel-title">❓ Savollar ('+questions.length+')</span></div>'
+      +'<div class="panel-body"><div class="q-list">'+addBtn+qhtml+'</div></div></div>';
+  }
+}
+
+// ─── QUIZ PLAYER ──────────────────────────────────────────
+async function renderQuizPlayer() {
+  const el = document.getElementById('mainContent');
+  let questions = [];
+  try { questions = await api('/api/tournaments/' + T_ID + '/questions'); } catch(e) {}
+  if (!questions.length) {
+    el.innerHTML = '<div class="waiting-banner"><div class="waiting-icon">⏳</div><div style="font-size:1rem;font-weight:700;">Hali savollar qo\'shilmagan.<br>Tashkilotchi savollar qo\'shguncha kuting.</div></div>';
+    return;
+  }
+  const answered = questions.filter(q => q.my_answer != null).length;
+  const total = questions.length;
+  let html = '<div class="panel" style="margin-bottom:16px;">'
+    +'<div class="panel-header"><span class="panel-title">🎯 Savollarga javob bering</span>'
+    +'<span style="font-size:.78rem;color:var(--muted);">'+answered+'/'+total+' javoblandi</span></div>'
+    +'<div class="q-progress"><span style="font-size:.72rem;color:var(--muted);">Progress</span>'
+    +'<div class="q-prog-bar"><div class="q-prog-fill" style="width:'+Math.round(answered/total*100)+'%;"></div></div></div></div>';
+
+  questions.forEach((q,i) => {
+    const isAnswered = q.my_answer != null;
+    const opts = [
+      {k:'A',label:q.option_a,cls:'opt-A'},
+      {k:'B',label:q.option_b,cls:'opt-B'},
+      {k:'C',label:q.option_c,cls:'opt-C'},
+      {k:'D',label:q.option_d,cls:'opt-D'},
+    ];
+    const optHtml = opts.map(o => {
+      let extra = '';
+      if (isAnswered) {
+        if (q.my_answer === o.k) extra = q.my_correct ? ' answered-correct' : ' answered-wrong';
+      }
+      return '<button class="opt-btn '+o.cls+extra+'"'
+        +(isAnswered?'disabled':' onclick="answerQ('+q.id+',\''+o.k+'\')"')+'>'
+        +'<div class="opt-icon">'+o.k+'</div>'+(o.label||'')+'</button>';
+    }).join('');
+    html += '<div class="answer-card" id="qcard_'+q.id+'">'
+      +'<div class="answer-question"><div class="answer-q-num">SAVOL '+(i+1)+' / '+total+'</div>'
+      +'<div class="answer-q-text">'+q.question_text+'</div></div>'
+      +'<div class="answer-opts">'+optHtml+'</div>'
+      +(isAnswered ? '<div class="answered-badge">'+(q.my_correct ? '✅ To\'g\'ri! +'+q.points+' ochko' : '❌ Noto\'g\'ri')+'</div>' : '')
+      +'</div>';
+  });
+  el.innerHTML = html;
+}
+
+async function answerQ(qId, option) {
+  try {
+    const r = await api('/api/tournaments/'+T_ID+'/answer', {method:'POST', body:JSON.stringify({question_id:qId, selected_option:option})});
+    if (r.success) {
+      showToast(r.is_correct ? '✅ To\'g\'ri! +'+r.points_earned+' ochko' : '❌ Noto\'g\'ri. To\'g\'ri: '+r.correct_option, r.is_correct?'success':'error');
+      // Update UI inline
+      const card = document.getElementById('qcard_'+qId);
+      if (card) {
+        card.querySelectorAll('.opt-btn').forEach(btn => {
+          btn.disabled = true;
+          const k = btn.querySelector('.opt-icon')?.textContent;
+          if (k === option) btn.classList.add(r.is_correct ? 'answered-correct' : 'answered-wrong');
+        });
+        const badge = document.createElement('div');
+        badge.className = 'answered-badge';
+        badge.textContent = r.is_correct ? '✅ To\'g\'ri! +'+r.points_earned+' ochko' : '❌ Noto\'g\'ri. To\'g\'ri: '+r.correct_option;
+        card.appendChild(badge);
+      }
+      refreshLB();
+    } else showToast(r.error, 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ─── FINAL LEADERBOARD ────────────────────────────────────
+async function renderFinalLeaderboard() {
+  const el = document.getElementById('mainContent');
+  let teams = [];
+  try { teams = await api('/api/tournaments/'+T_ID+'/leaderboard'); } catch(e) {}
+  const trophies = ['🥇','🥈','🥉'];
+  let html = '<div class="panel"><div class="panel-header"><span class="panel-title">🏆 Yakuniy natijalar</span></div><div class="panel-body">';
+  teams.forEach((tm,i) => {
+    const trophy = trophies[i]||'🎖️';
+    html += '<div style="background:rgba(255,255,255,.04);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;">'
+      +'<div style="font-size:2rem;">'+trophy+'</div>'
+      +'<div style="flex:1;"><div style="font-size:1rem;font-weight:800;">'+tm.name+'</div>'
+      +'<div style="font-size:.75rem;color:var(--muted);">'+tm.member_count+' a\'zo</div></div>'
+      +'<div style="font-size:1.6rem;font-weight:900;color:#fbbf24;">'+tm.total_points+'</div>'
+      +'</div>';
+  });
+  html += '</div></div>';
+  el.innerHTML += html;
+}
+
+// ─── LEADERBOARD SIDEBAR ──────────────────────────────────
+async function refreshLB() {
+  try {
+    const teams = await api('/api/tournaments/'+T_ID+'/leaderboard');
+    const el = document.getElementById('leaderboard');
+    if (!teams.length) { el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.8rem;">Hali natija yo\'q</div>'; return; }
+    const trophies = ['🥇','🥈','🥉'];
+    el.innerHTML = teams.map((tm,i) =>
+      '<div class="lb-row"><span class="lb-rank">'+(trophies[i]||i+1)+'</span>'
+      +'<div class="lb-dot" style="background:'+(tm.color||COLORS[i%8])+';"></div>'
+      +'<span class="lb-name">'+tm.name+'</span>'
+      +'<span class="lb-pts">'+tm.total_points+'</span></div>'
+    ).join('');
+  } catch(e) {}
+}
+
+// ─── TEAMS SIDEBAR ────────────────────────────────────────
+function renderTeams() {
+  const t = tourData;
+  const el = document.getElementById('teamsList');
+  const teams = t.teams || [];
+  const canJoin = t.status !== 'finished' && !t.my_team_id;
+  const canCreate = t.status !== 'finished' && !t.my_team_id;
+
+  let html = '';
+  if (canCreate) {
+    html += '<button class="create-team-btn" onclick="openCreateTeam()">➕ Yangi jamoa yaratish</button>';
+  }
+  if (!teams.length) {
+    html += '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.8rem;">Hali jamoa yo\'q</div>';
+  }
+  teams.forEach((tm,i) => {
+    const isMine = tm.id === t.my_team_id;
+    const color = tm.color || COLORS[i%COLORS.length];
+    const mems = (tm.members||[]).map(m =>
+      '<div class="mem-av" style="background:'+color+'66;" title="'+(m.full_name||'')+'">'
+      +(m.avatar ? '<img src="'+m.avatar+'">' : (m.full_name||'?').charAt(0).toUpperCase())+'</div>'
+    ).join('');
+    html += '<div class="team-card'+(isMine?' mine':'')+'">'
+      +(tm.is_private ? '<div class="lock-badge">🔒 Maxsus</div>' : '')
+      +'<div class="team-header"><div class="team-dot" style="background:'+color+';"></div>'
+      +'<div class="team-name-big">'+tm.name+'</div>'
+      +'<div class="team-pts" style="color:'+color+';">'+tm.total_points+'</div></div>'
+      +'<div style="font-size:.72rem;color:var(--muted);margin-bottom:8px;">'+tm.member_count+' a\'zo</div>'
+      +'<div class="team-members-list">'+mems+'</div>'
+      +(isMine ? '<div style="margin-top:10px;font-size:.75rem;color:#4ade80;font-weight:700;">✓ Sizning jamoangiz</div>'
+        : canJoin ? '<button class="join-team-btn" onclick="joinTeam('+tm.id+',\''+(tm.is_private?'private':'public')+'\')">Qo\'shilish</button>' : '')
+      +'</div>';
+  });
+  el.innerHTML = html;
+
+  // My status card
+  const myTeam = teams.find(tm => tm.id === t.my_team_id);
+  const msEl = document.getElementById('myStatus');
+  if (myTeam) {
+    const color = myTeam.color || '#6366f1';
+    msEl.innerHTML = '<div style="background:linear-gradient(135deg,'+color+'22,'+color+'11);border:1.5px solid '+color+'44;border-radius:14px;padding:14px 16px;">'
+      +'<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px;font-weight:700;">SIZNING JAMOANGIZ</div>'
+      +'<div style="font-size:1rem;font-weight:800;color:'+color+';">'+myTeam.name+'</div>'
+      +'</div>';
+  } else msEl.innerHTML = '';
+}
+
+// ─── JOIN / CREATE TEAM ───────────────────────────────────
+function joinTeam(teamId, type) {
+  const t = tourData;
+  pendingJoinTeamId = teamId;
+  pendingJoinIsPrivate = type === 'private';
+  if (type === 'private') {
+    const tm = (t.teams||[]).find(x => x.id === teamId);
+    document.getElementById('joinPrivateTeamName').textContent = '🔒 Jamoa: ' + (tm ? tm.name : '');
+    document.getElementById('joinCode').value = '';
+    const feeNote = document.getElementById('joinFeeNote');
+    if (t.entry_fee) { feeNote.textContent = '🎟️ Kirish narxi: ' + t.entry_fee + ' ochko'; feeNote.style.display = 'block'; }
+    else feeNote.style.display = 'none';
+    openModal('joinPrivateModal');
+  } else {
+    const tm = (t.teams||[]).find(x => x.id === teamId);
+    document.getElementById('joinPublicTitle').textContent = '👥 "' + (tm?tm.name:'Jamoa') + '" ga qo\'shilish';
+    document.getElementById('joinPublicBody').textContent = t.entry_fee
+      ? '🎟️ Kirish narxi: '+t.entry_fee+' ochko hisobingizdan ayriladi.'
+      : 'Bu jamoaga bepul qo\'shilishingiz mumkin.';
+    openModal('joinPublicModal');
+  }
+}
+
+async function confirmJoinPublic() {
+  closeModal('joinPublicModal');
+  await doJoin(pendingJoinTeamId, '');
+}
+
+async function confirmJoinPrivate() {
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if (!code) { showToast('Kod kiriting', 'error'); return; }
+  closeModal('joinPrivateModal');
+  await doJoin(pendingJoinTeamId, code);
+}
+
+async function doJoin(teamId, code) {
+  try {
+    const r = await api('/api/tournaments/'+T_ID+'/join', {method:'POST', body:JSON.stringify({team_id:teamId, join_code:code})});
+    if (r.success) { showToast('Jamoaga qo\'shildingiz! 🎉', 'success'); await loadData(); }
+    else showToast(r.error, 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+function openCreateTeam() { openModal('createTeamModal'); }
+
+async function createTeam() {
+  const name = document.getElementById('tmName').value.trim();
+  if (!name) { showToast('Jamoa nomini kiriting', 'error'); return; }
+  const data = { name, color: document.getElementById('tmColor').value, is_private: document.getElementById('tmPrivate').checked };
+  try {
+    const r = await api('/api/tournaments/'+T_ID+'/teams/create', {method:'POST', body:JSON.stringify(data)});
+    if (r.success) {
+      closeModal('createTeamModal');
+      if (r.join_code) showToast('Maxsus kod: ' + r.join_code + ' — do\'stlaringizga yuboring!', 'success');
+      else showToast('Jamoa yaratildi! 🎉', 'success');
+      await loadData();
+    } else showToast(r.error, 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ─── QUESTIONS CRUD ───────────────────────────────────────
+function openAddQ() {
+  document.getElementById('qText').value=''; document.getElementById('qA').value='';
+  document.getElementById('qB').value=''; document.getElementById('qC').value='';
+  document.getElementById('qD').value=''; document.getElementById('qCorrect').value='A';
+  document.getElementById('qTime').value='30'; document.getElementById('qPts').value='10';
+  document.getElementById('editQId').textContent='';
+  openModal('addQModal');
+}
+
+function openEditQ(q) {
+  document.getElementById('qText').value=q.question_text||'';
+  document.getElementById('qA').value=q.option_a||''; document.getElementById('qB').value=q.option_b||'';
+  document.getElementById('qC').value=q.option_c||''; document.getElementById('qD').value=q.option_d||'';
+  document.getElementById('qCorrect').value=q.correct_option||'A';
+  document.getElementById('qTime').value=q.time_limit||30; document.getElementById('qPts').value=q.points||10;
+  document.getElementById('editQId').textContent=q.id;
+  openModal('addQModal');
+}
+
+async function saveQuestion() {
+  const data = {
+    question_text: document.getElementById('qText').value.trim(),
+    option_a: document.getElementById('qA').value.trim(), option_b: document.getElementById('qB').value.trim(),
+    option_c: document.getElementById('qC').value.trim(), option_d: document.getElementById('qD').value.trim(),
+    correct_option: document.getElementById('qCorrect').value,
+    time_limit: parseInt(document.getElementById('qTime').value)||30,
+    points: parseInt(document.getElementById('qPts').value)||10
+  };
+  if (!data.question_text || !data.option_a || !data.option_b) { showToast('Savol va kamida A, B variantlarni kiriting', 'error'); return; }
+  const editId = document.getElementById('editQId').textContent;
+  try {
+    let r;
+    if (editId) r = await api('/api/tournaments/'+T_ID+'/questions/'+editId+'/edit', {method:'POST', body:JSON.stringify(data)});
+    else r = await api('/api/tournaments/'+T_ID+'/questions/add', {method:'POST', body:JSON.stringify(data)});
+    if (r.success) { closeModal('addQModal'); showToast('Saqlandi ✅', 'success'); await loadData(); }
+    else showToast(r.error||'Xato', 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function deleteQ(qId) {
+  if (!confirm('Savolni o\'chirasizmi?')) return;
+  try {
+    await api('/api/tournaments/'+T_ID+'/questions/'+qId+'/delete', {method:'POST', body:'{}'});
+    showToast('O\'chirildi', 'success'); await loadData();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ─── ACTIVATE / FINISH ────────────────────────────────────
+async function activateTournament() {
+  if (!confirm('Musobaqani hozir boshlashni tasdiqlaysizmi?')) return;
+  try {
+    const r = await api('/api/tournaments/'+T_ID+'/activate', {method:'POST', body:'{}'});
+    if (r.success) { showToast('Musobaqa boshlandi! ⚡', 'success'); await loadData(); startPoll(); }
+    else showToast(r.error, 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function finishTournament() {
+  if (!confirm('Musobaqani yakunlashni tasdiqlaysizmi? G\'olib jamoaga mukofot beriladi.')) return;
+  try {
+    const r = await api('/api/tournaments/'+T_ID+'/finish', {method:'POST', body:'{}'});
+    if (r.success) { showToast('Musobaqa yakunlandi! 🏆', 'success'); if(pollInterval) clearInterval(pollInterval); await loadData(); }
+    else showToast(r.error, 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ─── UTILS ────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

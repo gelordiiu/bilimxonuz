@@ -1,0 +1,41 @@
+{
+  "lesson": "PYTHON - Ro'yxatlar (List) va ularni boshqarish",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Ro'yxatlar (List) va ularni boshqarish haqida asosiy tushuncha nima?",
+      "options": [
+        "Birinchi variant",
+        "Ikkinchi variant",
+        "To'g'ri javob",
+        "To'rtinchi variant"
+      ],
+      "correct": 2,
+      "explanation": "Ro'yxatlar (List) va ularni boshqarish mavzusining asosiy tushunchasi."
+    },
+    {
+      "id": 2,
+      "question": "Quyidagilardan qaysi biri Ro'yxatlar (List) va ularni boshqarish bilan bog'liq?",
+      "options": [
+        "Bog'liq emas",
+        "Bog'liq",
+        "Ba'zan bog'liq",
+        "Nomaqbul"
+      ],
+      "correct": 1,
+      "explanation": "Bu mavzu Ro'yxatlar (List) va ularni boshqarish bilan bevosita bog'liq."
+    },
+    {
+      "id": 3,
+      "question": "Ro'yxatlar (List) va ularni boshqarish qayerda qo'llaniladi?",
+      "options": [
+        "Hech qayerda",
+        "Dasturlashda",
+        "Faqat matematikada",
+        "Kundalik hayotda"
+      ],
+      "correct": 1,
+      "explanation": "Ro'yxatlar (List) va ularni boshqarish dasturlashda keng qo'llaniladi."
+    }
+  ]
+}

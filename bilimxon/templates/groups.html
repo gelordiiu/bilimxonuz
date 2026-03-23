@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Guruhlar</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    *{box-sizing:border-box;}
+    body{font-family:'Outfit',sans-serif;background:#0d1117;color:#fff;min-height:100vh;}
+
+    /* ══ LAYOUT — Telegram 3-column ══ */
+    .groups-page{display:flex;height:calc(100vh - var(--topbar-h,60px));margin-top:var(--topbar-h,60px);overflow:hidden;}
+
+    /* LEFT SIDEBAR */
+    .gs-left{width:320px;flex-shrink:0;border-right:1px solid #21262d;display:flex;flex-direction:column;background:#0d1117;}
+    @media(max-width:768px){.gs-left{width:100%;}.gs-main{display:none!important;}}
+
+    /* Search header */
+    .gs-header{padding:14px 14px 10px;border-bottom:1px solid #21262d;}
+    .gs-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .gs-title{font-size:1.1rem;font-weight:900;color:#fff;}
+    .gs-create-btn{padding:6px 14px;border-radius:20px;background:linear-gradient(135deg,#1B3A6B,#C9A84C);color:#fff;border:none;font-size:.78rem;font-weight:800;cursor:pointer;font-family:inherit;}
+    .gs-search{display:flex;align-items:center;gap:8px;background:#161b22;border-radius:10px;padding:8px 12px;border:1px solid #21262d;}
+    .gs-search input{flex:1;background:none;border:none;outline:none;color:#fff;font-size:.85rem;font-family:inherit;}
+    .gs-search input::placeholder{color:#555;}
+    .gs-search-icon{color:#555;font-size:.9rem;}
+
+    /* Filter tabs */
+    .gs-filters{display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid #21262d;overflow-x:auto;scrollbar-width:none;}
+    .gs-filters::-webkit-scrollbar{display:none;}
+    .gs-filter{padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:700;background:transparent;border:1px solid #21262d;color:#888;cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit;}
+    .gs-filter.active{background:rgba(201,168,76,.12);border-color:#C9A84C;color:#C9A84C;}
+
+    /* Groups list */
+    .gs-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#21262d transparent;}
+    .gs-list::-webkit-scrollbar{width:4px;}
+    .gs-list::-webkit-scrollbar-thumb{background:#21262d;border-radius:2px;}
+    .gs-list-empty{text-align:center;padding:40px 20px;color:#555;}
+    .gs-list-empty .icon{font-size:2.5rem;margin-bottom:10px;}
+
+    /* Group item — Telegram style */
+    .gs-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:.12s;border-bottom:1px solid rgba(255,255,255,.03);}
+    .gs-item:hover,.gs-item.active{background:#161b22;}
+    .gs-item-av{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;overflow:hidden;position:relative;}
+    .gs-item-av img{width:100%;height:100%;object-fit:cover;}
+    .gs-item-info{flex:1;min-width:0;}
+    .gs-item-top{display:flex;align-items:center;justify-content:space-between;gap:4px;}
+    .gs-item-name{font-weight:700;font-size:.88rem;color:#e6edf3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .gs-item-count{font-size:.68rem;color:#555;flex-shrink:0;}
+    .gs-item-desc{font-size:.75rem;color:#666;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .gs-item-badge{display:inline-flex;align-items:center;gap:3px;font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-top:4px;}
+    .badge-channel{background:rgba(74,222,128,.1);color:#4ade80;}
+    .badge-group{background:rgba(96,165,250,.1);color:#60a5fa;}
+    .badge-public{background:rgba(168,85,247,.1);color:#c084fc;}
+    .badge-private{background:rgba(251,146,60,.1);color:#fb923c;}
+    .badge-study{background:rgba(251,191,36,.1);color:#fbbf24;}
+
+    /* MAIN PANEL */
+    .gs-main{flex:1;display:flex;flex-direction:column;background:#080b14;align-items:center;justify-content:center;}
+    .gs-main-empty{text-align:center;color:#555;}
+    .gs-main-empty .big-icon{font-size:4rem;margin-bottom:16px;}
+    .gs-main-empty h3{font-size:1.1rem;font-weight:800;color:#aaa;margin-bottom:6px;}
+    .gs-main-empty p{font-size:.83rem;line-height:1.5;}
+    .gs-create-big{margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#1B3A6B,#C9A84C);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;font-family:inherit;}
+
+    /* CREATE MODAL */
+    .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:16px;}
+    .modal-backdrop.open{display:flex;}
+    .modal-box{background:#161b22;border:1px solid #21262d;border-radius:18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+    .modal-box::-webkit-scrollbar{width:4px;}
+    .modal-box::-webkit-scrollbar-thumb{background:#21262d;}
+    .modal-head{padding:18px 20px;border-bottom:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;}
+    .modal-head-title{font-weight:900;font-size:1rem;color:#fff;}
+    .modal-close-btn{background:none;border:none;color:#666;font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:6px;}
+    .modal-close-btn:hover{background:#21262d;color:#fff;}
+    .modal-body{padding:20px;}
+    .form-group{margin-bottom:14px;}
+    .form-label{font-size:.75rem;font-weight:800;color:#888;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+    .form-input,.form-select,.form-textarea{width:100%;padding:10px 13px;border:1.5px solid #21262d;border-radius:10px;background:#0d1117;color:#fff;font-family:inherit;font-size:.88rem;outline:none;transition:.15s;}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#444;}
+    .form-input::placeholder,.form-textarea::placeholder{color:#444;}
+    .form-textarea{resize:vertical;min-height:70px;}
+    .form-select option{background:#0d1117;}
+    .modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:16px 20px;border-top:1px solid #21262d;}
+    .btn-cancel{padding:9px 18px;background:rgba(255,255,255,.06);border:1px solid #21262d;border-radius:10px;color:#888;cursor:pointer;font-family:inherit;font-weight:700;font-size:.83rem;}
+    .btn-create{padding:9px 20px;background:linear-gradient(135deg,#1B3A6B,#C9A84C);border:none;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.83rem;}
+
+    /* TYPE SELECTOR */
+    .type-selector{display:flex;gap:10px;margin-bottom:4px;}
+    .type-opt{flex:1;padding:12px;border:1.5px solid #21262d;border-radius:12px;cursor:pointer;text-align:center;transition:.15s;}
+    .type-opt:hover{border-color:#444;}
+    .type-opt.sel{border-color:#C9A84C;background:rgba(201,168,76,.06);}
+    .type-opt .type-icon{font-size:1.4rem;margin-bottom:4px;}
+    .type-opt .type-name{font-size:.8rem;font-weight:700;color:#fff;}
+    .type-opt .type-desc{font-size:.68rem;color:#666;margin-top:2px;}
+
+    @media(max-width:768px){
+      .gs-left{width:100%;border-right:none;}
+    }
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="groups-page">
+  <!-- LEFT SIDEBAR -->
+  <div class="gs-left">
+    <div class="gs-header">
+      <div class="gs-title-row">
+        <span class="gs-title">💬 Guruhlar</span>
+        <button class="gs-create-btn" onclick="openCreateModal()">+ Yaratish</button>
+      </div>
+      <div class="gs-search">
+        <span class="gs-search-icon">🔍</span>
+        <input id="searchInput" placeholder="Guruh qidirish..." oninput="onSearch()">
+      </div>
+    </div>
+    <div class="gs-filters">
+      <button class="gs-filter active" onclick="setFilter('all',this)">🌍 Barchasi</button>
+      <button class="gs-filter" onclick="setFilter('mine',this)">⭐ Meniki</button>
+      <button class="gs-filter" onclick="setFilter('group',this)">👥 Guruhlar</button>
+      <button class="gs-filter" onclick="setFilter('channel',this)">📢 Kanallar</button>
+    </div>
+    <div class="gs-list" id="groupsList">
+      <div class="gs-list-empty"><div class="icon">⏳</div><p>Yuklanmoqda...</p></div>
+    </div>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <div class="gs-main" id="gsMain">
+    <div class="gs-main-empty">
+      <div class="big-icon">💬</div>
+      <h3>Guruhni tanlang</h3>
+      <p>Chap tarafdan guruh tanlang<br>yoki yangi guruh yarating</p>
+      <button class="gs-create-big" onclick="openCreateModal()">+ Guruh Yaratish</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal-backdrop" id="createModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-head-title">🌐 Yangi Guruh / Kanal</span>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Type selector -->
+      <div class="form-group">
+        <label class="form-label">Tur tanlang</label>
+        <div class="type-selector">
+          <div class="type-opt sel" id="typeGroup" onclick="selectType('group')">
+            <div class="type-icon">👥</div>
+            <div class="type-name">Guruh</div>
+            <div class="type-desc">Ikki tomonlama suhbat</div>
+          </div>
+          <div class="type-opt" id="typeChannel" onclick="selectType('channel')">
+            <div class="type-icon">📢</div>
+            <div class="type-name">Kanal</div>
+            <div class="type-desc">Faqat admin yozadi</div>
+          </div>
+        </div>
+        <input type="hidden" id="gType" value="group">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nomi *</label>
+        <input class="form-input" id="gName" placeholder="Guruh yoki kanal nomi">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tavsif</label>
+        <textarea class="form-textarea" id="gDesc" placeholder="Bu guruh haqida qisqacha..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategoriya</label>
+        <select class="form-select" id="gCategory">
+          <option value="normal">💬 Oddiy chat</option>
+          <option value="study">📚 O'quv guruh</option>
+          <option value="gaming">🎮 O'yinlar</option>
+          <option value="coding">💻 Dasturlash</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kirish turi</label>
+        <select class="form-select" id="gPublic">
+          <option value="1">🌍 Ochiq — hamma ko'ra oladi</option>
+          <option value="0">🔒 Yopiq — faqat taklif bilan</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Bekor</button>
+      <button class="btn-create" onclick="createGroup()">✅ Yaratish</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+let currentFilter = 'all';
+let searchTimer = null;
+let myGroupSlugs = new Set();
+let selectedType = 'group';
+
+function selectType(type) {
+  selectedType = type;
+  document.getElementById('gType').value = type;
+  document.getElementById('typeGroup').classList.toggle('sel', type==='group');
+  document.getElementById('typeChannel').classList.toggle('sel', type==='channel');
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.gs-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  reloadGroups();
+}
+
+function onSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(reloadGroups, 300);
+}
+
+const COLORS = ['#1B3A6B','#2965f1','#e34c26','#3776ab','#512bd4','#10a37f','#C9A84C','#8B5CF6','#0d9488','#d97706'];
+
+async function reloadGroups() {
+  const list = document.getElementById('groupsList');
+  list.innerHTML = '<div class="gs-list-empty"><div class="icon">⏳</div><p>Yuklanmoqda...</p></div>';
+  try {
+    const q = document.getElementById('searchInput').value.trim();
+    let groups;
+    if(currentFilter === 'mine') {
+      groups = await api('/api/groups/my');
+      myGroupSlugs = new Set(groups.map(g=>g.slug));
+    } else {
+      const p = new URLSearchParams({sort:'popular'});
+      if(q) p.set('q',q);
+      if(currentFilter !== 'all') p.set('type',currentFilter);
+      groups = await api('/api/groups?'+p);
+    }
+
+    if(!groups.length) {
+      list.innerHTML = `<div class="gs-list-empty">
+        <div class="icon">🔍</div>
+        <p style="font-weight:700;color:#aaa;margin-bottom:6px;">Guruh topilmadi</p>
+        <p style="font-size:.78rem;">Boshqa so'z bilan qidiring</p>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = groups.map(g => renderGroupItem(g)).join('');
+  } catch(e) {
+    list.innerHTML = `<div class="gs-list-empty"><p style="color:#f87171;">${e.message}</p></div>`;
+  }
+}
+
+function renderGroupItem(g) {
+  let hash=0; for(let c of g.slug) hash=(hash*31+c.charCodeAt(0))%COLORS.length;
+  const bg = COLORS[hash];
+  const isChannel = g.group_type==='channel';
+  const isMine = myGroupSlugs.has(g.slug);
+  const cnt = g.member_count||0;
+  const cntTxt = cnt>=1000?(cnt/1000).toFixed(1)+'K':cnt;
+  const av = g.avatar ? `<img src="${g.avatar}" alt="">` : `<span>${g.name.charAt(0).toUpperCase()}</span>`;
+  const typeLabel = isChannel ? `<span class="gs-item-badge badge-channel">📢 Kanal</span>` : `<span class="gs-item-badge badge-group">👥 Guruh</span>`;
+  const accessLabel = g.is_public ? `<span class="gs-item-badge badge-public">🌍 Ochiq</span>` : `<span class="gs-item-badge badge-private">🔒 Yopiq</span>`;
+
+  return `<div class="gs-item" onclick="openGroup('${g.slug}')">
+    <div class="gs-item-av" style="background:${bg}">${av}</div>
+    <div class="gs-item-info">
+      <div class="gs-item-top">
+        <div class="gs-item-name">${g.name}</div>
+        <div class="gs-item-count">👤 ${cntTxt}</div>
+      </div>
+      <div class="gs-item-desc">${g.description||g.bio||'—'}</div>
+      <div style="display:flex;gap:4px;margin-top:4px;">${typeLabel}${accessLabel}</div>
+    </div>
+  </div>`;
+}
+
+function openGroup(slug) {
+  // Highlight active
+  document.querySelectorAll('.gs-item').forEach(el=>el.classList.remove('active'));
+  event.currentTarget?.classList.add('active');
+  // Navigate to group
+  window.location.href = `/group/${slug}`;
+}
+
+function openCreateModal() {
+  document.getElementById('createModal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('createModal').classList.remove('open');
+}
+
+async function createGroup() {
+  const data = {
+    name: document.getElementById('gName').value.trim(),
+    group_type: selectedType,
+    group_category: document.getElementById('gCategory').value,
+    description: document.getElementById('gDesc').value.trim(),
+    bio: '',
+    is_public: document.getElementById('gPublic').value,
+  };
+  if(!data.name) { showToast('Nom kiriting', 'error'); return; }
+  try {
+    const res = await api('/api/groups/create', {method:'POST', body:JSON.stringify(data)});
+    if(res.success) {
+      showToast('Guruh yaratildi! 🎉', 'success');
+      closeModal();
+      window.location.href = `/group/${res.slug}`;
+    } else showToast(res.error||'Xato', 'error');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try { const m=await api('/api/groups/my'); myGroupSlugs=new Set(m.map(g=>g.slug)); } catch{}
+  reloadGroups();
+});
+</script>
+</body>
+</html>

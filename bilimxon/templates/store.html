@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Do'kon</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Outfit',sans-serif;background:#080b14;color:#fff;min-height:100vh;}
+    .sw{padding-top:var(--topbar-h,60px);min-height:100vh;}
+
+    /* ══ STORE HEADER ══ */
+    .store-header{
+      background:linear-gradient(135deg,#0d1b3e 0%,#1a1040 50%,#0d2a3e 100%);
+      padding:28px 24px 0;position:relative;overflow:hidden;
+    }
+    .store-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,.12) 0%,transparent 60%);}
+    .store-header-inner{max-width:1100px;margin:0 auto;position:relative;}
+    .store-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+    .store-brand{display:flex;align-items:center;gap:14px;}
+    .store-brand-icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#C9A84C,#8B6914);display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 6px 20px rgba(201,168,76,.3);}
+    .store-brand-title{font-size:1.5rem;font-weight:900;color:#fff;}
+    .store-brand-sub{font-size:.8rem;color:rgba(255,255,255,.45);margin-top:2px;}
+    .pts-pill{
+      display:flex;align-items:center;gap:8px;
+      background:rgba(201,168,76,.12);border:1.5px solid rgba(201,168,76,.35);
+      border-radius:999px;padding:8px 20px;
+      font-size:1rem;font-weight:900;color:#FFD700;
+    }
+    .pts-pill span{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.5);}
+
+    /* ══ TABS ══ */
+    .store-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.08);overflow-x:auto;scrollbar-width:none;}
+    .store-tabs::-webkit-scrollbar{display:none;}
+    .stab{
+      padding:14px 20px;font-size:.85rem;font-weight:700;
+      color:rgba(255,255,255,.4);cursor:pointer;
+      border-bottom:2.5px solid transparent;margin-bottom:-1px;
+      white-space:nowrap;transition:.15s;flex-shrink:0;
+    }
+    .stab:hover{color:rgba(255,255,255,.7);}
+    .stab.on{color:#C9A84C;border-bottom-color:#C9A84C;}
+
+    /* ══ CONTENT ══ */
+    .sc{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+
+    /* ══ SECTION TITLE ══ */
+    .sec-title{font-size:.95rem;font-weight:800;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .sec-badge{background:rgba(201,168,76,.12);color:#C9A84C;border:1px solid rgba(201,168,76,.2);padding:2px 10px;border-radius:999px;font-size:.7rem;font-weight:800;}
+
+    /* ══ ITEMS GRID ══ */
+    .ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+
+    /* ══ ITEM CARD ══ */
+    .ic{
+      background:#0f1623;border:1px solid rgba(255,255,255,.07);
+      border-radius:16px;overflow:hidden;cursor:pointer;
+      transition:.2s;position:relative;
+    }
+    .ic:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.3);box-shadow:0 12px 32px rgba(0,0,0,.5);}
+    .ic.legendary{border-color:rgba(245,158,11,.3);}
+    .ic.epic{border-color:rgba(139,92,246,.3);}
+    .ic.rare{border-color:rgba(59,130,246,.3);}
+    .ic.uncommon{border-color:rgba(34,197,94,.3);}
+
+    /* Item image area */
+    .ii{
+      height:96px;display:flex;align-items:center;justify-content:center;
+      font-size:2.6rem;position:relative;overflow:hidden;
+    }
+    .ii.legendary{background:linear-gradient(135deg,#78350F22,#B4530922);}
+    .ii.epic{background:linear-gradient(135deg,#2E106522,#5B21B622);}
+    .ii.rare{background:linear-gradient(135deg,#1E3A5F22,#1D4ED822);}
+    .ii.uncommon{background:linear-gradient(135deg,#14532D22,#15803D22);}
+    .ii.common{background:linear-gradient(135deg,#1F293722,#37415122);}
+    .ii-glow{position:absolute;inset:0;opacity:.15;filter:blur(20px);}
+    .rp{
+      position:absolute;top:7px;right:7px;
+      font-size:.6rem;font-weight:800;text-transform:uppercase;
+      padding:2px 7px;border-radius:999px;
+    }
+    .rp.legendary{background:#F59E0B;color:#451A03;}
+    .rp.epic{background:#8B5CF6;color:#fff;}
+    .rp.rare{background:#3B82F6;color:#fff;}
+    .rp.uncommon{background:#22C55E;color:#fff;}
+    .rp.common{background:#6B7280;color:#fff;}
+
+    /* Item body */
+    .ib{padding:12px;}
+    .etype{display:inline-flex;padding:2px 7px;border-radius:5px;font-size:.6rem;font-weight:700;background:rgba(59,130,246,.1);color:#60A5FA;margin-bottom:5px;}
+    .iname{font-weight:800;color:#fff;font-size:.82rem;margin-bottom:3px;line-height:1.3;}
+    .idesc{font-size:.68rem;color:rgba(255,255,255,.38);margin-bottom:8px;line-height:1.4;}
+    .ifoot{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+    .ptag{font-weight:900;font-size:.85rem;color:#FFD700;}
+    .owned-pill{background:rgba(34,197,94,.12);color:#4ade80;padding:3px 8px;border-radius:6px;font-size:.65rem;font-weight:700;border:1px solid rgba(34,197,94,.2);}
+    .bbtn{
+      background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;
+      border:none;border-radius:8px;padding:5px 12px;
+      font-size:.72rem;font-weight:800;cursor:pointer;
+      transition:.15s;font-family:inherit;
+    }
+    .bbtn:hover{opacity:.85;transform:scale(1.03);}
+    .bbtn:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* ══ PREMIUM SECTION ══ */
+    .prem-hero{
+      background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(236,72,153,.08));
+      border:1px solid rgba(168,85,247,.25);border-radius:18px;
+      padding:24px;margin-bottom:24px;text-align:center;
+    }
+    .prem-hero h2{font-size:1.3rem;font-weight:900;margin-bottom:6px;}
+    .prem-hero p{color:rgba(255,255,255,.5);font-size:.83rem;margin-bottom:16px;}
+    .prem-features{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;text-align:left;margin-bottom:16px;}
+    .pf{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:10px;font-size:.8rem;color:rgba(255,255,255,.7);}
+    .pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+    .pc{
+      background:#0f1623;border:1.5px solid rgba(168,85,247,.2);
+      border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:.2s;
+    }
+    .pc:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(168,85,247,.15);}
+    .pp{font-size:1.5rem;font-weight:900;color:#a855f7;margin:4px 0;}
+    .pbtn{
+      width:100%;padding:8px;border-radius:8px;border:none;
+      background:linear-gradient(135deg,#a855f7,#ec4899);
+      color:#fff;font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;
+    }
+
+    /* ══ BOXES ══ */
+    .bg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+    .bc{
+      background:#0f1623;border-radius:16px;overflow:hidden;
+      border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:.22s;text-align:center;
+    }
+    .bc:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.55);}
+    .bi{height:110px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;}
+    .bsh{position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,rgba(255,255,255,.08) 50%,transparent 75%);animation:sh 2.5s ease-in-out infinite;}
+    @keyframes sh{0%{transform:translateX(-150%)}100%{transform:translateX(150%)}}
+    .bb{padding:10px;}
+    .bname{font-weight:900;color:#fff;font-size:.82rem;margin-bottom:3px;}
+    .bprice{color:#FFD700;font-weight:800;font-size:.85rem;margin-bottom:7px;}
+    .obtn{
+      width:100%;padding:6px;background:linear-gradient(135deg,#C9A84C,#E8B84B);
+      color:#1a0f00;border:none;border-radius:8px;font-weight:800;font-size:.75rem;cursor:pointer;font-family:inherit;
+    }
+
+    /* ══ GIFT TAB ══ */
+    .ginp{
+      width:100%;padding:10px 13px;border-radius:10px;
+      border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);
+      color:#fff;font-size:.85rem;font-family:'Outfit',sans-serif;outline:none;
+    }
+    .ginp:focus{border-color:rgba(201,168,76,.4);}
+    .gsel{
+      width:100%;padding:9px 12px;border-radius:10px;
+      border:1.5px solid rgba(255,255,255,.1);background:#0f1623;
+      color:#fff;font-size:.85rem;outline:none;
+    }
+
+    /* ══ HOW-TO ══ */
+    .hw{background:#0f1623;border-radius:12px;padding:16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.07);}
+    .hrow{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+    .hico{width:30px;height:30px;border-radius:8px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+    .htxt{color:rgba(255,255,255,.55);font-size:.8rem;line-height:1.5;}
+    .htxt strong{color:#fff;}
+
+    /* ══ LOADING / EMPTY ══ */
+    .store-loader{grid-column:1/-1;text-align:center;padding:50px 20px;}
+    .store-empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:#555;}
+    .store-empty .icon{font-size:3rem;margin-bottom:12px;}
+
+    /* ══ OVERLAY (box opening) ══ */
+    .ov{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);}
+    .ov.show{display:flex;}
+    .pcv{position:fixed;inset:0;pointer-events:none;z-index:10000;}
+    .bcont{position:relative;width:130px;height:130px;margin:0 auto 14px;}
+    .gring{position:absolute;inset:-14px;border-radius:50%;animation:gp 1.2s ease-in-out infinite;}
+    @keyframes gp{0%,100%{opacity:.32;transform:scale(1)}50%{opacity:.88;transform:scale(1.13)}}
+    @keyframes bShk{0%,100%{transform:rotate(-3deg)}25%{transform:rotate(3deg)}75%{transform:rotate(4deg)}}
+    @keyframes bExp{0%{transform:scale(1);opacity:1}60%{transform:scale(1.7) rotate(20deg);opacity:.3}100%{transform:scale(0) rotate(720deg);opacity:0}}
+    @keyframes rPop{0%{transform:scale(0) rotate(-18deg);opacity:0}55%{transform:scale(1.1) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+    @keyframes shtxt{0%{background-position:0%}100%{background-position:200%}}
+    .bew{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4.6rem;}
+    .tapH{color:rgba(255,255,255,.36);font-size:.78rem;animation:gp 1.5s infinite;}
+    .rc{
+      background:linear-gradient(145deg,#0f1623,#0d1b2e);border-radius:20px;
+      padding:24px 20px;border:1px solid rgba(255,255,255,.1);
+      animation:rPop .55s cubic-bezier(.175,.885,.32,1.275) forwards;
+      text-align:center;max-width:310px;width:90%;
+    }
+    .reb{font-size:3.6rem;display:block;margin-bottom:6px;}
+    .resh{
+      font-size:1.1rem;font-weight:900;
+      background:linear-gradient(90deg,#FFD700,#F59E0B,#FFD700,#FFF,#FFD700);background-size:200%;
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:shtxt 2s linear infinite;margin-bottom:5px;
+    }
+    .resub{color:rgba(255,255,255,.43);font-size:.78rem;margin-bottom:10px;}
+    .repill{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.26);color:#FFD700;font-weight:700;font-size:.74rem;margin-bottom:7px;}
+    .clbtn{background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;border:none;border-radius:10px;padding:9px 26px;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;}
+
+    /* ══ POINTS CARD ══ */
+    .ptcard{
+      background:#0f1623;border-radius:12px;padding:14px;text-align:center;
+      cursor:pointer;border:1.5px solid rgba(201,168,76,.15);transition:.2s;
+    }
+    .ptcard:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.4);}
+
+    /* ══ SPINNER ══ */
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner-sm{display:inline-block;width:24px;height:24px;border-radius:50%;border:3px solid rgba(255,255,255,.08);border-top-color:#C9A84C;animation:spin 1s linear infinite;}
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:600px){
+      .store-header{padding:20px 14px 0;}
+      .ig,.pg,.bg2{grid-template-columns:repeat(2,1fr);}
+      .sc{padding:16px 14px 60px;}
+      .prem-features{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="sw">
+
+  <!-- ══ STORE HEADER ══ -->
+  <div class="store-header">
+    <div class="store-header-inner">
+      <div class="store-top-row">
+        <div class="store-brand">
+          <div class="store-brand-icon">🛒</div>
+          <div>
+            <div class="store-brand-title" data-i18n="store_title">Do'kon</div>
+            <div class="store-brand-sub" data-i18n="store_sub">Ochkolar bilan profilingizni bezating</div>
+          </div>
+        </div>
+        <div class="pts-pill">⭐ <span id="myPts">—</span> <span>ball</span></div>
+      </div>
+      <!-- ══ TABS ══ -->
+      <div class="store-tabs">
+        <div class="stab on" data-t="items"   onclick="stab('items')" data-i18n="store_items">🎁 Tovarlar</div>
+        <div class="stab"    data-t="premium" onclick="stab('premium')" data-i18n="store_premium">💎 Premium</div>
+        <div class="stab"    data-t="gift"    onclick="stab('gift')" data-i18n="store_gift">🎁 Hadya</div>
+        <div class="stab"    data-t="boxes"   onclick="stab('boxes')" data-i18n="store_boxes">📦 Qutichalar</div>
+        <div class="stab"    data-t="howto"   onclick="stab('howto')" data-i18n="store_howto">❓ Qanday</div>
+        <div class="stab"    data-t="themes"  onclick="stab('themes')" data-i18n="store_themes">🎨 Temalar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc">
+
+    <!-- TOVARLAR -->
+    <div id="t-items">
+      <div class="ig" id="itemsGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:50px;">
+          <div class="spinner-sm" style="margin:0 auto 10px;"></div>
+          <div style="color:rgba(255,255,255,.3);font-size:.82rem;">Yuklanmoqda...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREMIUM -->
+    <div id="t-premium" style="display:none;">
+      <div style="max-width:660px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:1.9rem;">💎</div>
+          <div style="color:#fff;font-weight:900;font-size:1.05rem;margin:5px 0 3px;">Premium Obuna</div>
+          <div style="color:rgba(255,255,255,.38);font-size:.77rem;">BilimxonAI, 2x XP, reklamasiz va ko'p imtiyozlar!</div>
+        </div>
+        <div style="background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.18);border-radius:10px;padding:10px 13px;margin-bottom:13px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <span style="font-size:.74rem;color:rgba(255,255,255,.6);">🤖 BilimxonAI (cheksiz)</span>
+          <span style="font-size:.74rem;color:rgba(255,255,255,.6);">💎 Premium titul</span>
+          <span style="font-size:.74rem;color:rgba(255,255,255,.6);">🚫 Reklama yo'q</span>
+          <span style="font-size:.74rem;color:rgba(255,255,255,.6);">⚡ 2x XP bonus</span>
+        </div>
+        <div id="premStat"></div>
+
+        <!-- Sale -->
+        <div style="background:linear-gradient(135deg,rgba(239,68,68,.09),rgba(245,158,11,.05));border:1.5px solid rgba(239,68,68,.22);border-radius:12px;padding:11px 13px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px;">
+            <span style="font-size:1.1rem;">🔥</span>
+            <div style="flex:1;">
+              <div style="font-weight:900;color:#fff;font-size:.85rem;">Aksiyalar</div>
+              <div style="font-size:.67rem;color:rgba(255,255,255,.32);">Cheklangan muddatli chegirmalar</div>
+            </div>
+            <div style="background:#EF4444;color:#fff;font-size:.59rem;font-weight:800;padding:2px 6px;border-radius:999px;">SALE</div>
+          </div>
+          <div class="pg" id="saleGrid">
+            <div style="text-align:center;color:rgba(255,255,255,.28);padding:10px;grid-column:1/-1;font-size:.74rem;">Yuklanmoqda...</div>
+          </div>
+        </div>
+
+        <div style="font-weight:800;color:rgba(255,255,255,.42);font-size:.75rem;margin-bottom:8px;">💳 Oddiy Narxlar</div>
+        <div class="pg" id="premGrid">
+          <div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,.28);padding:12px;">Yuklanmoqda...</div>
+        </div>
+
+        <!-- Points shop -->
+        <div style="margin-top:18px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;">
+          <div style="font-weight:800;color:rgba(255,255,255,.42);font-size:.75rem;margin-bottom:8px;">⭐ Ochko Sotib Olish</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;" id="ptGrid">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HADYA -->
+    <div id="t-gift" style="display:none;">
+      <div style="max-width:440px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:1.9rem;">🎁</div>
+          <div style="color:#fff;font-weight:900;font-size:1rem;margin:5px 0 2px;">Do'stingga Hadya</div>
+          <div style="color:rgba(255,255,255,.38);font-size:.76rem;">Ochko yoki Premium sovg'a qiling</div>
+        </div>
+        <div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid rgba(201,168,76,.13);">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div>
+              <div style="font-size:.67rem;color:rgba(255,255,255,.37);font-weight:700;margin-bottom:2px;">👤 Do'st username</div>
+              <input class="ginp" id="gTo" placeholder="@username">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+              <div>
+                <div style="font-size:.67rem;color:rgba(255,255,255,.37);font-weight:700;margin-bottom:2px;">🎁 Turi</div>
+                <select class="gsel" id="gType" onchange="gTC()">
+                  <option value="points">⭐ Ochko</option>
+                  <option value="premium">💎 Premium kun</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:.67rem;color:rgba(255,255,255,.37);font-weight:700;margin-bottom:2px;" id="gLbl">💰 Miqdor</div>
+                <input class="ginp" id="gVal" type="number" value="50" min="10">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.67rem;color:rgba(255,255,255,.37);font-weight:700;margin-bottom:2px;">✉️ Xabar</div>
+              <input class="ginp" id="gMsg" placeholder="Tabriklayman! 🎉" maxlength="100">
+            </div>
+            <button onclick="sendGift()" style="padding:10px;border-radius:9px;border:none;background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;font-weight:900;font-size:.84rem;cursor:pointer;">🎁 Yuborish</button>
+          </div>
+          <div style="margin-top:6px;font-size:.65rem;color:rgba(255,255,255,.2);">⚠️ Faqat do'stlaringizga yuborishingiz mumkin</div>
+        </div>
+        <div style="font-size:.74rem;font-weight:700;color:rgba(255,255,255,.36);margin-bottom:6px;">📬 Kelgan Hadyalar</div>
+        <div id="gInbox"><div style="color:rgba(255,255,255,.2);font-size:.72rem;">Yuklanmoqda...</div></div>
+      </div>
+    </div>
+
+    <!-- REKLAMA -->
+    <div id="t-ads" style="display:none;">
+      <div style="max-width:480px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:1.9rem;">📺</div>
+          <div style="color:#fff;font-weight:900;font-size:1rem;margin:5px 0 2px;">Reklama orqali qozing</div>
+          <div style="color:rgba(255,255,255,.38);font-size:.76rem;">5 ta reklama ko'ring va sovg'a oling!</div>
+        </div>
+        <div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:11px;padding:12px;margin-bottom:11px;text-align:center;border:1px solid rgba(255,255,255,.07);">
+          <div style="color:#fff;font-weight:700;margin-bottom:5px;">Ko'rilgan: <span id="adNum" style="color:#C9A84C;font-weight:900;">0</span> / 5</div>
+          <div style="background:rgba(255,255,255,.07);border-radius:999px;height:7px;overflow:hidden;margin-bottom:4px;">
+            <div id="adBar" style="height:100%;background:linear-gradient(90deg,#C9A84C,#F59E0B);border-radius:999px;width:0%;transition:width .35s;"></div>
+          </div>
+          <div style="font-size:.67rem;color:rgba(255,255,255,.26);">5 reklama = 1 soatlik AI yoki +50 ochko</div>
+        </div>
+        <div id="aiStat" style="margin-bottom:9px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:11px;padding:12px;text-align:center;border:1px solid rgba(139,92,246,.17);">
+            <div style="font-size:1.4rem;margin-bottom:4px;">🤖</div>
+            <div style="font-weight:800;color:#fff;font-size:.79rem;">BilimxonAI</div>
+            <div style="font-size:.63rem;color:rgba(255,255,255,.26);margin:2px 0 8px;">1 soatlik kirish</div>
+            <button onclick="doAds('ai')" style="width:100%;padding:6px;border-radius:7px;border:none;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;font-weight:800;font-size:.71rem;cursor:pointer;">5 reklama → AI</button>
+          </div>
+          <div style="background:linear-gradient(145deg,#1a2035,#111827);border-radius:11px;padding:12px;text-align:center;border:1px solid rgba(201,168,76,.17);">
+            <div style="font-size:1.4rem;margin-bottom:4px;">⭐</div>
+            <div style="font-weight:800;color:#fff;font-size:.79rem;">+50 Ochko</div>
+            <div style="font-size:.63rem;color:rgba(255,255,255,.26);margin:2px 0 8px;">Ballingizga qo'shiladi</div>
+            <button onclick="doAds('points')" style="width:100%;padding:6px;border-radius:7px;border:none;background:linear-gradient(135deg,#C9A84C,#E8B84B);color:#1a0f00;font-weight:800;font-size:.71rem;cursor:pointer;">5 reklama → Ochko</button>
+          </div>
+        </div>
+        <div id="adSim" style="display:none;background:linear-gradient(145deg,#111827,#1a2035);border-radius:11px;padding:14px;text-align:center;border:2px solid rgba(201,168,76,.19);">
+          <div style="font-size:1.1rem;margin-bottom:3px;" id="asIco">📢</div>
+          <div style="color:#fff;font-weight:700;margin-bottom:2px;" id="asName">Reklama...</div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,.26);margin-bottom:7px;" id="asSec">5 soniya...</div>
+          <div style="background:rgba(255,255,255,.07);border-radius:999px;height:5px;overflow:hidden;">
+            <div id="asBar" style="height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:999px;width:0%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUTICHALAR -->
+    <div id="t-boxes" style="display:none;">
+      <div style="text-align:center;margin-bottom:13px;">
+        <div style="color:#fff;font-weight:900;font-size:1rem;">📦 Mystery Qutichalar</div>
+        <div style="color:rgba(255,255,255,.33);font-size:.75rem;">Har bir qutidan tasodifiy sovg'a chiqadi!</div>
+      </div>
+      <div class="bg2" id="boxesGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:32px;color:rgba(255,255,255,.26);">Yuklanmoqda...</div>
+      </div>
+    </div>
+
+    <!-- QANDAY -->
+    <div id="t-howto" style="display:none;">
+      <div style="max-width:510px;margin:0 auto;">
+        <div class="hw">
+          <div style="color:#fff;font-weight:900;margin-bottom:9px;font-size:.87rem;">⭐ Ochko qanday topiladi?</div>
+          <div class="hrow"><div class="hico">📚</div><div class="htxt">Har bir darsni tugatganda <strong>+10 ochko</strong></div></div>
+          <div class="hrow"><div class="hico">📝</div><div class="htxt">Test 80%+ bilan o'tkazilganda <strong>+5 bonus</strong></div></div>
+          <div class="hrow"><div class="hico">👥</div><div class="htxt">Do'st qo'shganda <strong>+10 ochko</strong></div></div>
+          <div class="hrow" style="margin:0"><div class="hico">🏆</div><div class="htxt">Kurs tugallanganda <strong>+50 ochko</strong></div></div>
+        </div>
+        <div class="hw">
+          <div style="color:#fff;font-weight:900;margin-bottom:9px;font-size:.87rem;">💎 Premium imtiyozlari</div>
+          <div class="hrow"><div class="hico">🤖</div><div class="htxt">BilimxonAI — <strong>cheksiz</strong></div></div>
+          <div class="hrow"><div class="hico">⚡</div><div class="htxt">Har bir darsda <strong>2x XP</strong></div></div>
+          <div class="hrow" style="margin:0"><div class="hico">🎨</div><div class="htxt">Maxsus profil stil va <strong>"Premium" titul</strong></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMALAR -->
+    <div id="t-themes" style="display:none;">
+      <div style="max-width:640px;margin:0 auto;text-align:center;padding:16px 0 12px;">
+        <div style="font-size:1.9rem;margin-bottom:5px;">🎨</div>
+        <div style="color:#fff;font-weight:900;font-size:1rem;margin-bottom:3px;">Sayt Temasi</div>
+        <div style="color:rgba(255,255,255,.38);font-size:.76rem;margin-bottom:14px;">Saytning fon rangi va ko'rinishini o'zgartiring</div>
+        <a href="/settings" style="display:inline-block;padding:8px 20px;background:linear-gradient(135deg,#C9A84C,#8B6914);color:#fff;border-radius:10px;font-weight:800;font-size:.82rem;text-decoration:none;margin-bottom:16px;">⚙️ Kengaytirilgan Sozlamalar</a>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px;text-align:left;" id="themesGrid"></div>
+      </div>
+    </div>
+
+  </div><!-- /sc -->
+</div><!-- /sw -->
+
+<!-- Box overlay -->
+<div class="ov" id="boxOv">
+  <canvas class="pcv" id="cv1"></canvas>
+  <div id="boxStage" style="text-align:center;position:relative;width:100%;max-width:325px;padding:14px;"></div>
+</div>
+
+<!-- Buy/reward overlay -->
+<div class="ov" id="buyOv">
+  <canvas class="pcv" id="cv2"></canvas>
+  <div class="rc" id="buyCard"></div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   STORE — clean rewrite, no string-concat onclick bugs
+═══════════════════════════════════════ */
+
+var ETYPE = {cosmetic:'🎨 Kosmetik', title:'🏆 Unvon', premium:'👑 Premium', boost:'⚡ Boost'};
+var BOX_CFG = {
+  common:    {e:'📦', g:'rgba(107,114,128,.5)', bg:'linear-gradient(135deg,#1F2937,#374151)'},
+  rare:      {e:'💠', g:'rgba(59,130,246,.6)',  bg:'linear-gradient(135deg,#1E3A5F,#1E40AF)'},
+  epic:      {e:'🔮', g:'rgba(139,92,246,.6)',  bg:'linear-gradient(135deg,#2E1065,#5B21B6)'},
+  legendary: {e:'✨', g:'rgba(245,158,11,.7)',  bg:'linear-gradient(135deg,#78350F,#B45309)'}
+};
+var PT_PACKS = [
+  {amount:100,  price:'$0.99', color:'#C9A84C', bg:'linear-gradient(135deg,#C9A84C,#E8B84B)', tc:'#1a0f00', label:'Boshlang\'ich'},
+  {amount:500,  price:'$3.99', color:'#3B82F6', bg:'linear-gradient(135deg,#3B82F6,#1D4ED8)', tc:'#fff',    label:'Mashhur'},
+  {amount:1500, price:'$8.99', color:'#8B5CF6', bg:'linear-gradient(135deg,#8B5CF6,#6D28D9)', tc:'#fff',    label:'Premium', best:true}
+];
+
+/* ─── Store items cache ─── */
+var _storeItems = null;
+var _myPoints   = 0;
+
+/* ─── Tab switch ─── */
+function stab(n) {
+  document.querySelectorAll('[id^="t-"]').forEach(function(el){ el.style.display = 'none'; });
+  var panel = document.getElementById('t-' + n);
+  if (panel) panel.style.display = '';
+  document.querySelectorAll('.stab').forEach(function(b){
+    b.classList.toggle('on', b.dataset.t === n);
+  });
+  if (n === 'premium') loadPrem();
+  if (n === 'gift')    loadGInbox();
+  if (n === 'ads')     loadAiStat();
+  if (n === 'boxes')   loadBoxes();
+  if (n === 'themes')  renderThemes();
+}
+
+/* ─── Update points display ─── */
+function setPts(v) {
+  _myPoints = v || 0;
+  var el = document.getElementById('myPts');
+  if (el) el.textContent = Number(_myPoints).toLocaleString();
+}
+
+/* ─── TOVARLAR ─── */
+async function loadItems() {
+  var grid = document.getElementById('itemsGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;"><div class="spinner-sm" style="margin:0 auto 10px;"></div><div style="color:rgba(255,255,255,.3);font-size:.8rem;">Yuklanmoqda...</div></div>';
+  try {
+    var res = await api('/api/store/items');
+    setPts(res.my_points);
+    _storeItems = res.items || [];
+    var items = _storeItems.filter(function(i){ return Number(i.is_paid) !== 1; });
+    if (!items.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:44px;color:rgba(255,255,255,.3);">Tovarlar hali yo\'q. Admin panel orqali qo\'shing!</div>';
+      return;
+    }
+    renderItems(grid, items);
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:44px;color:#ef4444;">Xatolik: ' + e.message + '</div>';
+  }
+}
+
+function renderItems(grid, items) {
+  grid.innerHTML = '';
+  items.forEach(function(item) {
+    var r = item.rarity || 'common';
+    var em = getItemEmoji(item.name, item.item_type);
+    var card = document.createElement('div');
+    card.className = 'ic ' + r;
+    var imgHtml = (item.image && item.image.trim())
+      ? '<img src="' + item.image + '" style="max-width:64px;max-height:64px;object-fit:contain;">'
+      : '<span style="font-size:2.8rem;line-height:1;">' + em + '</span>';
+    card.innerHTML = ''
+      + '<div class="ii ' + r + '">'
+      +   imgHtml
+      +   '<span class="rp ' + r + '">' + r + '</span>'
+      + '</div>'
+      + '<div class="ib">'
+      +   '<div class="iname">' + (item.name || '') + '</div>'
+      +   '<div class="etype">' + (ETYPE[item.item_type] || item.item_type || '') + '</div>'
+      +   '<div class="idesc">' + (item.desc || '') + '</div>'
+      +   '<div class="ifoot">'
+      +     '<span class="ptag">⭐ ' + (item.price_points || 0) + '</span>'
+      +     (item.owned ? '<span class="opill">✅ Mavjud</span>' : '<button class="bbtn buy-btn">Sotib Ol</button>')
+      +   '</div>'
+      + '</div>';
+    /* Use dataset — no onclick string concat */
+    if (!item.owned) {
+      var btn = card.querySelector('.buy-btn');
+      btn.dataset.id    = item.id;
+      btn.dataset.name  = item.name || '';
+      btn.dataset.price = item.price_points || 0;
+      btn.dataset.type  = item.item_type || '';
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        buyItem(this.dataset.id, this.dataset.name, this.dataset.price, this.dataset.type);
+      });
+    }
+    grid.appendChild(card);
+  });
+}
+
+function getItemEmoji(n, t) {
+  n = (n || '').toLowerCase();
+  if (n.includes('premium'))  return '👑';
+  if (n.includes('xp') || n.includes('boost')) return '⚡';
+  if (n.includes('junior'))   return '🌱';
+  if (n.includes('senior'))   return '💎';
+  if (t === 'title')    return '🏆';
+  if (t === 'cosmetic') return '🎨';
+  return '🎁';
+}
+
+async function buyItem(id, name, price, itype) {
+  if (!confirm('"' + name + '" ni ' + price + ' ochkoga sotib olasizmi?')) return;
+  try {
+    var res = await api('/api/store/buy', {method:'POST', body:{item_id: Number(id)}});
+    if (res.success) {
+      var ic = {title:'🏆', cosmetic:'🎨', premium:'👑', boost:'⚡'};
+      popUp(ic[itype] || '🎁', 'Sotib olindi!', name, name + ' inventaringizga qo\'shildi!', 'legendary', null);
+      setTimeout(loadItems, 1400);
+    } else {
+      showToast(res.error || 'Xato', 'error');
+    }
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+/* ─── PREMIUM ─── */
+async function loadPrem() {
+  var premGrid = document.getElementById('premGrid');
+  var saleGrid = document.getElementById('saleGrid');
+  var premStat = document.getElementById('premStat');
+  var ptGrid   = document.getElementById('ptGrid');
+
+  /* Points packs */
+  if (ptGrid && !ptGrid.hasChildNodes()) {
+    PT_PACKS.forEach(function(pk) {
+      var d = document.createElement('div');
+      d.className = 'ptcard';
+      if (pk.best) d.style.borderColor = 'rgba(139,92,246,.28)';
+      d.style.position = 'relative';
+      d.innerHTML = (pk.best ? '<div style="position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:#8B5CF6;color:#fff;font-size:.54rem;font-weight:800;padding:2px 6px;border-radius:999px;white-space:nowrap;">BEST VALUE</div>' : '')
+        + '<div style="font-size:1.3rem;' + (pk.best ? 'margin-top:4px' : '') + '">⭐</div>'
+        + '<div style="color:#FFD700;font-weight:900;font-size:.88rem;margin:3px 0;">' + pk.amount + ' ochko</div>'
+        + '<div style="font-size:.66rem;color:rgba(255,255,255,.3);margin-bottom:6px;">' + pk.label + '</div>'
+        + '<div style="background:' + pk.bg + ';color:' + pk.tc + ';border-radius:6px;padding:3px 10px;font-weight:800;font-size:.7rem;display:inline-block;">' + pk.price + '</div>';
+      d.addEventListener('click', function() { buyPoints(pk.amount, pk.price); });
+      ptGrid.appendChild(d);
+    });
+  }
+
+  try {
+    var rs = await Promise.all([api('/api/store/items'), api('/api/user/premium-status')]);
+    var res = rs[0], st = rs[1];
+    setPts(res.my_points);
+
+    /* Status */
+    if (st.is_premium) {
+      var d2 = new Date(st.premium_until);
+      premStat.innerHTML = '<div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:9px;padding:8px 11px;display:flex;align-items:center;gap:7px;margin-bottom:11px;">'
+        + '<span>💎</span><div><div style="color:#fff;font-weight:800;font-size:.82rem;">Premium Faol ✓</div>'
+        + '<div style="font-size:.66rem;color:rgba(255,255,255,.38);">Muddat: ' + d2.toLocaleDateString('uz-UZ') + '</div></div></div>';
+    } else {
+      premStat.innerHTML = '';
+    }
+
+    var plans = (res.items || []).filter(function(i){ return Number(i.is_paid) === 1; });
+    var emojis = ['🌙','🌟','💎'];
+
+    /* Sale section */
+    if (saleGrid) {
+      saleGrid.innerHTML = '';
+      if (plans.length) {
+        var p = plans[0];
+        var sc = document.createElement('div');
+        sc.className = 'pc';
+        sc.style.cssText = 'position:relative;border-color:rgba(239,68,68,.28);';
+        sc.innerHTML = '<div style="position:absolute;top:-7px;right:9px;background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:999px;">-30% OFF</div>'
+          + '<div style="font-size:1.5rem;">🌟</div>'
+          + '<div style="color:#fff;font-weight:900;font-size:.84rem;margin-top:4px;">' + (p.name || '') + '</div>'
+          + '<div style="text-decoration:line-through;color:rgba(255,255,255,.28);font-size:.7rem;margin:2px 0 0;">$' + ((p.price_usd || 0) * 1.43).toFixed(2) + '</div>'
+          + '<div class="pp" style="color:#EF4444;">$' + (p.price_usd || 0).toFixed(2) + '</div>'
+          + '<div style="font-size:.64rem;color:rgba(255,255,255,.27);margin-bottom:9px;">' + (p.desc || '') + '</div>'
+          + '<button class="pbtn" style="background:linear-gradient(135deg,#EF4444,#DC2626);">🔥 Aksiya narxida</button>';
+        sc.querySelector('.pbtn').addEventListener('click', function() { buyPrem(p.id, p.name); });
+        saleGrid.appendChild(sc);
+      } else {
+        saleGrid.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.27);padding:9px;grid-column:1/-1;font-size:.72rem;">Hozircha aksiya yo\'q</div>';
+      }
+    }
+
+    /* All plans */
+    premGrid.innerHTML = '';
+    if (!plans.length) {
+      premGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,.27);padding:13px;">Hali rejalar mavjud emas</div>';
+    } else {
+      plans.forEach(function(p, i) {
+        var pc = document.createElement('div');
+        pc.className = 'pc';
+        pc.innerHTML = '<div style="font-size:1.5rem;">' + (emojis[i] || '💎') + '</div>'
+          + '<div style="color:#fff;font-weight:900;font-size:.84rem;margin-top:4px;">' + (p.name || '') + '</div>'
+          + '<div class="pp">$' + (p.price_usd || 0).toFixed(2) + '</div>'
+          + '<div style="font-size:.64rem;color:rgba(255,255,255,.27);margin-bottom:9px;">' + (p.desc || '') + '</div>'
+          + '<button class="pbtn">💳 Sotib Olish</button>';
+        pc.querySelector('.pbtn').addEventListener('click', function() { buyPrem(p.id, p.name); });
+        premGrid.appendChild(pc);
+      });
+    }
+  } catch(e) {
+    if (premGrid) premGrid.innerHTML = '<div style="grid-column:1/-1;color:#ef4444;text-align:center;padding:16px;">' + e.message + '</div>';
+  }
+}
+
+async function buyPrem(id, name) {
+  if (!confirm('"' + name + '" ni sotib olmoqchimisiz?')) return;
+  try {
+    var res = await api('/api/store/buy-paid', {method:'POST', body:{item_id: Number(id)}});
+    if (res.success) {
+      var d = new Date(res.premium_until);
+      popUp('💎', 'Premium Faollashtirildi!', name, 'Muddat: ' + d.toLocaleDateString('uz-UZ'), 'legendary', loadPrem);
+    } else {
+      showToast(res.error, 'error');
+    }
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function buyPoints(amount, price) {
+  showToast('💳 To\'lov tizimi (Demo: +' + amount + ' ochko)', 'info', 3000);
+  try {
+    var res = await api('/api/store/buy-points-demo', {method:'POST', body:{amount: Number(amount)}});
+    if (res.success) {
+      popUp('⭐', 'Ochko Qo\'shildi!', '+' + amount + ' ochko', 'Balansingiz yangilandi!', 'legendary', loadPrem);
+    }
+  } catch(e) {
+    popUp('⭐', 'Demo Rejim', '+' + amount + ' ochko', 'Real to\'lov tizimi tez orada qo\'shiladi!', 'rare', null);
+  }
+}
+
+/* ─── HADYA ─── */
+function gTC() {
+  var t = document.getElementById('gType').value;
+  var l = document.getElementById('gLbl');
+  var v = document.getElementById('gVal');
+  if (t === 'points') { l.textContent = '💰 Miqdor'; v.value = '50'; v.min = '10'; }
+  else                { l.textContent = '📅 Kun';    v.value = '1';  v.min = '1'; }
+}
+
+async function sendGift() {
+  var to   = (document.getElementById('gTo').value || '').replace('@','').trim();
+  var type = document.getElementById('gType').value;
+  var val  = document.getElementById('gVal').value;
+  var msg  = document.getElementById('gMsg').value;
+  if (!to) { showToast('Username kiriting', 'error'); return; }
+  try {
+    var res = await api('/api/gifts/send', {method:'POST', body:{to_username:to, gift_type:type, gift_value:val, message:msg}});
+    if (res.success) {
+      showToast('Hadya yuborildi! 🎁', 'success');
+      document.getElementById('gTo').value  = '';
+      document.getElementById('gMsg').value = '';
+      loadItems(); loadGInbox();
+    } else { showToast(res.error, 'error'); }
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function loadGInbox() {
+  var el = document.getElementById('gInbox');
+  try {
+    var gifts = await api('/api/gifts/inbox');
+    if (!gifts.length) { el.innerHTML = '<div style="color:rgba(255,255,255,.2);font-size:.72rem;">Hali hadya kelmagan</div>'; return; }
+    el.innerHTML = gifts.map(function(g) {
+      return '<div style="background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:7px;">'
+        + '<span>' + (g.gift_type === 'premium' ? '💎' : '⭐') + '</span>'
+        + '<div style="flex:1;">'
+        +   '<div style="color:#fff;font-size:.75rem;font-weight:700;">@' + g.from_username + ' — ' + (g.gift_type === 'points' ? g.gift_value + ' ochko' : g.gift_value + ' kun Premium') + '</div>'
+        +   (g.message ? '<div style="font-size:.65rem;color:rgba(255,255,255,.27);">' + g.message + '</div>' : '')
+        +   '<div style="font-size:.6rem;color:rgba(255,255,255,.17);">' + (g.created_at || '').slice(0,10) + '</div>'
+        + '</div></div>';
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="color:#ef4444;font-size:.7rem;">' + e.message + '</div>'; }
+}
+
+/* ─── ADS ─── */
+var _adN = 0, _adR = 'ai';
+
+async function loadAiStat() {
+  var el = document.getElementById('aiStat');
+  try {
+    var st = await api('/api/user/premium-status');
+    if (st.ai_active && st.ai_until) {
+      var d = new Date(st.ai_until);
+      el.innerHTML = '<div style="background:rgba(139,92,246,.09);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:6px;margin-bottom:8px;">'
+        + '<span>🤖</span><div style="color:#fff;font-size:.75rem;font-weight:700;">BilimxonAI faol — ' + d.toLocaleTimeString('uz-UZ') + ' gacha</div></div>';
+    } else { el.innerHTML = ''; }
+  } catch(e) { el.innerHTML = ''; }
+}
+
+var ADS = [
+  {i:'🚀', n:'Bilimxon Premium'}, {i:'💡', n:'Python Kursi'},
+  {i:'🎯', n:'Web Dasturlash'},   {i:'🏆', n:'IT Musobaqa'}, {i:'📱', n:'Mobile App'}
+];
+var _adTimer = null;
+
+function doAds(r) {
+  _adN = 0; _adR = r;
+  document.getElementById('adNum').textContent = '0';
+  document.getElementById('adBar').style.width = '0%';
+  nextAd();
+}
+
+function nextAd() {
+  if (_adN >= 5) { claimA(); return; }
+  var a = ADS[_adN];
+  document.getElementById('asIco').textContent  = a.i;
+  document.getElementById('asName').textContent = a.n;
+  document.getElementById('asSec').textContent  = '5 soniya...';
+  var bar = document.getElementById('asBar');
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  document.getElementById('adSim').style.display = '';
+  setTimeout(function() { bar.style.transition = 'width 5s linear'; bar.style.width = '100%'; }, 60);
+  var s = 5;
+  if (_adTimer) clearInterval(_adTimer);
+  _adTimer = setInterval(function() {
+    s--;
+    document.getElementById('asSec').textContent = s > 0 ? s + ' soniya...' : '✅ Tayyor!';
+    if (s <= 0) {
+      clearInterval(_adTimer); _adTimer = null;
+      _adN++;
+      document.getElementById('adNum').textContent = _adN;
+      document.getElementById('adBar').style.width = (_adN / 5 * 100) + '%';
+      document.getElementById('adSim').style.display = 'none';
+      if (_adN < 5) setTimeout(nextAd, 400); else claimA();
+    }
+  }, 1000);
+}
+
+async function claimA() {
+  try {
+    var res = await api('/api/store/watch-ad', {method:'POST', body:{reward: _adR}});
+    if (res.success) {
+      _adN = 0;
+      document.getElementById('adNum').textContent = '0';
+      document.getElementById('adBar').style.width = '0%';
+      popUp(
+        _adR === 'ai' ? '🤖' : '⭐',
+        res.message || 'Mukofot!',
+        _adR === 'ai' ? 'BilimxonAI (1 soat)' : '+50 Ochko',
+        _adR === 'ai' ? '1 soat BilimxonAI bilan suhbatlashing!' : '+50 ochko berildi!',
+        _adR === 'ai' ? 'epic' : 'rare',
+        loadAiStat
+      );
+    }
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+/* ─── BOXES ─── */
+async function loadBoxes() {
+  var grid = document.getElementById('boxesGrid');
+  if (!grid) return;
+  try {
+    var res = await api('/api/store/boxes');
+    setPts(res.my_points);
+    if (!(res.boxes || []).length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,.26);padding:26px;">Quti yo\'q</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    res.boxes.forEach(function(b) {
+      var c = BOX_CFG[b.rarity] || BOX_CFG.common;
+      var bc = document.createElement('div');
+      bc.className = 'bc';
+      bc.innerHTML = '<div class="bi" style="background:' + c.bg + '"><div class="bsh"></div><span style="position:relative;z-index:1;">' + c.e + '</span></div>'
+        + '<div class="bb"><div class="bname">' + (b.name || '') + '</div><div class="bprice">⭐ ' + (b.price_points || 0) + '</div><button class="obtn">📦 Ochish</button></div>';
+      bc.addEventListener('click', function() {
+        openBox(b.id, b.name, b.price_points || 0, b.rarity || 'common');
+      });
+      grid.appendChild(bc);
+    });
+  } catch(e) { grid.innerHTML = '<div style="color:#ef4444;text-align:center;padding:18px;">' + e.message + '</div>'; }
+}
+
+async function openBox(id, name, price, rarity) {
+  if (!confirm('"' + name + '" ni ' + price + ' ochkoga ochmoqchimisiz?')) return;
+  var cfg = BOX_CFG[rarity] || BOX_CFG.common;
+  var ov    = document.getElementById('boxOv');
+  var stage = document.getElementById('boxStage');
+  ov.classList.add('show');
+  stage.innerHTML = '<div style="color:rgba(255,255,255,.5);font-size:.82rem;margin-bottom:10px;">' + name + '</div>'
+    + '<div class="bcont"><div class="gring" style="background:radial-gradient(circle,' + cfg.g + ',transparent 65%);"></div>'
+    + '<div class="bew" id="bew" style="animation:bShk .6s ease-in-out infinite;filter:drop-shadow(0 0 16px ' + cfg.g + ');">' + cfg.e + '</div></div>'
+    + '<div class="tapH">👆 Bosib oching!</div>';
+  var rP = api('/api/store/open-box', {method:'POST', body:{box_id: Number(id)}});
+  ov.onclick = function(ev) {
+    if (ev.target.closest('.clbtn')) return;
+    ov.onclick = null;
+    var bew = document.getElementById('bew');
+    if (bew) bew.style.animation = 'bExp 1s ease forwards';
+    launchP('cv1', rarity);
+    rP.then(function(res) {
+      setTimeout(function() {
+        var closeBtn = document.createElement('button');
+        closeBtn.className = 'clbtn';
+        closeBtn.textContent = '🎉 Ajoyib!';
+        closeBtn.addEventListener('click', function() {
+          ov.classList.remove('show');
+          loadItems();
+        });
+        stage.innerHTML = '<div class="rc">'
+          + '<span class="reb">' + (res.reward_points ? '⭐' : '🎁') + '</span>'
+          + '<div class="resh">' + (res.reward_msg || 'Mukofot!') + '</div>'
+          + (res.reward_item_name ? '<div class="repill">' + res.reward_item_name + '</div>' : '')
+          + (res.reward_points ? '<div class="resub">+' + res.reward_points + ' ochko!</div>' : '<div class="resub">Inventaringizga qo\'shildi!</div>')
+          + '</div>';
+        stage.querySelector('.rc').appendChild(closeBtn);
+        launchP('cv1', rarity);
+      }, 900);
+    }).catch(function(e) {
+      setTimeout(function() {
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Yopish';
+        closeBtn.style.cssText = 'padding:7px 15px;border-radius:7px;border:1px solid rgba(255,255,255,.18);color:#fff;background:transparent;cursor:pointer;';
+        closeBtn.addEventListener('click', function() { ov.classList.remove('show'); });
+        stage.innerHTML = '<div style="color:#EF4444;margin-bottom:9px;">' + e.message + '</div>';
+        stage.appendChild(closeBtn);
+      }, 900);
+    });
+  };
+}
+
+/* ─── POPUP ─── */
+function popUp(ico, title, pill, sub, rarity, cb) {
+  var card = document.getElementById('buyCard');
+  var ov   = document.getElementById('buyOv');
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'clbtn';
+  closeBtn.textContent = '🎉 Ajoyib!';
+  closeBtn.addEventListener('click', function() {
+    ov.classList.remove('show');
+    if (cb) cb();
+  });
+  card.innerHTML = '<span class="reb">' + ico + '</span>'
+    + '<div class="resh">' + title + '</div>'
+    + '<div class="repill">' + pill + '</div>'
+    + '<div class="resub">' + sub + '</div>';
+  card.appendChild(closeBtn);
+  ov.classList.add('show');
+  launchP('cv2', rarity);
+}
+
+/* ─── CONFETTI ─── */
+function launchP(cid, rarity) {
+  var C = {
+    common:    ['#9CA3AF'],
+    uncommon:  ['#22C55E','#86EFAC'],
+    rare:      ['#3B82F6','#60A5FA'],
+    epic:      ['#8B5CF6','#A78BFA'],
+    legendary: ['#F59E0B','#FCD34D','#FFD700','#FF6B35']
+  };
+  var cl = C[rarity] || C.common;
+  var cv = document.getElementById(cid);
+  if (!cv) return;
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+  var ctx = cv.getContext('2d');
+  var cx = window.innerWidth / 2, cy = window.innerHeight * 0.42;
+  var pts = [];
+  for (var i = 0; i < 66; i++) {
+    var a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 8;
+    pts.push({
+      x:cx, y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-2.5,
+      sz:4+Math.random()*8, c:cl[Math.floor(Math.random()*cl.length)],
+      al:1, g:.18, r:Math.random()*360, rs:(Math.random()-.5)*7,
+      s:Math.random()>.4?'c':'r'
+    });
+  }
+  var f = 0;
+  (function loop() {
+    ctx.clearRect(0,0,cv.width,cv.height);
+    var alive = false;
+    for (var j = 0; j < pts.length; j++) {
+      var p = pts[j];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.al-=.014; p.r+=p.rs;
+      if (p.al <= 0) continue;
+      alive = true;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.al);
+      ctx.fillStyle   = p.c;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r * Math.PI / 180);
+      if (p.s === 'c') { ctx.beginPath(); ctx.arc(0,0,p.sz/2,0,Math.PI*2); ctx.fill(); }
+      else { ctx.fillRect(-p.sz/2, -p.sz*.3, p.sz, p.sz*.6); }
+      ctx.restore();
+    }
+    f++;
+    if (alive && f < 120) requestAnimationFrame(loop);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+/* ─── THEMES ─── */
+var THEMES = [
+  {name:"Standart Qora", bg:'#0a0e1a', a1:'#C9A84C', a2:'#8B6914'},
+  {name:"Chuqur Ko'k",   bg:'#0d1b2e', a1:'#3B82F6', a2:'#1D4ED8'},
+  {name:'Binafsha',      bg:'#1a0a2e', a1:'#8B5CF6', a2:'#6D28D9'},
+  {name:'Zangori',       bg:'#0a101a', a1:'#06B6D4', a2:'#0E7490'},
+  {name:'Yashil',        bg:'#0a1a0d', a1:'#22C55E', a2:'#15803D'},
+  {name:'Qizil',         bg:'#1a0a0a', a1:'#EF4444', a2:'#B91C1C'}
+];
+
+function renderThemes() {
+  var grid = document.getElementById('themesGrid');
+  if (!grid) return;
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('bx_settings_v1') || '{}'); } catch(e) {}
+  grid.innerHTML = '';
+  THEMES.forEach(function(t) {
+    var active = saved.bg === t.bg;
+    var card = document.createElement('div');
+    card.style.cssText = 'cursor:pointer;border-radius:12px;overflow:hidden;border:2px solid '+(active?'#C9A84C':'rgba(255,255,255,.07)')+';transition:.2s;background:#111827;';
+    card.innerHTML = '<div style="height:65px;background:'+t.bg+';display:flex;align-items:center;justify-content:center;">'
+      + '<div style="width:32px;height:13px;border-radius:4px;background:linear-gradient(135deg,'+t.a1+','+t.a2+');"></div>'
+      + '</div>'
+      + '<div style="padding:5px 8px;font-size:.71rem;font-weight:700;color:#fff;">'+t.name+'</div>';
+    card.addEventListener('click', function() { applyTheme(t.bg, t.a1, t.a2); });
+    grid.appendChild(card);
+  });
+}
+
+function applyTheme(bg, a1, a2) {
+  var cfg = {};
+  try { cfg = JSON.parse(localStorage.getItem('bx_settings_v1') || '{}'); } catch(e) {}
+  cfg.bg = bg; cfg.accent1 = a1; cfg.accent2 = a2;
+  localStorage.setItem('bx_settings_v1', JSON.stringify(cfg));
+  showToast('Tema qo\'llanildi! ✅', 'success');
+  renderThemes();
+  setTimeout(function() { location.reload(); }, 600);
+}
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', function() {
+  loadItems();
+  renderThemes();
+});
+</script>
+</body>
+</html>

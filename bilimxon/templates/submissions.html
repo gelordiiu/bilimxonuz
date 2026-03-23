@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Yechimlarim</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{font-family:'Outfit',sans-serif;background:#f0f2f5;}
+    .subs-wrap{padding-top:calc(var(--topbar-h) + 24px);max-width:960px;margin:0 auto;padding:calc(var(--topbar-h) + 24px) 20px 60px;}
+    .page-title{font-size:1.5rem;font-weight:900;color:var(--navy);margin-bottom:4px;}
+    .subs-table{background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:20px;}
+    .sub-head{display:grid;grid-template-columns:60px 1fr 130px 100px 80px 80px;padding:12px 20px;background:rgba(27,42,74,.04);border-bottom:1.5px solid #f3f4f6;font-size:.75rem;font-weight:800;color:var(--gray-500);text-transform:uppercase;gap:8px;}
+    .sub-row{display:grid;grid-template-columns:60px 1fr 130px 100px 80px 80px;padding:12px 20px;border-bottom:1px solid #f9fafb;align-items:center;gap:8px;cursor:pointer;transition:.15s;}
+    .sub-row:last-child{border-bottom:none;}
+    .sub-row:hover{background:#f8f9ff;}
+    .sub-id{font-size:.8rem;font-weight:700;color:var(--gray-400);}
+    .sub-prob{font-size:.88rem;font-weight:700;color:var(--navy);}
+    .sub-status{font-size:.8rem;font-weight:800;padding:3px 10px;border-radius:999px;display:inline-block;}
+    .st-accepted{background:#dcfce7;color:#166534;}
+    .st-wrong_answer,.st-wrong{background:#fee2e2;color:#991b1b;}
+    .st-runtime_error,.st-compile_error{background:#fef3c7;color:#92400e;}
+    .st-time_limit{background:#ede9fe;color:#5b21b6;}
+    .st-pending{background:#f3f4f6;color:#6b7280;}
+    .sub-lang{font-size:.8rem;color:var(--gray-500);font-family:'JetBrains Mono',monospace;}
+    .sub-ms{font-size:.8rem;color:var(--gray-400);}
+    .sub-pts{font-size:.8rem;font-weight:700;color:var(--navy);}
+    .sub-time{font-size:.73rem;color:var(--gray-400);}
+    .empty{text-align:center;padding:60px 20px;color:var(--gray-400);}
+    .code-modal{background:#0d1117;border-radius:12px;padding:16px;overflow-x:auto;max-height:400px;overflow-y:auto;}
+    .code-modal pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#e6edf3;white-space:pre-wrap;margin:0;}
+    @media(max-width:640px){.sub-head,.sub-row{grid-template-columns:40px 1fr 110px 70px;}.sub-head .sub-ms,.sub-row .sub-ms,.sub-head .sub-pts,.sub-row .sub-pts{display:none;}}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="subs-wrap">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
+    <div>
+      <h1 class="page-title">📋 Mening Yechimlarim</h1>
+      <p style="color:var(--gray-400);font-size:.85rem;">Barcha yuborganlaringiz tarixi</p>
+    </div>
+    <a href="/problems" class="btn btn-outline btn-sm">← Masalalarga</a>
+  </div>
+
+  <div class="subs-table">
+    <div class="sub-head">
+      <span>#</span><span>Masala</span><span>Holat</span><span>Til</span><span>Vaqt</span><span>Ball</span>
+    </div>
+    <div id="subsList">
+      <div class="empty"><div class="spinner" style="margin:0 auto 12px;"></div>Yuklanmoqda...</div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const statusMap = {
+  accepted:'✅ Qabul', wrong_answer:"❌ Noto'g'ri",
+  runtime_error:'💥 Runtime', compile_error:'🔧 Kompilyatsiya',
+  time_limit:'⏱ TLE', pending:'⏳ Kutish'
+};
+
+async function loadSubs() {
+  try {
+    const subs = await api('/api/submissions');
+    if(!subs.length) {
+      document.getElementById('subsList').innerHTML = '<div class="empty">😔 Hali hech narsa yuborilmagan.<br><a href="/problems" class="btn btn-primary btn-sm" style="margin-top:16px;">Masalalar</a></div>';
+      return;
+    }
+    document.getElementById('subsList').innerHTML = subs.map((s,i)=>`
+      <div class="sub-row" onclick="showCode('${escAttr(s.code)}','${s.language}')">
+        <span class="sub-id">${i+1}</span>
+        <span class="sub-prob"><a href="/problem/${s.problem_id}" onclick="event.stopPropagation()" style="color:var(--navy);text-decoration:none;">${escHtml(s.problem_title||'')}</a>
+          <small style="display:block;font-size:.7rem;color:var(--gray-400);">${diffLabel(s.difficulty)}</small>
+        </span>
+        <span><span class="sub-status st-${(s.status||'').replace(/[^a-z_]/g,'')||'pending'}">${statusMap[s.status]||s.status}</span></span>
+        <span class="sub-lang">${s.language}</span>
+        <span class="sub-ms">${s.runtime_ms ? s.runtime_ms+'ms' : '—'}</span>
+        <span class="sub-pts">${s.points_earned ? '⭐ '+s.points_earned : '—'}</span>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('subsList').innerHTML = `<div class="empty">Yuklab bo'lmadi: ${e.message}</div>`;
+  }
+}
+
+function diffLabel(d) {
+  return {easy:'🟢 Oson', medium:"🟡 O'rta", hard:'🔴 Qiyin'}[d] || d || '';
+}
+
+function showCode(code, lang) {
+  openModal(`<div class="modal-header"><span class="modal-title">💻 Yuborilgan kod (${lang})</span><button class="modal-close">✕</button></div>
+    <div class="code-modal"><pre>${escHtml(code)}</pre></div>`);
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s||'').replace(/'/g,"\\'").replace(/\n/g,'\\n'); }
+
+document.addEventListener('DOMContentLoaded', loadSubs);
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "lesson": "PYTHON - Qidiruv algoritmlari: Linear va Binary Search",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Qidiruv algoritmlari: Linear va Binary Search haqida asosiy tushuncha nima?",
+      "options": [
+        "Birinchi variant",
+        "Ikkinchi variant",
+        "To'g'ri javob",
+        "To'rtinchi variant"
+      ],
+      "correct": 2,
+      "explanation": "Qidiruv algoritmlari: Linear va Binary Search mavzusining asosiy tushunchasi."
+    },
+    {
+      "id": 2,
+      "question": "Quyidagilardan qaysi biri Qidiruv algoritmlari: Linear va Binary Search bilan bog'liq?",
+      "options": [
+        "Bog'liq emas",
+        "Bog'liq",
+        "Ba'zan bog'liq",
+        "Nomaqbul"
+      ],
+      "correct": 1,
+      "explanation": "Bu mavzu Qidiruv algoritmlari: Linear va Binary Search bilan bevosita bog'liq."
+    },
+    {
+      "id": 3,
+      "question": "Qidiruv algoritmlari: Linear va Binary Search qayerda qo'llaniladi?",
+      "options": [
+        "Hech qayerda",
+        "Dasturlashda",
+        "Faqat matematikada",
+        "Kundalik hayotda"
+      ],
+      "correct": 1,
+      "explanation": "Qidiruv algoritmlari: Linear va Binary Search dasturlashda keng qo'llaniladi."
+    }
+  ]
+}

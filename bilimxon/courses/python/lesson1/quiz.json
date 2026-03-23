@@ -1,0 +1,41 @@
+{
+  "lesson": "PYTHON - Dasturlash nima? Kompyuter qanday ishlaydi?",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Dasturlash nima? Kompyuter qanday ishlaydi? haqida asosiy tushuncha nima?",
+      "options": [
+        "Birinchi variant",
+        "Ikkinchi variant",
+        "To'g'ri javob",
+        "To'rtinchi variant"
+      ],
+      "correct": 2,
+      "explanation": "Dasturlash nima? Kompyuter qanday ishlaydi? mavzusining asosiy tushunchasi."
+    },
+    {
+      "id": 2,
+      "question": "Quyidagilardan qaysi biri Dasturlash nima? Kompyuter qanday ishlaydi? bilan bog'liq?",
+      "options": [
+        "Bog'liq emas",
+        "Bog'liq",
+        "Ba'zan bog'liq",
+        "Nomaqbul"
+      ],
+      "correct": 1,
+      "explanation": "Bu mavzu Dasturlash nima? Kompyuter qanday ishlaydi? bilan bevosita bog'liq."
+    },
+    {
+      "id": 3,
+      "question": "Dasturlash nima? Kompyuter qanday ishlaydi? qayerda qo'llaniladi?",
+      "options": [
+        "Hech qayerda",
+        "Dasturlashda",
+        "Faqat matematikada",
+        "Kundalik hayotda"
+      ],
+      "correct": 1,
+      "explanation": "Dasturlash nima? Kompyuter qanday ishlaydi? dasturlashda keng qo'llaniladi."
+    }
+  ]
+}

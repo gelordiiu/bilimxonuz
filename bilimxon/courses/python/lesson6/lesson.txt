@@ -1,0 +1,20 @@
+LESSON 6: Ro'yxatlar (List) va ularni boshqarish
+
+Bob: BOB 2: Ma'lumot Tuzilmalari (Junior-Middle)
+
+## Ro'yxatlar (List) va ularni boshqarish
+
+List — tartibli, o'zgartirilishi mumkin bo'lgan elementlar to'plami. Elementlarga indeks orqali murojaat qilinadi (0 dan boshlanadi). append(), remove(), sort(), len() kabi metodlar bilan ishlash mumkin.
+
+## Kod Namunasi
+```
+mevalar = ["olma", "banan", "gilos"]
+mevalar.append("shaftoli")
+print(mevalar)
+print(len(mevalar))
+for meva in mevalar:
+    print(meva)
+```
+
+## Amaliyot
+Yuqoridagi misolni o'rganing va o'zingizning variantingizni yozing!

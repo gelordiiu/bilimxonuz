@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — AI Assistant</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+body{font-family:'Outfit',sans-serif;background:#0a0e1a;margin:0;}
+.ai-wrap{padding-top:var(--topbar-h);height:100vh;display:flex;flex-direction:column;}
+.ai-header{background:linear-gradient(135deg,#0d1b2e,#1a2a4a);border-bottom:1px solid rgba(255,255,255,.08);padding:13px 22px;display:flex;align-items:center;gap:12px;}
+.ai-ava{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#a855f7,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;box-shadow:0 0 18px rgba(168,85,247,.4);}
+.ai-hi h2{color:white;font-size:.92rem;font-weight:800;margin:0;}
+.ai-hi p{color:rgba(255,255,255,.38);font-size:.7rem;margin:2px 0 0;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:auto;box-shadow:0 0 8px #22c55e;}
+/* Lock */
+.lock{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px 20px;}
+.lock-icon{font-size:3.8rem;margin-bottom:14px;}
+.lock-title{color:white;font-size:1.25rem;font-weight:900;margin-bottom:7px;}
+.lock-sub{color:rgba(255,255,255,.4);font-size:.85rem;max-width:360px;line-height:1.6;margin-bottom:26px;}
+.lock-opts{display:flex;flex-direction:column;gap:11px;width:100%;max-width:340px;}
+.lbtn{padding:13px 18px;border-radius:13px;border:none;font-weight:800;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:9px;justify-content:center;transition:.2s;}
+.lbtn:hover{transform:translateY(-2px);}
+.lbtn.prem{background:linear-gradient(135deg,#a855f7,#ec4899);color:white;box-shadow:0 4px 18px rgba(168,85,247,.35);}
+.lbtn.ads{background:linear-gradient(135deg,#1a2a4a,#0d1b2e);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.12);}
+.ac{background:rgba(201,168,76,.18);color:#C9A84C;padding:2px 7px;border-radius:5px;font-size:.72rem;margin-left:auto;}
+/* Ad modal */
+.ad-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;}
+.ad-modal.show{display:flex;}
+.ad-box{background:linear-gradient(145deg,#1a2035,#0d1b2e);border-radius:18px;padding:30px;width:90%;max-width:400px;text-align:center;border:1px solid rgba(255,255,255,.09);}
+.ad-prog{background:rgba(255,255,255,.08);border-radius:999px;height:9px;overflow:hidden;margin:14px 0 7px;}
+.ad-fill{height:100%;background:linear-gradient(90deg,#C9A84C,#F59E0B);border-radius:999px;transition:width .15s;}
+/* Chat */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.msgs{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+.msgs::-webkit-scrollbar{width:3px;}
+.msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px;}
+.msg{display:flex;gap:10px;max-width:82%;animation:mIn .28s ease;}
+@keyframes mIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse;}
+.mava{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+.mava.ai{background:linear-gradient(135deg,#a855f7,#ec4899);}
+.mava.usr{background:linear-gradient(135deg,#1B2A4A,#3B82F6);color:white;font-weight:800;font-size:.72rem;}
+.mbub{padding:11px 15px;border-radius:15px;font-size:.86rem;line-height:1.55;max-width:100%;}
+.msg.ai .mbub{background:rgba(255,255,255,.07);color:rgba(255,255,255,.88);border-radius:4px 15px 15px 15px;}
+.msg.user .mbub{background:linear-gradient(135deg,#a855f7,#7c3aed);color:white;border-radius:15px 4px 15px 15px;}
+.mbub pre{background:rgba(0,0,0,.35);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:.76rem;overflow-x:auto;margin:7px 0;}
+.mbub code{font-family:'JetBrains Mono',monospace;font-size:.8rem;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px;}
+.typing{display:flex;gap:4px;padding:11px 14px;background:rgba(255,255,255,.07);border-radius:4px 15px 15px 15px;width:fit-content;}
+.td{width:6px;height:6px;border-radius:50%;background:#a855f7;animation:tb 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+.inp-area{padding:14px 18px;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06);display:flex;gap:9px;align-items:flex-end;}
+.cinp{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:11px 15px;color:white;font-family:'Outfit',sans-serif;font-size:.86rem;resize:none;outline:none;min-height:42px;max-height:130px;}
+.cinp::placeholder{color:rgba(255,255,255,.28);}
+.cinp:focus{border-color:rgba(168,85,247,.45);}
+.sbtn{width:42px;height:42px;border-radius:11px;border:none;flex-shrink:0;background:linear-gradient(135deg,#a855f7,#ec4899);color:white;font-size:1rem;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;}
+.sbtn:hover{transform:scale(1.08);box-shadow:0 0 14px rgba(168,85,247,.5);}
+.sbtn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.tbadge{font-size:.67rem;color:rgba(255,255,255,.22);text-align:center;padding:3px 0;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+.chip{padding:5px 11px;border-radius:999px;border:1px solid rgba(168,85,247,.35);color:rgba(255,255,255,.65);font-size:.73rem;font-weight:600;cursor:pointer;transition:.2s;background:transparent;}
+.chip:hover{background:rgba(168,85,247,.18);color:white;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="ai-wrap">
+  <div class="ai-header">
+    <div class="ai-ava">🤖</div>
+    <div class="ai-hi">
+      <h2>BilimxonAI</h2>
+      <p>Bobur Alijonov tomonidan yaratilgan · Dasturlash, matematika va fanlar bo'yicha yordam</p>
+    </div>
+    <div id="timerBadge" style="display:none;background:rgba(168,85,247,.13);border:1px solid rgba(168,85,247,.28);border-radius:8px;padding:3px 11px;color:#c084fc;font-size:.73rem;font-weight:700;margin-left:auto;"></div>
+    <div class="status-dot" style="margin-left:10px;"></div>
+  </div>
+
+  <!-- LOCK SCREEN -->
+  <div class="lock" id="lockScreen">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">BilimxonAI — Premium xizmat</div>
+    <div class="lock-sub">AI assistentdan foydalanish uchun Premium obuna sotib oling yoki 5 ta reklama ko'rib 1 soatlik kirish oling.</div>
+    <div class="lock-opts">
+      <button class="lbtn prem" onclick="window.location='/store'">💎 Premium Sotib Olish</button>
+      <button class="lbtn ads" onclick="startAds()">
+        📺 5 ta Reklama Ko'rish
+        <span class="ac" id="adCtr">0/5</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div class="chat-area" id="chatScreen" style="display:none;">
+    <div class="msgs" id="msgs">
+      <div class="tbadge" id="startBadge"></div>
+      <div class="msg ai">
+        <div class="mava ai">🤖</div>
+        <div>
+          <div class="mbub">Salom! Men <strong>BilimxonAI</strong>man 👋<br><br>Bobur Alijonov tomonidan yaratilgan sun'iy intellekt assistentiman. Dasturlash, matematika, fizika yoki o'qishingiz bo'yicha istalgan savolingizni bering!</div>
+          <div class="chips">
+            <button class="chip" onclick="suggest('Python da for loop qanday ishlaydi?')">Python for loop</button>
+            <button class="chip" onclick="suggest('HTML nima va qanday ishlaydi?')">HTML nima?</button>
+            <button class="chip" onclick="suggest('JavaScript da funksiya yozib ko\\'rsат')">JS funksiya</button>
+            <button class="chip" onclick="suggest('Algoritm nima?')">Algoritm</button>
+            <button class="chip" onclick="suggest('Sen kimsan?')">Sen kimsan?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="inp-area">
+      <textarea class="cinp" id="cinp" placeholder="Savolingizni yozing..." rows="1"
+        onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+      <button class="sbtn" id="sbtn" onclick="send()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- AD MODAL -->
+<div class="ad-modal" id="adModal">
+  <div class="ad-box">
+    <div style="font-size:2.4rem;margin-bottom:10px;" id="adIco">📢</div>
+    <div style="color:white;font-weight:800;font-size:.95rem;margin-bottom:5px;" id="adName">Reklama yuklanmoqda...</div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.38);" id="adSub">Iltimos kuting</div>
+    <div class="ad-prog"><div class="ad-fill" id="adFill" style="width:0%"></div></div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.3);" id="adIdx">1 / 5</div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+// ── CONFIG ──
+const SYSTEM_PROMPT = `Sen BilimxonAI — Bobur Alijonov tomonidan yaratilgan sun'iy intellekt assistentsan. Sen ChatGPT yoki boshqa AI emas, balki Bilimxon ta'lim platformasining o'z AI assistentisan.
+
+MUHIM QOIDALAR:
+- O'zingni har doim "BilimxonAI" deb tanishtir
+- Yaratuvching "Bobur Alijonov" ekanligini ayt
+- Foydalanuvchilarga dasturlash (Python, JavaScript, HTML, CSS, SQL va boshqalar), matematika, fizika va boshqa fanlar bo'yicha yordam ber
+- Javoblarni o'zbek tilida ber (foydalanuvchi rus tilida so'rasa rus tilida javob ber)
+- Kod misollarini markdown formatida \`\`\`til ... \`\`\` ko'rinishida yoz
+- Qisqa va aniq javob ber, keraksiz so'z ishlatma`;
+
+let msgs = [];
+let busy = false;
+let aiOk = false;
+let aiTill = null;
+let adsDone = 0;
+let adReward = 'ai';
+let timerTick = null;
+
+const AD_LIST = [
+  {i:'🚀',n:'Bilimxon Premium — AI, 2x XP va ko\'p imtiyozlar!'},
+  {i:'💡',n:'Python kursi — 0 dan Professional darajaga'},
+  {i:'🎯',n:'Web dasturlash — HTML, CSS, JavaScript'},
+  {i:'🏆',n:'IT Musobaqa — $500 mukofot yutib oling!'},
+  {i:'📱',n:'Mobile dasturlash — Android va iOS ilovalar'},
+];
+
+// Check access
+async function checkAccess() {
+  try {
+    const st = await api('/api/user/premium-status');
+    if (st.is_premium) { unlock('💎 Premium — cheksiz kirish'); return; }
+    if (st.ai_active && st.ai_until && new Date(st.ai_until) > new Date()) {
+      unlock(); startTimer(new Date(st.ai_until)); return;
+    }
+  } catch(e) {}
+  document.getElementById('lockScreen').style.display = '';
+  document.getElementById('chatScreen').style.display = 'none';
+}
+
+function unlock(badge) {
+  aiOk = true;
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('chatScreen').style.display = '';
+  document.getElementById('startBadge').textContent =
+    new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+  if (badge) {
+    const b = document.getElementById('timerBadge');
+    b.style.display = ''; b.textContent = badge;
+  }
+}
+
+function startTimer(until) {
+  const b = document.getElementById('timerBadge');
+  b.style.display = '';
+  timerTick = setInterval(() => {
+    const d = Math.max(0, until - new Date());
+    if (!d) { clearInterval(timerTick); b.textContent = 'Vaqt tugadi'; return; }
+    const m = Math.floor(d/60000), s = Math.floor((d%60000)/1000);
+    b.textContent = `⏱ ${m}:${s.toString().padStart(2,'0')} qoldi`;
+  }, 1000);
+}
+
+// Ads
+function startAds() {
+  adsDone = 0;
+  document.getElementById('adCtr').textContent = '0/5';
+  showAd();
+}
+
+function showAd() {
+  const ad = AD_LIST[adsDone];
+  document.getElementById('adIco').textContent = ad.i;
+  document.getElementById('adName').textContent = ad.n;
+  document.getElementById('adSub').textContent = 'Reklama ko\'rilmoqda...';
+  document.getElementById('adIdx').textContent = `${adsDone+1} / 5`;
+  document.getElementById('adFill').style.transition = 'none';
+  document.getElementById('adFill').style.width = '0%';
+  document.getElementById('adModal').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('adFill').style.transition = 'width 5s linear';
+    document.getElementById('adFill').style.width = '100%';
+  }, 80);
+  let s = 5;
+  const t = setInterval(() => {
+    s--;
+    document.getElementById('adSub').textContent = s > 0 ? `${s} soniya qoldi` : '✅ Tayyor!';
+    if (s <= 0) {
+      clearInterval(t);
+      document.getElementById('adModal').classList.remove('show');
+      adsDone++;
+      document.getElementById('adCtr').textContent = `${adsDone}/5`;
+      if (adsDone < 5) setTimeout(showAd, 500);
+      else claimAds();
+    }
+  }, 1000);
+}
+
+async function claimAds() {
+  try {
+    const res = await api('/api/store/watch-ad', {method:'POST', body:JSON.stringify({reward:'ai'})});
+    if (res.success) {
+      const until = new Date(res.ai_until);
+      aiOk = true;
+      unlock();
+      startTimer(until);
+    }
+  } catch(e) { showToast('Xatolik: ' + e.message, 'error'); }
+}
+
+// Chat
+function resize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+function onKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+function suggest(txt) {
+  document.getElementById('cinp').value = txt;
+  send();
+}
+
+function addMsg(role, html) {
+  const u = window._me || {};
+  const init = (u.full_name || u.username || 'U').charAt(0).toUpperCase();
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  d.innerHTML = role === 'ai'
+    ? `<div class="mava ai">🤖</div><div><div class="mbub">${html}</div></div>`
+    : `<div class="mava usr">${init}</div><div><div class="mbub">${html}</div></div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function showTyping() {
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg ai'; d.id = 'typ';
+  d.innerHTML = `<div class="mava ai">🤖</div><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hideTyping() { document.getElementById('typ')?.remove(); }
+
+function fmt(txt) {
+  txt = txt.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  txt = txt.replace(/`([^`]+)`/g, '<code>$1</code>');
+  txt = txt.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  txt = txt.replace(/\n/g, '<br>');
+  return txt;
+}
+
+async function send() {
+  if (!aiOk || busy) return;
+  const inp = document.getElementById('cinp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = ''; inp.style.height = 'auto';
+  addMsg('user', txt.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+  msgs.push({role:'user', content: txt});
+  busy = true;
+  document.getElementById('sbtn').disabled = true;
+  showTyping();
+
+  try {
+    const r = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        system: SYSTEM_PROMPT,
+        messages: msgs.slice(-12)
+      })
+    });
+    const data = await r.json();
+    hideTyping();
+    if (data.error) throw new Error(data.error);
+    const reply = data.reply || 'Kechirasiz, javob bera olmadim.';
+    msgs.push({role:'assistant', content: reply});
+    addMsg('ai', fmt(reply));
+  } catch(e) {
+    hideTyping();
+    addMsg('ai', `❌ Xatolik: ${e.message}`);
+  }
+  busy = false;
+  document.getElementById('sbtn').disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try { window._me = await api('/api/me'); } catch {}
+  checkAccess();
+});
+</script>
+</body>
+</html>

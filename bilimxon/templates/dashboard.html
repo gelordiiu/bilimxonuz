@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilimxon — Dashboard</title>
+  <link rel="icon" href="/static/images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div id="dashAdBanner" style="max-width:900px;margin:0 auto;padding:0 20px;"></div>
+
+<div class="page-inner">
+  <div class="container">
+    <h1 class="page-title" id="dashGreeting" data-i18n="dash_title">Mening Dashboardim</h1>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Course Progress -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:4px;">
+      <!-- In-progress courses -->
+      <div>
+        <h2 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:16px;" data-i18n="dash_progress">Mening Rivojlanishim</h2>
+        <div id="progressList">
+          <div class="loader"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- All Courses quick access -->
+      <div>
+        <h2 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:16px;" data-i18n="courses_title">Barcha Kurslar</h2>
+        <div id="allCoursesList">
+          <div class="loader"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function loadDashboard() {
+  try {
+    const [dash, courses] = await Promise.all([api('/api/dashboard'), api('/api/courses')]);
+
+    // Update greeting
+    const user = await getMe();
+    const greet = CURRENT_LANG === 'ru'
+      ? `Salom, ${user.full_name?.split(' ')[0] || ''} 👋`
+      : `Salom, ${user.full_name?.split(' ')[0] || ''} 👋`;
+    document.getElementById('dashGreeting').textContent = greet;
+
+    // Stats
+    let streakCard = '';
+    try {
+      const sk = await api('/api/streak/status');
+      const flame = sk.active_today ? '🔥' : (sk.at_risk ? '⚡' : '💤');
+      const streakColor = sk.active_today ? '#ffc800' : (sk.at_risk ? '#f97316' : '#555');
+      streakCard = `<div class="stat-card" style="border-color:rgba(255,200,0,.2);background:rgba(255,200,0,.04);cursor:pointer;" onclick="window.location='/streak'">
+        <div class="stat-icon gold">${flame}</div>
+        <div>
+          <div class="stat-num" style="color:${streakColor};">${sk.streak_days}</div>
+          <div class="stat-label">Kunlik streak</div>
+          ${sk.at_risk && !sk.active_today ? '<div style="font-size:.65rem;color:#f97316;margin-top:2px;">⚠️ Bugun dars qiling!</div>' : '<div style="font-size:.65rem;color:#555;margin-top:2px;">Tafsilot →</div>'}
+        </div>
+      </div>`;
+    } catch(e) {}
+
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon navy">📚</div>
+        <div><div class="stat-num">${dash.total_mavzu}</div><div class="stat-label" data-i18n="dash_total">${t('dash_total')}</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div><div class="stat-num">${dash.completed}</div><div class="stat-label" data-i18n="dash_completed">${t('dash_completed')}</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold">⭐</div>
+        <div><div class="stat-num">${dash.avg_score}%</div><div class="stat-label" data-i18n="dash_score">${t('dash_score')}</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">🎯</div>
+        <div><div class="stat-num">${dash.overall_pct}%</div><div class="stat-label">Umumiy</div></div>
+      </div>
+      ${streakCard}
+    `;
+
+    // Progress list
+    const progressEl = document.getElementById('progressList');
+    if (dash.course_stats.length === 0) {
+      progressEl.innerHTML = `
+        <div class="card" style="text-align:center;padding:32px;">
+          <div style="font-size:2.5rem;margin-bottom:12px;">🚀</div>
+          <p style="color:var(--gray-400);margin-bottom:16px;" data-i18n="dash_no_progress">${t('dash_no_progress')}</p>
+          <a href="/#courses" class="btn btn-primary btn-sm" data-i18n="dash_go_courses">${t('dash_go_courses')}</a>
+        </div>`;
+    } else {
+      progressEl.innerHTML = `<div class="progress-list">${
+        dash.course_stats.map(c => `
+          <div class="progress-item" onclick="window.location='/course/${c.slug}'" style="cursor:pointer;">
+            <div class="progress-item-icon" style="background:${c.color}22;">${c.icon}</div>
+            <div class="progress-item-info">
+              <div class="progress-item-title">${c.title}</div>
+              <div class="progress-item-sub">${c.completed} / ${c.total} ${t('course_lessons')}</div>
+              <div class="progress-item-bar">${makeProgressBar(c.pct)}</div>
+            </div>
+            <div class="progress-pct">${c.pct}%</div>
+          </div>
+        `).join('')
+      }</div>`;
+    }
+
+    // All courses list
+    document.getElementById('allCoursesList').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${courses.map(c => `
+          <div onclick="window.location='/course/${c.slug}'"
+               style="display:flex;align-items:center;gap:12px;padding:12px 16px;
+                      background:white;border-radius:var(--radius);box-shadow:var(--shadow);
+                      cursor:pointer;transition:var(--transition);border:1px solid var(--gray-200);"
+               onmouseover="this.style.transform='translateX(4px)'"
+               onmouseout="this.style.transform=''">
+            <span style="font-size:1.4rem;">${c.icon}</span>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:0.88rem;color:var(--navy);">${c.title}</div>
+              <div style="font-size:0.75rem;color:var(--gray-400);">${c.total_mavzu} ${t('course_lessons')}</div>
+            </div>
+            ${c.progress_pct > 0 ? `<span class="badge badge-success">${c.progress_pct}%</span>` : ''}
+            <span style="color:var(--gray-400);">›</span>
+          </div>
+        `).join('')}
+      </div>`;
+
+  } catch (e) {
+    showToast(t('error') + ': ' + e.message, 'error');
+  }
+}
+
+function reloadPageContent() { loadDashboard(); }
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+
+<script>
+// ── Ad Banner System ──
+const ADS = [
+  {
+  renderAd('dashAdBanner'); renderSidebarAd('dashSideAd');icon:'🚀',title:'Duolingo kabi o'rgan!',sub:'Bilimxon bilan bilimingizni oshiring',cta:'Boshlash'},
+  {icon:'💡',title:'Python dasturlashni o'rganing',sub:'100+ interaktiv darslar',cta:"Ko'rish"},
+  {icon:'🎯',title:'Kurslarni tugatib ochko to'plang',sub:'Premium sovg'alar sizni kutmoqda!',cta:'Do'kon'},
+  {icon:'🏆',title:'Reytingda 1-o'rinni egallang',sub:'Eng yaxshi talabaga maxsus sovg'a!',cta:'Reyting'},
+];
+function renderAd(containerId){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const ad = ADS[Math.floor(Math.random()*ADS.length)];
+  el.innerHTML = `<div class="ad-banner" onclick="window.location='/store'">
+    <span class="ad-banner-icon">${ad.icon}</span>
+    <div class="ad-banner-text">
+      <div class="ad-banner-title">${ad.title}</div>
+      <div class="ad-banner-sub">${ad.sub}</div>
+    </div>
+    <button class="ad-banner-btn">${ad.cta}</button>
+  </div>`;
+}
+const SIDEBAR_ADS = [
+  {title:"Premium obunani sinab ko'ring",sub:'AI, 2x XP va boshqa imtiyozlar',cta:'$0.50/kun'},
+  {title:'Do'stingga hadya yo'nat',sub:'Ochko yoki Premium sovg'a qiling',cta:'Hadya'},
+  {title:'Mystery Box ochish',sub:'Tasodifiy sovg'a yutib oling!',cta:'Ochish'},
+];
+function renderSidebarAd(containerId){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const ad = SIDEBAR_ADS[Math.floor(Math.random()*SIDEBAR_ADS.length)];
+  el.innerHTML = `<div class="ad-sidebar-block">
+    <div class="ad-label">AD</div>
+    <div class="ad-content">${ad.title}<br><span style="font-size:.7rem;color:rgba(255,255,255,.4);">${ad.sub}</span></div>
+    <button class="ad-cta" onclick="window.location='/store'">${ad.cta}</button>
+  </div>`;
+}
+</script>
+</body>
+</html>

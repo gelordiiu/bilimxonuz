@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Do'stlar</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+body{font-family:'Outfit',sans-serif;background:#f0f4f8;}
+.social-layout{padding-top:96px;max-width:960px;margin:0 auto;padding-left:20px;padding-right:20px;padding-bottom:60px;}
+/* ADD FRIEND BOX */
+.add-box{background:white;border-radius:20px;padding:22px 24px;box-shadow:0 4px 20px rgba(0,0,0,.07);margin-bottom:24px;border:2px solid #E5E7EB;}
+.add-box-title{font-size:1rem;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.add-row{display:flex;gap:10px;}
+.add-input{flex:1;padding:11px 16px;border:2px solid #E5E7EB;border-radius:12px;font-size:.9rem;font-family:'Outfit',sans-serif;outline:none;transition:.2s;}
+.add-input:focus{border-color:var(--navy);}
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:24px;}
+.search-wrap input{width:100%;padding:13px 20px 13px 48px;border:2px solid #E5E7EB;border-radius:14px;font-size:.93rem;font-family:'Outfit',sans-serif;outline:none;background:white;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:.2s;}
+.search-wrap input:focus{border-color:var(--navy);}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:1.1rem;color:#9CA3AF;}
+/* USER CARD */
+.users-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;margin-bottom:28px;}
+.user-card{background:white;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid #F3F4F6;transition:.2s;}
+.user-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px);}
+.uavatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:white;flex-shrink:0;overflow:hidden;cursor:pointer;}
+.uavatar img{width:100%;height:100%;object-fit:cover;}
+.tick{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;background:#3B82F6;border-radius:50%;color:white;font-size:.58rem;margin-left:3px;}
+/* PENDING */
+.req-card{background:white;border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #F3F4F6;margin-bottom:8px;}
+.section-title{font-size:1rem;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.empty-msg{padding:20px;background:white;border-radius:12px;text-align:center;color:#9CA3AF;font-size:.87rem;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="social-layout">
+
+  <!-- Add Friend -->
+  <div class="add-box">
+    <div class="add-box-title">➕ Username orqali Do'st Qo'shish</div>
+    <div class="add-row">
+      <input class="add-input" id="addInput" type="text" placeholder="@username kiriting..."
+        onkeydown="if(event.key==='Enter')addByUsername()">
+      <button class="btn btn-primary" onclick="addByUsername()">Qo'shish</button>
+    </div>
+    <div id="addResult" style="margin-top:10px;font-size:.85rem;min-height:20px;"></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Foydalanuvchi qidirish..." oninput="onSearch()">
+  </div>
+
+  <!-- Search results -->
+  <div id="searchResults" style="display:none;margin-bottom:24px;">
+    <div class="section-title">🔍 Natijalar</div>
+    <div class="users-grid" id="searchGrid"></div>
+  </div>
+
+  <!-- Pending -->
+  <div style="margin-bottom:24px;">
+    <div class="section-title">📬 Kelgan So'rovlar <span id="pendingBadge" class="badge badge-gold" style="display:none;"></span></div>
+    <div id="pendingList"><div class="empty-msg">Kelgan so'rov yo'q</div></div>
+  </div>
+
+  <!-- Friends -->
+  <div>
+    <div class="section-title">👥 Do'stlarim <span id="friendsCount" style="color:#9CA3AF;font-weight:500;font-size:.85rem;"></span></div>
+    <div class="users-grid" id="friendsList">
+      <div style="grid-column:1/-1;text-align:center;padding:30px;"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+let searchTimeout=null;
+
+async function addByUsername(){
+  const input=document.getElementById('addInput');
+  const result=document.getElementById('addResult');
+  const username=input.value.trim().replace(/^@/,'');
+  if(!username){result.innerHTML='<span style="color:var(--danger);">Username kiriting</span>';return;}
+  try{
+    const res=await api('/api/social/add-by-username',{method:'POST',body:JSON.stringify({username})});
+    if(res.success){
+      result.innerHTML=`<span style="color:var(--success);">✅ ${res.name} (@${res.username}) ga so'rov yuborildi!</span>`;
+      input.value='';
+      setTimeout(()=>{result.innerHTML='';},4000);
+    }
+  }catch(e){
+    result.innerHTML=`<span style="color:var(--danger);">❌ ${e.message}</span>`;
+    setTimeout(()=>{result.innerHTML='';},4000);
+  }
+}
+
+function onSearch(){
+  clearTimeout(searchTimeout);
+  const q=document.getElementById('searchInput').value.trim();
+  if(q.length<2){document.getElementById('searchResults').style.display='none';return;}
+  searchTimeout=setTimeout(()=>doSearch(q),350);
+}
+
+async function doSearch(q){
+  const res=await api(`/api/social/search?q=${encodeURIComponent(q)}`);
+  const grid=document.getElementById('searchGrid');
+  document.getElementById('searchResults').style.display='';
+  if(!res.length){grid.innerHTML='<p style="color:#9CA3AF;">Topilmadi</p>';return;}
+  grid.innerHTML=res.map(u=>userCardHTML(u,true)).join('');
+}
+
+function userCardHTML(u,showAct=false){
+  const st=u.friend_status;
+  let act='';
+  if(showAct){
+    if(st==='friends')act=`<button class="btn btn-outline btn-sm" onclick="window.location='/chat?user=${u.id}'">💬</button>`;
+    else if(st==='pending')act=`<button class="btn btn-outline btn-sm" disabled>⏳</button>`;
+    else act=`<button class="btn btn-primary btn-sm" onclick="sendReq(${u.id},this)">➕</button>`;
+  }
+  return`<div class="user-card">
+    <div class="uavatar" onclick="window.location='/profile/${u.username}'">${u.avatar?`<img src="${u.avatar}">`:(u.full_name||'?')[0]}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+        <span style="font-weight:700;font-size:.88rem;color:var(--navy);cursor:pointer;" onclick="window.location='/profile/${u.username}'">${u.full_name}</span>
+        ${u.has_tick?'<span class="tick">✓</span>':''}
+      </div>
+      <div style="font-size:.75rem;color:#9CA3AF;">@${u.username}</div>
+      <div style="font-size:.75rem;color:var(--gold);font-weight:700;">⭐ ${u.points}</div>
+    </div>${act}
+  </div>`;
+}
+
+async function sendReq(to_id,btn){
+  try{
+    await api('/api/social/friend-request',{method:'POST',body:JSON.stringify({to_id})});
+    btn.textContent='⏳';btn.disabled=true;
+    showToast("So'rov yuborildi!",'success');
+  }catch(e){showToast(e.message,'error');}
+}
+
+async function loadPending(){
+  const reqs=await api('/api/social/pending-requests');
+  const badge=document.getElementById('pendingBadge');
+  const list=document.getElementById('pendingList');
+  if(!reqs.length){list.innerHTML='<div class="empty-msg">Kelgan so\'rov yo\'q</div>';return;}
+  badge.style.display='';badge.textContent=reqs.length;
+  list.innerHTML=reqs.map(r=>`
+    <div class="req-card">
+      <div class="uavatar" onclick="window.location='/profile/${r.username}'">${r.avatar?`<img src="${r.avatar}">`:(r.full_name||'?')[0]}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:.88rem;color:var(--navy);">${r.full_name}</div>
+        <div style="font-size:.73rem;color:#9CA3AF;">@${r.username}</div>
+      </div>
+      <button class="btn btn-success btn-sm" onclick="acceptReq(${r.from_id})">✅ Qabul</button>
+      <button class="btn btn-outline btn-sm" onclick="rejectReq(${r.from_id})">❌</button>
+    </div>`).join('');
+}
+
+async function acceptReq(from_id){
+  await api('/api/social/accept-friend',{method:'POST',body:JSON.stringify({from_id})});
+  showToast("Do'st qo'shildi!",'success');loadPending();loadFriends();
+}
+async function rejectReq(from_id){
+  await api('/api/social/reject-friend',{method:'POST',body:JSON.stringify({from_id})});
+  loadPending();
+}
+
+async function loadFriends(){
+  const list=document.getElementById('friendsList');
+  const friends=await api('/api/social/friends');
+  document.getElementById('friendsCount').textContent=`(${friends.length})`;
+  if(!friends.length){list.innerHTML='<div style="grid-column:1/-1;"><div class="empty-msg">Hali do\'st yo\'q. Username orqali qo\'shing!</div></div>';return;}
+  list.innerHTML=friends.map(f=>userCardHTML({...f,friend_status:'friends'},true)).join('');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{loadPending();loadFriends();});
+</script>
+</body>
+</html>

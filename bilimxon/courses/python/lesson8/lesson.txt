@@ -1,0 +1,18 @@
+LESSON 8: To'plamlar (Set) va Kortejlar (Tuple)
+
+Bob: BOB 2: Ma'lumot Tuzilmalari (Junior-Middle)
+
+## To'plamlar (Set) va Kortejlar (Tuple)
+
+Set — takrorlanmas elementlar to'plami, tartib yo'q. Tuple — o'zgartirib bo'lmaydigan List. Set matematik amallar (union, intersection) uchun qulay. Tuple — o'zgarmaydigan ma'lumotlar uchun ishlatiladi.
+
+## Kod Namunasi
+```
+sonlar = {1, 2, 3, 3, 4}
+print(sonlar)  # duplikatlar yo'q
+kortej = (10, 20, 30)
+print(kortej[0])
+```
+
+## Amaliyot
+Yuqoridagi misolni o'rganing va o'zingizning variantingizni yozing!

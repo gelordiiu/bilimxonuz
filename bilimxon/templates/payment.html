@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>To'lov — Bilimxon</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{font-family:'Outfit',sans-serif;background:var(--gray-50);padding-top:var(--topbar-h);}
+    .pay-wrap{max-width:480px;margin:48px auto;padding:0 20px;}
+    .pay-card{background:white;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.1);overflow:hidden;}
+    .pay-header{background:linear-gradient(135deg,#1B2A4A,#2a3f6f);padding:32px;text-align:center;color:white;}
+    .pay-logo{font-size:2rem;font-weight:900;margin-bottom:4px;}
+    .pay-title{font-size:1rem;opacity:.7;}
+    .pay-body{padding:32px;}
+    .order-info{background:var(--gray-50);border-radius:14px;padding:20px;margin-bottom:28px;}
+    .order-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+    .order-row:not(:last-child){border-bottom:1px solid var(--gray-200);}
+    .order-label{font-size:.82rem;color:#9CA3AF;}
+    .order-val{font-size:.88rem;font-weight:700;color:var(--navy);}
+    .order-total .order-val{font-size:1.2rem;color:var(--gold);}
+    .methods{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+    .method-btn{padding:16px;border-radius:14px;border:2px solid var(--gray-200);cursor:pointer;text-align:center;transition:.2s;background:white;}
+    .method-btn:hover,.method-btn.selected{border-color:var(--navy);background:rgba(27,42,74,.04);}
+    .method-icon{font-size:1.8rem;margin-bottom:4px;}
+    .method-name{font-size:.8rem;font-weight:700;color:var(--navy);}
+    .pay-btn{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,#1B2A4A,#2a3f6f);color:white;border:none;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:.2s;}
+    .pay-btn:hover{opacity:.9;}
+    .pay-btn:disabled{opacity:.5;cursor:not-allowed;}
+    .secure-note{text-align:center;font-size:.72rem;color:#9CA3AF;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:4px;}
+    /* Fake payment form */
+    .card-form{display:none;border:2px solid var(--gray-200);border-radius:14px;padding:20px;margin-bottom:20px;}
+    .card-form.visible{display:block;}
+    .cf-label{font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:5px;}
+    .cf-input{width:100%;border:2px solid var(--gray-200);border-radius:10px;padding:10px 12px;font-size:.9rem;font-family:'Outfit',sans-serif;outline:none;margin-bottom:12px;}
+    .cf-input:focus{border-color:var(--navy);}
+    .cf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .success-screen{display:none;text-align:center;padding:40px 20px;}
+    .success-screen.visible{display:block;}
+    .success-icon{font-size:4rem;margin-bottom:16px;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="pay-wrap">
+  <div class="pay-card">
+    <div class="pay-header">
+      <div class="pay-logo">🎓 Bilimxon</div>
+      <div class="pay-title">Xavfsiz to'lov</div>
+    </div>
+    <div class="pay-body" id="payBody">
+      <div class="order-info">
+        <div class="order-row">
+          <span class="order-label">Xizmat</span>
+          <span class="order-val" id="purposeLabel">—</span>
+        </div>
+        <div class="order-row">
+          <span class="order-label">To'lov raqami</span>
+          <span class="order-val">#{{ payment.id }}</span>
+        </div>
+        <div class="order-row order-total">
+          <span class="order-label">Jami summa</span>
+          <span class="order-val" id="amountLabel">{{ payment.amount }} so'm</span>
+        </div>
+      </div>
+
+      <div style="font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:12px;">To'lov usulini tanlang:</div>
+      <div class="methods">
+        <div class="method-btn" onclick="selectMethod('payme',this)">
+          <div class="method-icon">💳</div>
+          <div class="method-name">Payme</div>
+        </div>
+        <div class="method-btn" onclick="selectMethod('click',this)">
+          <div class="method-icon">📱</div>
+          <div class="method-name">Click</div>
+        </div>
+        <div class="method-btn" onclick="selectMethod('uzum',this)">
+          <div class="method-icon">🛍️</div>
+          <div class="method-name">Uzum Bank</div>
+        </div>
+        <div class="method-btn" onclick="selectMethod('card',this)">
+          <div class="method-icon">🏦</div>
+          <div class="method-name">Karta orqali</div>
+        </div>
+      </div>
+
+      <!-- Fake card form for demo -->
+      <div class="card-form" id="cardForm">
+        <div class="cf-label">Karta raqami</div>
+        <input class="cf-input" id="cardNum" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+        <div class="cf-row">
+          <div>
+            <div class="cf-label">Amal qilish muddati</div>
+            <input class="cf-input" id="cardExp" placeholder="MM/YY" maxlength="5">
+          </div>
+          <div>
+            <div class="cf-label">CVV</div>
+            <input class="cf-input" id="cardCvv" placeholder="***" maxlength="3" type="password">
+          </div>
+        </div>
+      </div>
+
+      <button class="pay-btn" id="payBtn" onclick="processPayment()" disabled>To'lov usulini tanlang</button>
+      <div class="secure-note">🔒 Ma'lumotlar 256-bit SSL bilan himoyalangan</div>
+    </div>
+
+    <!-- Success screen -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">🎉</div>
+      <div style="font-size:1.3rem;font-weight:800;color:var(--navy);margin-bottom:8px;">To'lov muvaffaqiyatli!</div>
+      <div style="font-size:.88rem;color:#6B7280;margin-bottom:24px;" id="successMsg"></div>
+      <a href="/dashboard" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,var(--navy),#2a3f6f);color:white;border-radius:12px;font-weight:700;text-decoration:none;">Dashboardga qaytish</a>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const payment = {{ payment | tojson }};
+let selectedMethod = null;
+
+const purposeNames = {
+  premium_1d: '⭐ Premium — 1 kun', premium_7d: '⭐ Premium — 7 kun',
+  premium_30d: '⭐ Premium — 30 kun',
+};
+function getPurposeName(p) {
+  if (purposeNames[p]) return purposeNames[p];
+  if (p && p.startsWith('points_')) return '⭐ ' + p.split('_')[1] + ' ta ochko';
+  return p;
+}
+
+document.getElementById('purposeLabel').textContent = getPurposeName(payment.purpose);
+document.getElementById('amountLabel').textContent = Number(payment.amount).toLocaleString('uz-UZ') + " so'm";
+
+function selectMethod(method, el) {
+  selectedMethod = method;
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  const btn = document.getElementById('payBtn');
+  btn.disabled = false;
+  btn.textContent = 'To\'lash — ' + Number(payment.amount).toLocaleString() + " so'm";
+  document.getElementById('cardForm').classList.toggle('visible', method === 'card');
+}
+
+function formatCard(inp) {
+  let v = inp.value.replace(/\D/g,'').substring(0,16);
+  inp.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+async function processPayment() {
+  if (!selectedMethod) return;
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true; btn.textContent = 'Ishlanmoqda...';
+
+  // Simulate payment processing
+  await new Promise(r => setTimeout(r, 1800));
+
+  try {
+    const res = await api('/api/payment/complete', {method:'POST', body:JSON.stringify({payment_id: payment.id})});
+    if (res.success) {
+      document.getElementById('payBody').style.display = 'none';
+      const sc = document.getElementById('successScreen');
+      sc.classList.add('visible');
+      const msgs = {
+        premium_1d: '1 kunlik Premium faollashtirildi!', premium_7d: '7 kunlik Premium faollashtirildi!',
+        premium_30d: '30 kunlik Premium faollashtirildi!',
+      };
+      let msg = msgs[payment.purpose];
+      if (!msg && payment.purpose && payment.purpose.startsWith('points_')) msg = payment.purpose.split('_')[1] + ' ta ochko hisobingizga qo\'shildi!';
+      document.getElementById('successMsg').textContent = msg || 'To\'lov qabul qilindi';
+    }
+  } catch(e) {
+    btn.disabled = false; btn.textContent = "To'lash";
+    showToast(e.message, 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => { if(typeof renderTopbar==='function') renderTopbar(); });
+</script>
+</body>
+</html>

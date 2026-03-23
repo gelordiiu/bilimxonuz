@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — Sozlamalar</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body{font-family:'Outfit',sans-serif;background:#0a0e1a;color:white;}
+    .sw{padding-top:calc(var(--topbar-h) + 28px);max-width:800px;margin:0 auto;padding-left:20px;padding-right:20px;padding-bottom:60px;}
+    .page-title{font-size:1.6rem;font-weight:900;color:white;margin-bottom:4px;}
+    .page-sub{color:rgba(255,255,255,.4);font-size:.9rem;margin-bottom:28px;}
+    .scard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px 24px;margin-bottom:16px;}
+    .scard-title{font-size:.8rem;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;margin-bottom:18px;}
+    .srow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .srow:last-child{border-bottom:none;padding-bottom:0;}
+    .srow-label{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.8);}
+    .srow-sub{font-size:.76rem;color:rgba(255,255,255,.35);margin-top:2px;}
+    .color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+    .csw{width:34px;height:34px;border-radius:10px;cursor:pointer;border:2.5px solid transparent;transition:.15s;position:relative;}
+    .csw:hover,.csw.sel{border-color:white;transform:scale(1.12);}
+    .csw.sel::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:white;font-weight:900;}
+    .preview-box{background:var(--preview-bg,#0a0e1a);border-radius:14px;padding:18px;margin-top:16px;border:1.5px solid rgba(255,255,255,.1);transition:background .3s;}
+    .preview-btn{display:inline-block;padding:9px 22px;border-radius:10px;font-weight:800;font-size:.9rem;cursor:pointer;border:none;background:var(--preview-btn,linear-gradient(135deg,#C9A84C,#8B6914));color:white;transition:.2s;margin-right:8px;margin-top:8px;}
+    .preview-card{background:rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-top:10px;}
+    .preview-card-title{font-weight:700;color:white;font-size:.9rem;}
+    .preview-card-sub{font-size:.77rem;color:rgba(255,255,255,.45);margin-top:3px;}
+    .range-wrap{display:flex;align-items:center;gap:12px;margin-top:6px;}
+    .range-input{flex:1;accent-color:#C9A84C;}
+    .range-val{font-size:.85rem;font-weight:700;color:#C9A84C;min-width:36px;text-align:right;}
+    .toggle-switch{position:relative;width:46px;height:26px;cursor:pointer;}
+    .toggle-switch input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:999px;transition:.25s;}
+    .toggle-switch input:checked + .toggle-slider{background:linear-gradient(135deg,#C9A84C,#8B6914);}
+    .toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:white;border-radius:50%;transition:.25s;}
+    .toggle-switch input:checked + .toggle-slider::before{transform:translateX(20px);}
+    .apply-btn{width:100%;padding:14px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:14px;color:white;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:.2s;margin-top:20px;}
+    .apply-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(201,168,76,.4);}
+    .reset-btn{width:100%;padding:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,255,255,.5);font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s;margin-top:8px;}
+    .reset-btn:hover{background:rgba(255,255,255,.08);color:white;}
+    .font-opt{padding:8px 16px;border-radius:10px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;font-size:.85rem;font-weight:700;transition:.15s;}
+    .font-opt.sel{border-color:#C9A84C;color:#C9A84C;background:rgba(201,168,76,.08);}
+    .um-input{background:#1f2937;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 13px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;}
+    .s-ticket-btn{padding:7px 14px;border-radius:20px;border:1.5px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s;font-family:'Outfit',sans-serif;}
+    .s-ticket-btn:hover{border-color:rgba(255,255,255,.3);color:#fff;}
+    .s-ticket-btn.active{border-color:#C9A84C;color:#C9A84C;background:rgba(201,168,76,.08);}
+    .ticket-item{background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);}
+    .ticket-status-open{color:#fbbf24;font-size:.68rem;font-weight:800;}
+    .ticket-status-resolved{color:#4ade80;font-size:.68rem;font-weight:800;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+<div class="sw">
+  <div class="page-title" data-i18n="settings_title">⚙️ Sozlamalar</div>
+  <div class="page-sub" data-i18n="settings_sub">Sayt ko'rinishini va xatti-harakatlarini o'zingizga moslang</div>
+
+  <!-- BG Color -->
+  <div class="scard">
+    <div class="scard-title">🎨 Sayt Orqa Foni</div>
+    <div class="srow" style="flex-direction:column;align-items:flex-start;">
+      <div class="srow-label">Fon Rangini Tanlang</div>
+      <div class="srow-sub">Sahifa orqa fon rangi</div>
+      <div class="color-row" id="bgColors">
+        <div class="csw sel" data-bg="#0a0e1a" style="background:#0a0e1a;" title="Standart Qora"></div>
+        <div class="csw" data-bg="#06091a" style="background:#06091a;" title="Chuqur Qora"></div>
+        <div class="csw" data-bg="#0d1b2e" style="background:#0d1b2e;" title="Chuqur Ko'k"></div>
+        <div class="csw" data-bg="#0f172a" style="background:#0f172a;" title="Slate"></div>
+        <div class="csw" data-bg="#1a0a2e" style="background:#1a0a2e;" title="Binafsha"></div>
+        <div class="csw" data-bg="#0a1a0d" style="background:#0a1a0d;" title="Yashil"></div>
+        <div class="csw" data-bg="#1a0a0a" style="background:#1a0a0a;" title="Qizil"></div>
+        <div class="csw" data-bg="#1a1209" style="background:#1a1209;" title="Jigarrang"></div>
+        <div class="csw" data-bg="#111827" style="background:#111827;" title="Kulrang"></div>
+        <div class="csw" data-bg="linear-gradient(135deg,#0a0e1a,#1a0a2e)" style="background:linear-gradient(135deg,#0a0e1a,#1a0a2e);" title="Gradient"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+        <label style="font-size:.82rem;color:rgba(255,255,255,.5);">Maxsus rang:</label>
+        <input type="color" id="bgCustomColor" value="#0a0e1a" style="width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;background:none;padding:0;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Accent Color -->
+  <div class="scard">
+    <div class="scard-title">✨ Asosiy Rang (Accent)</div>
+    <div class="srow" style="flex-direction:column;align-items:flex-start;">
+      <div class="srow-label">Tugma va Element Rangini Tanlang</div>
+      <div class="srow-sub">Asosiy tugmalar, belgilar va aksent elementlar rangi</div>
+      <div class="color-row" id="accentColors">
+        <div class="csw sel" data-accent1="#C9A84C" data-accent2="#8B6914" style="background:linear-gradient(135deg,#C9A84C,#8B6914);" title="Oltin (standart)"></div>
+        <div class="csw" data-accent1="#3B82F6" data-accent2="#1D4ED8" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);" title="Ko'k"></div>
+        <div class="csw" data-accent1="#8B5CF6" data-accent2="#6D28D9" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);" title="Binafsha"></div>
+        <div class="csw" data-accent1="#22C55E" data-accent2="#15803D" style="background:linear-gradient(135deg,#22C55E,#15803D);" title="Yashil"></div>
+        <div class="csw" data-accent1="#EF4444" data-accent2="#B91C1C" style="background:linear-gradient(135deg,#EF4444,#B91C1C);" title="Qizil"></div>
+        <div class="csw" data-accent1="#F59E0B" data-accent2="#B45309" style="background:linear-gradient(135deg,#F59E0B,#B45309);" title="To'q Sariq"></div>
+        <div class="csw" data-accent1="#EC4899" data-accent2="#9D174D" style="background:linear-gradient(135deg,#EC4899,#9D174D);" title="Pushti"></div>
+        <div class="csw" data-accent1="#06B6D4" data-accent2="#0E7490" style="background:linear-gradient(135deg,#06B6D4,#0E7490);" title="Moviy"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Font & Radius -->
+  <div class="scard">
+    <div class="scard-title">🔤 Shrift va Ko'rinish</div>
+    <div class="srow" style="flex-direction:column;align-items:flex-start;">
+      <div class="srow-label">Shrift Oilasi</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" id="fontOpts">
+        <button class="font-opt sel" data-font="'Outfit',sans-serif" style="font-family:'Outfit',sans-serif;">Outfit</button>
+        <button class="font-opt" data-font="'Inter',sans-serif" style="font-family:'Inter',sans-serif;">Inter</button>
+        <button class="font-opt" data-font="system-ui,sans-serif" style="font-family:system-ui;">System</button>
+        <button class="font-opt" data-font="'Georgia',serif" style="font-family:'Georgia',serif;">Georgia</button>
+      </div>
+    </div>
+    <div class="srow" style="flex-direction:column;align-items:flex-start;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;margin-top:4px;">
+      <div class="srow-label">Burchak Yumaloqligi</div>
+      <div class="range-wrap">
+        <span style="font-size:.8rem;color:rgba(255,255,255,.4);">Tik</span>
+        <input type="range" min="0" max="24" value="12" id="radiusRange" class="range-input">
+        <span style="font-size:.8rem;color:rgba(255,255,255,.4);">Yumaloq</span>
+        <span class="range-val" id="radiusVal">12px</span>
+      </div>
+    </div>
+    <div class="srow" style="flex-direction:column;align-items:flex-start;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;margin-top:4px;">
+      <div class="srow-label">Shrift Kattaligi</div>
+      <div class="range-wrap">
+        <span style="font-size:.8rem;color:rgba(255,255,255,.4);">Kichik</span>
+        <input type="range" min="12" max="18" value="15" id="fontSizeRange" class="range-input">
+        <span style="font-size:.8rem;color:rgba(255,255,255,.4);">Katta</span>
+        <span class="range-val" id="fontSizeVal">15px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Effects -->
+  <div class="scard">
+    <div class="scard-title">💫 Effektlar</div>
+    <div class="srow">
+      <div>
+        <div class="srow-label">Shaffoflik Effekti (Glassmorphism)</div>
+        <div class="srow-sub">Kartalar shaffof ko'rinishda bo'ladi</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="togGlass" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="srow">
+      <div>
+        <div class="srow-label">Animatsiyalar</div>
+        <div class="srow-sub">Sahifa o'tishlari va effektlar</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="togAnim" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="srow">
+      <div>
+        <div class="srow-label">Sidebar Shadow</div>
+        <div class="srow-sub">Yon panel soyasi</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="togShadow" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="scard">
+    <div class="scard-title">👁️ Ko'rinish Namunasi</div>
+    <div class="preview-box" id="previewBox">
+      <div style="font-weight:800;font-size:1rem;margin-bottom:8px;">Bilimxon Platformasi</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:12px;">Bu sizning yangi ko'rinishingiz qanday ko'rinadi</div>
+      <button class="preview-btn" id="previewBtn1">Asosiy Tugma</button>
+      <button class="preview-btn" id="previewBtn2" style="background:rgba(255,255,255,.08);color:white;">Ikkinchi Tugma</button>
+      <div class="preview-card">
+        <div class="preview-card-title">📚 Kurs Namunasi</div>
+        <div class="preview-card-sub">Bu karta ko'rinishi qanday bo'ladi</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Notifications -->
+  <div class="scard">
+    <div class="scard-title">🔔 Bildirishnomalar</div>
+    <div class="srow">
+      <div><div class="srow-label">Push bildirishnomalar</div><div class="srow-sub">Yangi xabar va faoliyatlar</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togNotif" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Do'stlik so'rovlari</div><div class="srow-sub">Kimdir do'st qo'shishni so'raganda</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togFriendNotif" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Masala javoblari</div><div class="srow-sub">Submitted kod natijasi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togProblemNotif" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Blog like va izohlar</div><div class="srow-sub">Postingizga reaction kelganda</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togBlogNotif" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Haftalik hisobot</div><div class="srow-sub">Haftalik o'quv natijalaringiz</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togWeekly"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <!-- Privacy -->
+  <div class="scard">
+    <div class="scard-title">🔒 Maxfiylik</div>
+    <div class="srow">
+      <div><div class="srow-label">Profilni hamma ko'ra oladi</div><div class="srow-sub">Tizimga kirmagan foydalanuvchilar ham</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togPublicProfile" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Online statusni ko'rsatish</div><div class="srow-sub">Do'stlar sizni onlayn ko'radi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togOnlineStatus" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Faollik statistikasini yashirish</div><div class="srow-sub">Ball va progress boshqalarga ko'rinmaydi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togHideStats"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Faqat do'stlar xabar yoza oladi</div><div class="srow-sub">Noma'lumlar chat yoza olmaydi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togFriendsOnly"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <!-- Account -->
+  <div class="scard">
+    <div class="scard-title">👤 Hisob</div>
+    <div class="srow">
+      <div><div class="srow-label">Parolni o'zgartirish</div><div class="srow-sub">Xavfsizlik uchun muntazam o'zgartiring</div></div>
+      <button onclick="openPassModal()" style="padding:7px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">O'zgartirish</button>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Tilni o'zgartirish</div><div class="srow-sub">Interfeys tili</div></div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="setLang('uz')" id="btnUZ" style="padding:6px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;">UZ</button>
+        <button onclick="setLang('ru')" id="btnRU" style="padding:6px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;">RU</button>
+        <button onclick="setLang('en')" id="btnEN" style="padding:6px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;">EN</button>
+      </div>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Ma'lumotlarni yuklab olish</div><div class="srow-sub">Barcha ma'lumotlaringiz JSON formatda</div></div>
+      <button onclick="exportData()" style="padding:7px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;">Yuklab olish</button>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label" style="color:#f87171;">Hisobni o'chirish</div><div class="srow-sub">Barcha ma'lumotlar o'chiriladi</div></div>
+      <button onclick="confirmDelete()" style="padding:7px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;color:#f87171;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;">O'chirish</button>
+    </div>
+  </div>
+
+  <!-- Display -->
+  <div class="scard">
+    <div class="scard-title">📱 Ko'rinish</div>
+    <div class="srow">
+      <div><div class="srow-label">Compact rejim</div><div class="srow-sub">Elementlar orasidagi bo'sh joy kamayadi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togCompact"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Topbar qisqa versiya</div><div class="srow-sub">Nav tugmalari faqat ikonka ko'rsatadi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togMinNav"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Avto ijro video</div><div class="srow-sub">Blog va Shorts videolari avtomatik o'ynaydi</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togAutoplay" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="srow-label">Ko'plab oyna uchun kengaytma</div><div class="srow-sub">Sidebar hamisha ko'rsatiladi keng ekranda</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="togWideSidebar" checked><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <!-- Password modal -->
+  <div id="passModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#111827;border-radius:16px;padding:24px;max-width:380px;width:100%;border:1px solid rgba(255,255,255,.1);">
+      <h3 style="color:#fff;margin-bottom:16px;font-size:1rem;">🔑 Parolni O'zgartirish</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <input class="um-input" id="oldPass" type="password" placeholder="Joriy parol" style="background:#1f2937;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 13px;color:#fff;font-family:inherit;width:100%;outline:none;">
+        <input class="um-input" id="newPass" type="password" placeholder="Yangi parol" style="background:#1f2937;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 13px;color:#fff;font-family:inherit;width:100%;outline:none;">
+        <input class="um-input" id="newPass2" type="password" placeholder="Yangi parolni takrorlang" style="background:#1f2937;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 13px;color:#fff;font-family:inherit;width:100%;outline:none;">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button onclick="changePass()" style="flex:1;padding:10px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;">Saqlash</button>
+        <button onclick="document.getElementById('passModal').style.display='none'" style="padding:10px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;cursor:pointer;font-family:inherit;">Bekor</button>
+      </div>
+    </div>
+  </div>
+
+    <button class="apply-btn" onclick="applySettings()">✅ Sozlamalarni Saqlash</button>
+  <button class="reset-btn" onclick="resetSettings()">↺ Standart Ko'rinishga Qaytarish</button>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const STORAGE_KEY = 'bx_settings_v1';
+
+let cfg = loadCfg();
+
+function loadCfg() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultCfg();
+  } catch(e) { return defaultCfg(); }
+}
+
+function defaultCfg() {
+  return {
+    bg: '#0a0e1a',
+    accent1: '#C9A84C',
+    accent2: '#8B6914',
+    font: "'Outfit',sans-serif",
+    radius: 12,
+    fontSize: 15,
+    glass: true,
+    anim: true,
+    shadow: true
+  };
+}
+
+function initUI() {
+  // BG
+  document.querySelectorAll('#bgColors .csw').forEach(el => {
+    el.classList.toggle('sel', el.dataset.bg === cfg.bg);
+    el.onclick = function() {
+      document.querySelectorAll('#bgColors .csw').forEach(e => e.classList.remove('sel'));
+      this.classList.add('sel');
+      cfg.bg = this.dataset.bg;
+      updatePreview();
+    };
+  });
+  document.getElementById('bgCustomColor').value = cfg.bg.startsWith('#') ? cfg.bg : '#0a0e1a';
+  document.getElementById('bgCustomColor').oninput = function() {
+    document.querySelectorAll('#bgColors .csw').forEach(e => e.classList.remove('sel'));
+    cfg.bg = this.value;
+    updatePreview();
+  };
+
+  // Accent
+  document.querySelectorAll('#accentColors .csw').forEach(el => {
+    el.classList.toggle('sel', el.dataset.accent1 === cfg.accent1);
+    el.onclick = function() {
+      document.querySelectorAll('#accentColors .csw').forEach(e => e.classList.remove('sel'));
+      this.classList.add('sel');
+      cfg.accent1 = this.dataset.accent1;
+      cfg.accent2 = this.dataset.accent2;
+      updatePreview();
+    };
+  });
+
+  // Font
+  document.querySelectorAll('#fontOpts .font-opt').forEach(el => {
+    el.classList.toggle('sel', el.dataset.font === cfg.font);
+    el.onclick = function() {
+      document.querySelectorAll('#fontOpts .font-opt').forEach(e => e.classList.remove('sel'));
+      this.classList.add('sel');
+      cfg.font = this.dataset.font;
+      updatePreview();
+    };
+  });
+
+  // Radius
+  var rr = document.getElementById('radiusRange');
+  rr.value = cfg.radius;
+  document.getElementById('radiusVal').textContent = cfg.radius + 'px';
+  rr.oninput = function() {
+    cfg.radius = parseInt(this.value);
+    document.getElementById('radiusVal').textContent = cfg.radius + 'px';
+    updatePreview();
+  };
+
+  // Font size
+  var fr = document.getElementById('fontSizeRange');
+  fr.value = cfg.fontSize;
+  document.getElementById('fontSizeVal').textContent = cfg.fontSize + 'px';
+  fr.oninput = function() {
+    cfg.fontSize = parseInt(this.value);
+    document.getElementById('fontSizeVal').textContent = cfg.fontSize + 'px';
+    updatePreview();
+  };
+
+  // Toggles
+  document.getElementById('togGlass').checked = cfg.glass;
+  document.getElementById('togAnim').checked = cfg.anim;
+  document.getElementById('togShadow').checked = cfg.shadow;
+  document.getElementById('togGlass').onchange = function() { cfg.glass = this.checked; updatePreview(); };
+  document.getElementById('togAnim').onchange = function() { cfg.anim = this.checked; };
+  document.getElementById('togShadow').onchange = function() { cfg.shadow = this.checked; };
+
+  updatePreview();
+}
+
+function updatePreview() {
+  var box = document.getElementById('previewBox');
+  var btn1 = document.getElementById('previewBtn1');
+  box.style.background = cfg.bg;
+  box.style.borderRadius = cfg.radius + 'px';
+  box.style.fontFamily = cfg.font;
+  box.style.fontSize = cfg.fontSize + 'px';
+  btn1.style.background = 'linear-gradient(135deg,' + cfg.accent1 + ',' + cfg.accent2 + ')';
+  btn1.style.borderRadius = (cfg.radius - 2) + 'px';
+}
+
+function applySettings() {
+  // Save extra toggles
+  cfg.notif = document.getElementById('togNotif')?.checked ?? true;
+  cfg.friendNotif = document.getElementById('togFriendNotif')?.checked ?? true;
+  cfg.problemNotif = document.getElementById('togProblemNotif')?.checked ?? true;
+  cfg.blogNotif = document.getElementById('togBlogNotif')?.checked ?? true;
+  cfg.weekly = document.getElementById('togWeekly')?.checked ?? false;
+  cfg.publicProfile = document.getElementById('togPublicProfile')?.checked ?? true;
+  cfg.onlineStatus = document.getElementById('togOnlineStatus')?.checked ?? true;
+  cfg.hideStats = document.getElementById('togHideStats')?.checked ?? false;
+  cfg.friendsOnly = document.getElementById('togFriendsOnly')?.checked ?? false;
+  cfg.compact = document.getElementById('togCompact')?.checked ?? false;
+  cfg.minNav = document.getElementById('togMinNav')?.checked ?? false;
+  cfg.autoplay = document.getElementById('togAutoplay')?.checked ?? true;
+  cfg.wideSidebar = document.getElementById('togWideSidebar')?.checked ?? true;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+  applyToPage(cfg);
+  showToast('Sozlamalar saqlandi! ✅', 'success');
+  setTimeout(() => location.reload(), 800);
+}
+
+function resetSettings() {
+  localStorage.removeItem(STORAGE_KEY);
+  showToast("Standart ko'rinishga qaytarildi", 'info');
+  setTimeout(() => location.reload(), 800);
+}
+
+function openPassModal() {
+  document.getElementById('passModal').style.display = 'flex';
+}
+
+async function changePass() {
+  const old = document.getElementById('oldPass').value;
+  const n1  = document.getElementById('newPass').value;
+  const n2  = document.getElementById('newPass2').value;
+  if(!old || !n1) { showToast('Barcha maydonlarni to\'ldiring', 'error'); return; }
+  if(n1 !== n2) { showToast('Yangi parollar mos kelmadi', 'error'); return; }
+  if(n1.length < 6) { showToast('Parol kamida 6 ta belgidan iborat bo\'lsin', 'error'); return; }
+  try {
+    const res = await api('/api/profile/change-password', {method:'POST', body:JSON.stringify({old_password:old, new_password:n1})});
+    showToast('Parol muvaffaqiyatli o\'zgartirildi! ✅', 'success');
+    document.getElementById('passModal').style.display = 'none';
+    ['oldPass','newPass','newPass2'].forEach(id => document.getElementById(id).value = '');
+  } catch(e) { showToast(e.message || 'Xato parol', 'error'); }
+}
+
+async function exportData() {
+  try {
+    const me = await api('/api/me');
+    const data = { user: me, exported_at: new Date().toISOString(), platform: 'Bilimxon' };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bilimxon_data_${me.username}_${Date.now()}.json`;
+    a.click();
+    showToast('Ma\'lumotlar yuklab olindi ✅', 'success');
+  } catch(e) { showToast('Xato yuz berdi', 'error'); }
+}
+
+function confirmDelete() {
+  if(confirm("Hisobni o'chirmoqchimisiz? Bu amal qaytarib bo'lmaydi!")) {
+    if(prompt("Tasdiqlash uchun 'O\'CHIRISH' deb yozing:") === "O'CHIRISH") {
+      api('/api/profile/delete-account', {method:'DELETE'})
+        .then(() => { showToast('Hisob o\'chirildi', 'info'); setTimeout(()=>window.location='/', 1500); })
+        .catch(e => showToast(e.message, 'error'));
+    }
+  }
+}
+
+// Init lang buttons
+document.addEventListener('DOMContentLoaded', () => {
+  initUI();
+  const curLang = (document.cookie.match(/lang=([^;]+)/) || [])[1] || 'uz';
+  document.getElementById('btnUZ')?.style && (document.getElementById('btnUZ').style.background = curLang==='uz' ? 'rgba(201,168,76,.3)' : '');
+  document.getElementById('btnRU')?.style && (document.getElementById('btnRU').style.background = curLang==='ru' ? 'rgba(201,168,76,.3)' : '');
+  document.getElementById('btnEN')?.style && (document.getElementById('btnEN').style.background = curLang==='en' ? 'rgba(201,168,76,.3)' : '');
+  loadMyTickets();
+});
+
+// ── SUPPORT TICKETS ──
+let currentTicketType = 'bug';
+
+const TICKET_HINTS = {
+  bug: '🐛 <strong style="color:rgba(255,255,255,.8);">Bug xabari:</strong> Nima yuz berdi, qaysi sahifada, qanday qadam bosib xatoga keldingiz — shularni yozing. Moderatorgа yetkaziladi.',
+  question: '❓ <strong style="color:rgba(255,255,255,.8);">Savol:</strong> Savolingizni yozing. Moderator javob beradi.',
+  vacancy: '💼 <strong style="color:rgba(255,255,255,.8);">Vakansiya:</strong> Qaysi lavozimda ishlashni xohlaysiz, tajribangiz haqida yozing. Bilimxon asoschi adminga yetkaziladi.',
+};
+
+function setTicketType(type, btn) {
+  currentTicketType = type;
+  document.querySelectorAll('.s-ticket-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ticketHint').innerHTML = TICKET_HINTS[type];
+  const labels = {bug:'Xato tavsifi', question:'Savolingiz', vacancy:'Ariza matni'};
+  document.getElementById('msgLabel').textContent = labels[type]||'Xabar';
+  const placeholders = {bug:'Nima xato yuz berdi? Qaysi sahifada?', question:'Savolingizni batafsil yozing...', vacancy:'Lavozim, tajriba, ko\'nikmalar...'};
+  document.getElementById('ticketMessage').placeholder = placeholders[type];
+}
+
+async function sendTicket() {
+  const subject = document.getElementById('ticketSubject').value.trim();
+  const message = document.getElementById('ticketMessage').value.trim();
+  if(!subject) { showToast('Mavzuni kiriting!','error'); return; }
+  if(!message) { showToast('Xabar yozing!','error'); return; }
+  const btn = document.getElementById('ticketBtn');
+  btn.disabled=true; btn.textContent='⏳ Yuborilmoqda...';
+  try {
+    await api('/api/support/submit', {method:'POST', body:JSON.stringify({type:currentTicketType, subject, message})});
+    showToast('✅ Murojaatingiz yuborildi!','success');
+    document.getElementById('ticketSubject').value='';
+    document.getElementById('ticketMessage').value='';
+    loadMyTickets();
+  } catch(e) { showToast(e.message,'error'); }
+  btn.disabled=false; btn.textContent='📤 Yuborish';
+}
+
+async function loadMyTickets() {
+  const list = document.getElementById('myTicketsList');
+  if(!list) return;
+  try {
+    const tickets = await api('/api/support/tickets');
+    if(!tickets.length) { list.innerHTML='<span style="color:#555;">Hali murojaatlar yo\'q</span>'; return; }
+    const typeIcons = {bug:'🐛', question:'❓', vacancy:'💼'};
+    list.innerHTML = tickets.slice(0,5).map(t => `
+      <div class="ticket-item">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-weight:700;color:#fff;font-size:.82rem;">${typeIcons[t.ticket_type]||'📩'} ${t.subject}</span>
+          <span class="ticket-status-${t.status}">${t.status==='resolved'?'✅ Javob berildi':'⏳ Kutilmoqda'}</span>
+        </div>
+        <div style="font-size:.75rem;color:#666;">${timeAgo(t.created_at)}</div>
+        ${t.reply ? `<div style="margin-top:6px;background:rgba(74,222,128,.08);border-radius:8px;padding:7px 10px;font-size:.78rem;color:#d0d0d0;border-left:3px solid #4ade80;"><strong style="color:#4ade80;">Javob:</strong> ${t.reply}</div>` : ''}
+      </div>`).join('');
+  } catch(e) { list.innerHTML=''; }
+}
+</script>
+</body>
+</html>

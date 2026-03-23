@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilimxon — O'yin</title>
+  <link rel="icon" href="/static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+body{font-family:'Outfit',sans-serif;background:linear-gradient(160deg,#0d1b2e 0%,#111827 60%,#0a0e1a 100%);min-height:100vh;}
+.gd-wrap{padding-top:88px;max-width:1080px;margin:0 auto;padding-left:20px;padding-right:20px;padding-bottom:60px;}
+/* Breadcrumb */
+.breadcrumb{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.35);font-size:.82rem;margin-bottom:20px;}
+.breadcrumb a{color:rgba(255,255,255,.4);text-decoration:none;transition:.15s;}
+.breadcrumb a:hover{color:#a78bfa;}
+.breadcrumb span{color:rgba(255,255,255,.2);}
+/* Game player box */
+.game-player-box{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;margin-bottom:28px;position:relative;}
+.game-cover{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#1a1035,#2a0860);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;}
+.game-cover-thumb{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;opacity:.4;}
+.game-cover-content{position:relative;z-index:1;text-align:center;}
+.game-cover-icon{font-size:5rem;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(124,58,237,.6));}
+.game-cover h2{font-size:1.6rem;font-weight:900;color:white;margin-bottom:16px;}
+.play-btn{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;border:none;padding:16px 40px;border-radius:16px;font-size:1.1rem;font-weight:800;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(124,58,237,.5);}
+.play-btn:hover{transform:scale(1.05);box-shadow:0 12px 40px rgba(124,58,237,.65);}
+.game-iframe-wrap{width:100%;aspect-ratio:16/9;display:none;position:relative;}
+.game-iframe-wrap iframe{width:100%;height:100%;border:none;display:block;}
+.fullscreen-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);color:white;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem;z-index:10;transition:.15s;}
+.fullscreen-btn:hover{background:rgba(124,58,237,.5);}
+/* Info section */
+.gd-info{display:grid;grid-template-columns:1fr 320px;gap:28px;}
+@media(max-width:700px){.gd-info{grid-template-columns:1fr;}}
+/* Left: title, desc */
+.gd-main{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:24px;}
+.gd-cat{font-size:.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.gd-title{font-size:1.8rem;font-weight:900;color:white;margin-bottom:12px;line-height:1.2;}
+.gd-author{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.gd-author-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B2A4A,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:.9rem;overflow:hidden;flex-shrink:0;}
+.gd-author-avatar img{width:100%;height:100%;object-fit:cover;}
+.gd-author-name{font-weight:700;color:rgba(255,255,255,.7);font-size:.9rem;}
+.gd-author-sub{font-size:.75rem;color:rgba(255,255,255,.3);}
+.gd-desc{color:rgba(255,255,255,.55);font-size:.92rem;line-height:1.7;}
+/* Right: stats + rating */
+.gd-side{display:flex;flex-direction:column;gap:18px;}
+.gd-stats-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;}
+.gd-stat-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.gd-stat-row:last-child{border-bottom:none;}
+.gd-stat-label{color:rgba(255,255,255,.4);font-size:.83rem;}
+.gd-stat-val{color:white;font-weight:700;font-size:.9rem;}
+/* Rating card */
+.gd-rating-card{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:16px;padding:20px;}
+.gd-rating-card h3{font-size:.85rem;font-weight:800;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.rating-avg-big{font-size:2.8rem;font-weight:900;color:#C9A84C;text-align:center;line-height:1;}
+.rating-avg-stars{text-align:center;font-size:1.3rem;margin:6px 0 2px;}
+.rating-count-text{text-align:center;font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:18px;}
+.star-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;}
+.star-btn{background:none;border:none;font-size:1.8rem;cursor:pointer;transition:.15s;filter:grayscale(1);opacity:.4;padding:2px;}
+.star-btn.lit{filter:grayscale(0);opacity:1;transform:scale(1.15);}
+.star-btn:hover{filter:grayscale(0);opacity:1;}
+.rate-label{text-align:center;font-size:.8rem;color:rgba(255,255,255,.35);margin-bottom:12px;min-height:1.2em;}
+.rate-submit{width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;border:none;padding:11px;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s;}
+.rate-submit:hover:not(:disabled){transform:translateY(-1px);}
+.rate-submit:disabled{opacity:.4;cursor:not-allowed;}
+/* Back btn */
+.back-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:.85rem;text-decoration:none;transition:.15s;margin-bottom:20px;}
+.back-link:hover{color:#a78bfa;}
+  </style>
+</head>
+<body>
+<nav class="topbar" id="topbar"></nav>
+
+<div class="gd-wrap">
+  <a href="/games" class="back-link">← O'yinlarga qaytish</a>
+
+  <!-- Game Player -->
+  <div class="game-player-box">
+    <!-- Cover (before play) -->
+    <div class="game-cover" id="gameCover" onclick="startGame()">
+      <img class="game-cover-thumb" id="coverThumb" src="" alt="" style="display:none;">
+      <div class="game-cover-content">
+        <div class="game-cover-icon">🎮</div>
+        <h2 id="coverTitle">Yuklanmoqda...</h2>
+        <button class="play-btn">▶ O'ynash</button>
+      </div>
+    </div>
+    <!-- IFrame (after play) -->
+    <div class="game-iframe-wrap" id="iframeWrap">
+      <button class="fullscreen-btn" onclick="goFullscreen()">⛶ To'liq ekran</button>
+      <iframe id="gameFrame" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-orientation-lock"></iframe>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="gd-info">
+    <div class="gd-main" id="gameMain">
+      <div class="spinner" style="margin:20px auto;width:28px;height:28px;border-width:3px;border-color:rgba(255,255,255,.1);border-top-color:#7c3aed;"></div>
+    </div>
+    <div class="gd-side">
+      <!-- Stats -->
+      <div class="gd-stats-card" id="gameStats">
+        <div style="color:rgba(255,255,255,.3);text-align:center;padding:16px;">Yuklanmoqda...</div>
+      </div>
+      <!-- Rating -->
+      <div class="gd-rating-card">
+        <h3>⭐ Baholash</h3>
+        <div class="rating-avg-big" id="ratingBig">—</div>
+        <div class="rating-avg-stars" id="ratingStars">☆☆☆☆☆</div>
+        <div class="rating-count-text" id="ratingCount">Hali baho yo'q</div>
+
+        <div class="star-row" id="starRow">
+          <button class="star-btn" data-v="1" onclick="pickStar(1)">⭐</button>
+          <button class="star-btn" data-v="2" onclick="pickStar(2)">⭐</button>
+          <button class="star-btn" data-v="3" onclick="pickStar(3)">⭐</button>
+          <button class="star-btn" data-v="4" onclick="pickStar(4)">⭐</button>
+          <button class="star-btn" data-v="5" onclick="pickStar(5)">⭐</button>
+        </div>
+        <div class="rate-label" id="rateLabel">Bahoingizni tanlang</div>
+        <button class="rate-submit" id="rateBtn" onclick="submitRating()" disabled>Baholash</button>
+      </div>
+
+      <!-- Monetizatsiya panel (faqat muallif uchun) -->
+      <div id="gameMonetCard" style="display:none;" class="gd-rating-card">
+        <h3 style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="showGameMonetization()">
+          💰 Monetizatsiya
+          <span style="font-size:.65rem;background:rgba(201,168,76,.15);color:#C9A84C;padding:2px 7px;border-radius:999px;font-weight:700;">MUALLIF</span>
+        </h3>
+        <div id="gameMonetPanel" style="margin-top:10px;">
+          <div style="font-size:.8rem;color:#888;text-align:center;padding:12px;">Yuklash uchun bosing ↑</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMENTS SECTION -->
+    <div id="gameCommentsSection" style="margin-top:20px;max-width:700px;">
+      <div style="background:#161b22;border:2px solid #21262d;border-radius:18px;padding:20px;">
+        <h3 style="font-size:.95rem;font-weight:800;color:#fff;margin:0 0 16px;display:flex;align-items:center;gap:8px;">💬 Izohlar</h3>
+        <!-- Input -->
+        <div style="display:flex;gap:10px;margin-bottom:16px;">
+          <textarea id="commentInput" placeholder="O'yin haqida fikringizni yozing..." rows="2"
+            style="flex:1;background:#0d1117;border:1.5px solid #21262d;border-radius:12px;padding:10px 14px;color:#fff;font-family:inherit;font-size:.85rem;outline:none;resize:none;transition:.15s;"
+            onkeydown="if(event.ctrlKey&&event.key==='Enter'){postGameComment();}"
+            onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#21262d'"></textarea>
+          <button id="commentBtn" onclick="postGameComment()"
+            style="padding:10px 18px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;white-space:nowrap;align-self:flex-end;">
+            📤 Yuborish
+          </button>
+        </div>
+        <!-- List -->
+        <div id="commentsList">
+          <div style="text-align:center;color:#555;font-size:.82rem;padding:20px;">Yuklanmoqda...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const GAME_ID = parseInt(window.location.pathname.split('/').pop());
+let gameData = null;
+let chosenRating = 0;
+
+const rateLabels = ['', '😐 Yomon', '🙂 Oddiy', '😊 Yaxshi', '😃 Juda yaxshi', '🤩 Zo\'r!'];
+
+async function loadGame() {
+  try {
+    const g = await api('/api/games/' + GAME_ID);
+    gameData = g;
+    document.title = `Bilimxon — ${g.title}`;
+
+    // Update cover
+    document.getElementById('coverTitle').textContent = g.title;
+    if (g.thumbnail) {
+      const th = document.getElementById('coverThumb');
+      th.src = g.thumbnail; th.style.display = 'block';
+    }
+
+    // Main info
+    const authorAvatar = g.avatar
+      ? `<img src="${g.avatar}" alt="">`
+      : `<span>${(g.full_name||'?')[0].toUpperCase()}</span>`;
+
+    document.getElementById('gameMain').innerHTML = `
+      <div class="gd-cat">${g.category || 'O\'yin'}</div>
+      <div class="gd-title">${g.title}</div>
+      <div class="gd-author">
+        <div class="gd-author-avatar">${authorAvatar}</div>
+        <div>
+          <div class="gd-author-name">${g.full_name || g.username}</div>
+          <div class="gd-author-sub">@${g.username} · Muallif</div>
+        </div>
+      </div>
+      <div class="gd-desc">${g.description || "<em style='opacity:.4'>Tavsif yo'q</em>"}</div>
+    `;
+
+    // Stats
+    document.getElementById('gameStats').innerHTML = `
+      <div class="gd-stat-row">
+        <span class="gd-stat-label">👁 Ko'rishlar</span>
+        <span class="gd-stat-val">${(g.views||0).toLocaleString()}</span>
+      </div>
+      <div class="gd-stat-row">
+        <span class="gd-stat-label">⭐ Reyting</span>
+        <span class="gd-stat-val">${g.rating_count ? g.rating_avg.toFixed(1) + '/5' : 'Baholanmagan'}</span>
+      </div>
+      <div class="gd-stat-row">
+        <span class="gd-stat-label">📅 Yuklangan</span>
+        <span class="gd-stat-val">${g.created_at ? g.created_at.split('T')[0] : '—'}</span>
+      </div>
+      <div class="gd-stat-row">
+        <span class="gd-stat-label">🏷️ Kategoriya</span>
+        <span class="gd-stat-val">${g.category || 'Boshqa'}</span>
+      </div>
+    `;
+
+    // Rating display
+    updateRatingDisplay(g.rating_avg, g.rating_count);
+
+    // User's previous rating
+    if (g.user_rating) {
+      chosenRating = g.user_rating;
+      highlightStars(chosenRating);
+      document.getElementById('rateLabel').textContent = rateLabels[chosenRating] || '';
+      document.getElementById('rateBtn').disabled = false;
+      document.getElementById('rateBtn').textContent = 'Yangilash';
+    }
+
+    // Show monetization card for author
+    try {
+      const me = await api('/api/me');
+      if(me.logged_in && me.id === g.author_id) {
+        document.getElementById('gameMonetCard').style.display = '';
+      }
+    } catch(e2) {}
+
+    // Load comments
+    loadGameComments();
+  } catch(e) {
+    document.getElementById('gameMain').innerHTML = `<p style="color:#ef4444;">Xatolik: ${e.message}</p>`;
+  }
+}
+
+async function loadGameComments() {
+  const section = document.getElementById('gameCommentsSection');
+  if (!section) return;
+  try {
+    const comments = await api(`/api/games/${GAME_ID}/comments`);
+    const list = document.getElementById('commentsList');
+    if (!comments.length) {
+      list.innerHTML = `<div style="text-align:center;color:#555;font-size:.82rem;padding:20px;">Hali izoh yo'q. Birinchi bo'ling!</div>`;
+      return;
+    }
+    list.innerHTML = comments.map(c => `
+      <div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #1e1e1e;">
+        <div style="width:34px;height:34px;border-radius:50%;background:#1e1e1e;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#aaa;flex-shrink:0;overflow:hidden;">
+          ${c.avatar ? `<img src="${c.avatar}" style="width:100%;height:100%;object-fit:cover;">` : (c.full_name||'?')[0]}
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="font-size:.82rem;font-weight:800;color:#fff;">${c.full_name||c.username}</span>
+            ${c.has_tick ? '<span style="color:#C9A84C;font-size:.7rem;">✓</span>' : ''}
+            <span style="font-size:.68rem;color:#444;">${new Date(c.created_at).toLocaleDateString('uz')}</span>
+          </div>
+          <div style="font-size:.82rem;color:rgba(255,255,255,.7);line-height:1.5;">${escapeHtmlC(c.content)}</div>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function postGameComment() {
+  const input = document.getElementById('commentInput');
+  const btn = document.getElementById('commentBtn');
+  const content = input?.value.trim();
+  if (!content) { showToast('Izoh yozing!', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    await api(`/api/games/${GAME_ID}/comments`, {method:'POST', body:JSON.stringify({content})});
+    input.value = '';
+    await loadGameComments();
+    showToast('Izoh qo\'shildi ✅', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+  btn.disabled = false; btn.textContent = '📤 Yuborish';
+}
+
+function escapeHtmlC(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateRatingDisplay(avg, cnt) {
+  document.getElementById('ratingBig').textContent = cnt ? avg.toFixed(1) : '—';
+  const full = cnt ? Math.round(avg) : 0;
+  document.getElementById('ratingStars').textContent = '⭐'.repeat(full) + '☆'.repeat(5 - full);
+  document.getElementById('ratingCount').textContent = cnt ? `${cnt} ta baho` : 'Hali baho yo\'q';
+}
+
+function pickStar(v) {
+  chosenRating = v;
+  highlightStars(v);
+  document.getElementById('rateLabel').textContent = rateLabels[v] || '';
+  document.getElementById('rateBtn').disabled = false;
+}
+
+function highlightStars(v) {
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.toggle('lit', parseInt(btn.dataset.v) <= v);
+  });
+}
+
+async function submitRating() {
+  if (!chosenRating) return;
+  const btn = document.getElementById('rateBtn');
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const data = await api(`/api/games/${GAME_ID}/rate`, { method:'POST', body: JSON.stringify({ rating: chosenRating }) });
+    updateRatingDisplay(data.rating_avg, data.rating_count);
+    showToast('Bahoyingiz saqlandi! ⭐', 'success');
+    btn.textContent = 'Yangilash';
+    btn.disabled = false;
+  } catch(e) {
+    showToast(e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Baholash';
+  }
+}
+
+function startGame() {
+  if (!gameData || !gameData.game_url) {
+    showToast("O'yin fayli topilmadi", 'error'); return;
+  }
+  // Increment view
+  api(`/api/games/${GAME_ID}/view`, { method: 'POST' }).catch(()=>{});
+
+  document.getElementById('gameCover').style.display = 'none';
+  const iw = document.getElementById('iframeWrap');
+  iw.style.display = 'block';
+  document.getElementById('gameFrame').src = gameData.game_url;
+
+  // Update view count locally
+  if (gameData) {
+    gameData.views = (gameData.views || 0) + 1;
+    const sv = document.querySelector('.gd-stat-val');
+    if (sv) sv.textContent = gameData.views.toLocaleString();
+  }
+}
+
+function goFullscreen() {
+  const frame = document.getElementById('gameFrame');
+  if (frame.requestFullscreen) frame.requestFullscreen();
+  else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
+}
+
+// ── GAME MONETIZATSIYA ──
+let gameMonetLoaded = false;
+async function showGameMonetization() {
+  if(gameMonetLoaded) return;
+  gameMonetLoaded = true;
+  const panel = document.getElementById('gameMonetPanel');
+  if(!panel) return;
+  panel.innerHTML = '<div style="color:#888;padding:20px;text-align:center;">Yuklanmoqda...</div>';
+  try {
+    const m = await api(`/api/games/${GAME_ID}/monetization/status`);
+    const fmtNum = n => n>=1000?(n/1000).toFixed(1)+'K':String(n||0);
+    const reqHtml = m.requirements.map(r => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:7px;border:1px solid ${r.met?'rgba(74,222,128,.2)':'rgba(255,255,255,.06)'};">
+        <div style="width:26px;height:26px;border-radius:50%;background:${r.met?'rgba(74,222,128,.2)':'rgba(239,68,68,.1)'};display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0;">${r.met?'✓':'✗'}</div>
+        <div style="flex:1;">
+          <div style="font-size:.82rem;font-weight:700;color:#fff;">${r.label}</div>
+          <div style="font-size:.7rem;color:#888;margin-top:1px;">${fmtNum(r.current)} / ${fmtNum(r.target)}</div>
+          <div style="height:3px;background:#21262d;border-radius:99px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;background:${r.met?'#22c55e':'#C9A84C'};border-radius:99px;width:${Math.min(100,Math.round(r.current/r.target*100))}%;transition:.5s;"></div>
+          </div>
+        </div>
+      </div>`).join('');
+
+    const isEnabled = m.status === 'approved';
+    panel.innerHTML = `
+      <div style="background:${isEnabled?'rgba(74,222,128,.08)':'rgba(201,168,76,.06)'};border:1px solid ${isEnabled?'rgba(74,222,128,.25)':'rgba(201,168,76,.15)'};border-radius:14px;padding:18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+        <div style="font-size:2rem;">${isEnabled?'💰':'🔒'}</div>
+        <div>
+          <div style="font-weight:900;font-size:1rem;color:#fff;">${isEnabled?'Monetizatsiya yoqilgan ✅':'Monetizatsiya yoqilmagan'}</div>
+          <div style="font-size:.78rem;color:#888;margin-top:3px;">${isEnabled?`Reklama kliklari: ${m.total_ad_clicks}`:'Quyidagi talablarni bajaring'}</div>
+        </div>
+        ${!isEnabled && m.all_met ? `<button onclick="applyGameMonet()" style="margin-left:auto;padding:9px 18px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:10px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.83rem;">✅ Yoqish</button>` : ''}
+      </div>
+      <div style="font-weight:800;color:#fff;margin-bottom:10px;font-size:.85rem;">📋 Talablar</div>
+      ${reqHtml}
+      ${isEnabled ? `
+      <div style="margin-top:18px;border-top:1px solid rgba(255,255,255,.07);padding-top:16px;">
+        <div style="font-weight:800;color:#fff;margin-bottom:12px;font-size:.85rem;">📣 Reklama Sozlamalari</div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <input id="gAdTitle" value="${m.ad_title||''}" placeholder="Reklama sarlavhasi" style="padding:9px 12px;background:#161b22;border:1.5px solid #21262d;border-radius:8px;color:#fff;font-family:inherit;font-size:.83rem;outline:none;width:100%;">
+          <textarea id="gAdDesc" placeholder="Qisqa tavsif" rows="2" style="padding:9px 12px;background:#161b22;border:1.5px solid #21262d;border-radius:8px;color:#fff;font-family:inherit;font-size:.83rem;outline:none;resize:none;width:100%;">${m.ad_description||''}</textarea>
+          <input id="gAdLink" value="${m.ad_link||''}" placeholder="https://sizningsayt.com" style="padding:9px 12px;background:#161b22;border:1.5px solid #21262d;border-radius:8px;color:#fff;font-family:inherit;font-size:.83rem;outline:none;width:100%;">
+          <input id="gAdCta" value="${m.ad_cta||"O'ynash"}" placeholder="CTA tugma matni" style="padding:9px 12px;background:#161b22;border:1.5px solid #21262d;border-radius:8px;color:#fff;font-family:inherit;font-size:.83rem;outline:none;width:100%;">
+          <button onclick="saveGameAdSettings()" style="padding:10px;background:linear-gradient(135deg,#C9A84C,#8B6914);border:none;border-radius:8px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.83rem;">💾 Reklama Saqlash</button>
+        </div>
+      </div>` : ''}`;
+  } catch(e) {
+    panel.innerHTML = `<p style="color:#f87171;text-align:center;padding:20px;">${e.message}</p>`;
+  }
+}
+
+async function applyGameMonet() {
+  try {
+    await api(`/api/games/${GAME_ID}/monetization/apply`, {method:'POST'});
+    showToast('💰 Monetizatsiya yoqildi! ✅','success');
+    gameMonetLoaded = false; showGameMonetization();
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+async function saveGameAdSettings() {
+  const d = {
+    ad_title: document.getElementById('gAdTitle')?.value.trim()||'',
+    ad_description: document.getElementById('gAdDesc')?.value.trim()||'',
+    ad_link: document.getElementById('gAdLink')?.value.trim()||'',
+    ad_cta: document.getElementById('gAdCta')?.value.trim()||"O'ynash",
+  };
+  if(!d.ad_link) { showToast('Reklama linkini kiriting!','error'); return; }
+  try {
+    await api(`/api/games/${GAME_ID}/monetization/settings`,{method:'POST',body:JSON.stringify(d)});
+    showToast('Reklama saqlandi ✅','success');
+  } catch(e) { showToast(e.message,'error'); }
+}
+
+document.addEventListener('DOMContentLoaded', loadGame);
+</script>
+</body>
+</html>
